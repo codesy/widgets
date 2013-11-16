@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+
+  "name": "codesy.io",
+  "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
+  "version": "1.0",
+
+  "permissions": [
+    "https://codesy.io/"
+  ],
+
+  "web_accessible_resources": [
+      "img/codesy-100x27.png",
+      "jquery-2.0.3.min.js",
+      "jquery-2.0.3.min.map"
+  ],
+
+  "content_scripts" : [
+    {
+      "matches" : [
+        "https://github.com/*/*/issues/*"
+      ],
+      "js" : [
+        "jquery-2.0.3.min.js",
+        "github.js"
+      ],
+      "run_at" : "document_idle",
+      "all_frames" : false
+    }
+  ]
+
+}
