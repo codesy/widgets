@@ -12,3 +12,8 @@ Getting Started with Development
   Chrome](http://developer.chrome.com/extensions/getstarted.html#unpacked)
 3. Fiddle with the code
 4. Reload the extension page in Chrome
+
+Developing with patronage
+-------------------------
+
+By default, the add-on communicates with [codesy.io](http://codesy.io). You should use the [dev.codesy.io](http://dev.codesy.io) site while you work on the add-on. You can configure the extension to use another domain in the extension Options.
