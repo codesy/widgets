@@ -5,7 +5,11 @@
   "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
   "version": "1.0",
 
+  "options_page": "options.html",
+
   "permissions": [
+    "storage",
+    "https://dev.codesy.io/",
     "https://codesy.io/"
   ],
 
@@ -19,6 +23,9 @@
     {
       "matches" : [
         "https://github.com/*/*/issues/*"
+      ],
+      "css" : [
+        "github.css"
       ],
       "js" : [
         "jquery-2.0.3.min.js",

@@ -3,12 +3,19 @@
 // * Whether the bug has any bids in codesy
 // * An offer input, filled with user's existing bid if applicable
 // * An ask input, filled with user's existing bid if applicable
-var codesyImgUrl = chrome.extension.getURL("img/codesy-100x27.png");
-$(".discussion-sidebar").append('<img src="' + codesyImgUrl + '"/>');
+chrome.storage.local.get(function(options){
+  var codesyImgUrl = chrome.extension.getURL("img/codesy-100x27.png"),
+      codesyDomain = options.domain;
 
-/*
-xhr.open("GET", "https://codesy.io/bids?url=" window.location);
-xhr.onreadystatechange = function() {
-  alert("got bids back from codesy: " + xhr.responseText);
-}
-*/
+  var html = '<img src="' + codesyImgUrl + '"/>' +
+      '<form id="codesy" action="https://' + codesyDomain + '/bids" method="POST">' +
+      '<input type="text" placeholder="offer amount" id="bid_offer" name="bid[offer]"/><br/>' +
+      '<input type="text" placeholder="ask amount" id="bid_ask" name="bid[ask]"/><br/>' +
+      '<a class="button minibutton">Bid</a>';
+  $(".discussion-sidebar").append(html);
+  $form = $("form#codesy");
+  $form.find("a.button").click(function(){
+    $form.submit();
+  });
+  var bid = $.getJSON('//' + codesyDomain + '/api/v1/bids.json?url=' + window.location);
+});
