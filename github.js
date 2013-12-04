@@ -7,11 +7,14 @@ chrome.storage.local.get(function(options){
   var codesyImgUrl = chrome.extension.getURL("img/codesy-100x27.png"),
       codesyDomain = options.domain;
 
-  var html = '<img src="' + codesyImgUrl + '"/>' +
+  var html = '<hr/>' +
+      '<div id="codesy-widget">' +
+      '<img src="' + codesyImgUrl + '"/>' +
       '<form id="codesy" action="https://' + codesyDomain + '/bids" method="POST">' +
       '<input type="text" placeholder="offer amount" id="bid_offer" name="bid[offer]"/><br/>' +
       '<input type="text" placeholder="ask amount" id="bid_ask" name="bid[ask]"/><br/>' +
-      '<a class="button minibutton">Bid</a>';
+      '<a class="button minibutton">Bid</a>' +
+      '</div>';
   $(".discussion-sidebar").append(html);
   $form = $("form#codesy");
   $form.find("a.button").click(function(){
