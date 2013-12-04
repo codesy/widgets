@@ -16,7 +16,8 @@
   "permissions": [
     "storage",
     "https://dev.codesy.io/",
-    "https://codesy.io/"
+    "https://codesy.io/",
+    "https://codesy-dev.herokuapp.com/"
   ],
 
   "web_accessible_resources": [
