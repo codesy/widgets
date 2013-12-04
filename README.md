@@ -16,4 +16,8 @@ Getting Started with Development
 Developing with patronage
 -------------------------
 
-By default, the add-on communicates with [codesy.io](http://codesy.io). You should use the [dev.codesy.io](http://dev.codesy.io) site while you work on the add-on. You can configure the extension to use another domain in the extension Options.
+By default, the extension communicates with
+[api.codesy.io](http://api.codesy.io). You should use the
+[codesy-dev.herokuapp.com](https://codesy-dev.herokuapp.com) dev site while you
+work on the extension. Configure the extension to use domain
+`codesy-dev.herokuapp.com` in the extension Options.

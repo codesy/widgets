@@ -12,6 +12,7 @@ function saveOptions() {
 function loadOptions() {
   chrome.storage.local.get(function(options){
     var domain = options.domain;
+    if (!domain) { domain = "api.codesy.io"; }
     document.getElementById("domain").value = domain;
   });
 }
