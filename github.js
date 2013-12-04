@@ -9,7 +9,7 @@ chrome.storage.local.get(function(options){
 
   var html = '<hr/>' +
       '<div id="codesy-widget">' +
-      '<img src="' + codesyImgUrl + '"/>' +
+      '<a href="http://codesy.io" target="_new"><img src="' + codesyImgUrl + '"/></a>' +
       '<form id="codesy" action="https://' + codesyDomain + '/bids" method="POST">' +
       '<input type="text" placeholder="offer amount" id="bid_offer" name="bid[offer]"/><br/>' +
       '<input type="text" placeholder="ask amount" id="bid_ask" name="bid[ask]"/><br/>' +
