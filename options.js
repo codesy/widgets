@@ -1,4 +1,4 @@
-var domains=['api.codesy.io','codesy-stage-herokuapp.com','codesy-dev-herokuapp.com']
+var domains=['api.codesy.io','codesy-stage.herokuapp.com','codesy-dev.herokuapp.com']
 
 
 function saveOptions() {
