@@ -1,16 +1,40 @@
 <html>
   <head>
-    <title>codesy Extension Options</title>
+    <title>codesy options</title>
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!-- Custom styles for this template -->
+    <link href="css/jumbotron-narrow.css" rel="stylesheet">
+    
+    <link href="css/options.css" rel="stylesheet" type="text/css">
+    
     <script src="jquery-2.0.3.min.js"></script>
 
   </head>
 
   <body>
-    <label for="domain">Domain:</label>
-    <select id='domain_list'></select>
-    <br/>
-    <div id="status"></div>
-    <button id="save">Save</button>
+      
+      <div class="container">
+        <div class="header">
+          <ul class="nav nav-pills pull-right">
+              <img src='img/codesy-100x27.png'/>
+          </ul>
+          <h3 class="text-muted">codesy.io</h3>
+        </div>
+      
+        <div class="row marketing">
+          <p> <strong>Options</strong></p>
+          <label for="domain">Choose a domain:</label>
+          <select id='domain_list'></select>
+          <br/>
+          <div id="status"></div>
+          <button id="save">Save</button>
+
+        </div>
+
+    </div> <!-- /container -->
+      
   </body>
 
   <script src="options.js"></script>

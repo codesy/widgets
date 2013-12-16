@@ -1,6 +1,5 @@
 var domains=['api.codesy.io','codesy-stage.herokuapp.com','codesy-dev.herokuapp.com']
-
-
+  
 function saveOptions() {
   var domain = $('#domain_list').val();
   chrome.storage.local.set({"domain": domain});
