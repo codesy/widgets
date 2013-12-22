@@ -36,6 +36,7 @@
       ],
       "js" : [
         "js/jquery-2.0.3.min.js",
+        "js/codesy.js",        
         "js/github.js"
       ],
       "run_at" : "document_idle",

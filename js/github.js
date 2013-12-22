@@ -7,10 +7,10 @@
 chrome.storage.local.get(function(options){
   var codesyImgUrl = chrome.extension.getURL("img/codesy-100x27.png"),
       codesyDomain = options.domain;
+      
+  codesy = new codesy_api(codesyDomain);
 
-  $.ajax({
-    url: "https://" + codesyDomain + "/api/v1/csrf_token.json"
-  }).done(function(data) {
+  codesy.csrf_token().done(function(data) {
     console.log("$.ajax successful.");
     console.log(data);
 
@@ -21,13 +21,14 @@ chrome.storage.local.get(function(options){
   });
 
 });
+
 var appendForm = function(codesyImgUrl, codesyDomain, csrfToken) {
   var $codesy_link = $('<a href="http://codesy.io" target="_new"><img src="' + codesyImgUrl + '"/></a>' ),
   $codesy_form = $('<form>'),  
   $submit_button = $('<button>')
     .attr('class','button minibutton')
     .text('Bid')
-    .click(function(){$codesy_form.submit();})
+    .click(function(){$codesy_form.submit();});
 
   $codesy_form 
     .attr('id','codesy')
