@@ -13,7 +13,6 @@ chrome.storage.local.get(function(options){
   codesy.csrf_token().done(function(data) {
     console.log("$.ajax successful.");
     console.log(data);
-
     appendForm(codesyImgUrl, codesyDomain, data.csrf_token);
   }).fail(function(data) {
     console.log("$.ajax failed.");
