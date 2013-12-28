@@ -3,6 +3,7 @@
 // * Whether the bug has any bids in codesy
 // * An offer input, filled with user's existing bid if applicable
 // * An ask input, filled with user's existing bid if applicable
+
 chrome.storage.local.get(function(options){
   var codesyImgUrl = chrome.extension.getURL("img/codesy-100x27.png"),
       codesyDomain = options.domain;
@@ -20,7 +21,6 @@ chrome.storage.local.get(function(options){
   });
 
 });
-
 var appendForm = function(codesyImgUrl, codesyDomain, csrfToken) {
   var html = '<hr/>' +
         '<div id="codesy-widget">' +
