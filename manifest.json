@@ -22,8 +22,8 @@
 
   "web_accessible_resources": [
       "img/codesy-100x27.png",
-      "jquery-2.0.3.min.js",
-      "jquery-2.0.3.min.map"
+      "js/jquery-2.0.3.min.js",
+      "js/jquery-2.0.3.min.map"
   ],
 
   "content_scripts" : [
@@ -35,8 +35,9 @@
         "github.css"
       ],
       "js" : [
-        "jquery-2.0.3.min.js",
-        "github.js"
+        "js/jquery-2.0.3.min.js",
+        "js/codesy.js",        
+        "js/github.js"
       ],
       "run_at" : "document_idle",
       "all_frames" : false
