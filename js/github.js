@@ -48,6 +48,8 @@ var appendForm = function(codesyImgUrl, codesyDomain, csrfToken) {
         .append($codesy_link)
         .append($codesy_form)
         
-  var bid = $.getJSON('//' + codesyDomain + '/api/v1/bids.json?url=' + window.location);
+  var bid = codesy.bids({url:window.location.toString()});
+  
+  console.log(bid)
 
 };

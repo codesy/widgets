@@ -21,7 +21,7 @@ var codesy_api = (function (){
     options.domain = domain || options.domain;
     var call_map = [
       ['csrf_token','/csrf_token.json'],
-      ['bids', '/bids']
+      ['bids', '/bids.json']
     ];
     call_map.forEach(function(value) {
       this.prototype[value[0]] = function(params) {
