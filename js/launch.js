@@ -14,7 +14,7 @@ codesy.match(window.location)
         var codesyToken = data.csrf_token;
         console.log(data);
 // see if the HTML element for this domain exists    
-        if($(mission.target_selector).lenth >0 ){
+        if($(mission.target_selector).length >0 ){
 
 // get the extension user options
           chrome.storage.local.get(function(options){
