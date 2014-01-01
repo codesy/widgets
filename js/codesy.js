@@ -2,14 +2,8 @@
 
 var codesy={};
 
-(function (c){
-  var options = {
-    endpoint: '/api',
-    version: '/v1',
-    domain: 'codesy-dev.herokuapp.com'
-  },
-
-  pages = [
+(function (cdsy){
+  var pages = [
     { domain:/.github.com/i,
       target:{selector:'.discussion-sidebar'},
       before_append:function(){},
@@ -25,8 +19,15 @@ var codesy={};
           }                  
     },
   ]
+  
+  cdsy.options = {
+    endpoint: '/api',
+    version: '/v1',
+    domain: 'codesy-dev.herokuapp.com'
+  }
 
-  c.appendForm = function(mission,codesyImgUrl, codesyDomain, csrfToken) {
+
+  cdsy.appendForm = function(mission,codesyImgUrl, csrfToken) {
     var dfd = new $.Deferred(),
     
     $codesy_link = $('<a href="http://codesy.io" target="_new"><img src="' + codesyImgUrl + '"/></a>' ),
@@ -40,7 +41,7 @@ var codesy={};
 
     $codesy_form
       .attr('id', 'codesy')
-      .attr('action', 'https://' + codesyDomain + '/bids')
+      .attr('action', 'https://' + cdsy.options.domain + '/bids')
       .attr('method', 'POST')
       .append('<input name="authenticity_token" type="hidden" value="' + csrfToken + '" />')
       .append('<input type="hidden" name="bid[url]" value="' + window.location + '" />')
@@ -72,7 +73,7 @@ var codesy={};
     return dfd.promise()
   }
 
-  c.match = function(location){
+  cdsy.match = function(location){
     var dfd = new $.Deferred(),
     url = location.toString() || dfd.reject('No url defined') 
     
@@ -90,14 +91,14 @@ var codesy={};
     ajax_params = ajax_params || {};
     return $.ajax({
       type: "get",
-      url: "https://" + options.domain + options.endpoint + options.version+resource,
+      url: "https://" + cdsy.options.domain + cdsy.options.endpoint + cdsy.options.version+resource,
       data: ajax_params,
       dataType: 'json'
     })
   };
 
   function API(domain){
-    options.domain = domain || options.domain;
+    cdsy.options.domain = domain || cdsy.options.domain;
     var call_map = [
       ['csrf_token','/csrf_token.json'],
       ['bids', '/bids.json']
@@ -110,7 +111,7 @@ var codesy={};
 
   }  
   
-  c.api = new API;
+  cdsy.api = new API;
 
 }(codesy));
 
