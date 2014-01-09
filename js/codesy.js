@@ -18,6 +18,10 @@ var codesy={};
             containers:['<li>','<ul class="sidebarmenu">']            
           }                  
     },
+    { domain:/.stackoverflow.com/i,
+      target:{selector:'#sidebar'
+          }                  
+    }
   ]
   
   cdsy.options = {
