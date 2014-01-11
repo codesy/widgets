@@ -18,6 +18,10 @@ var codesy={};
             containers:['<li>','<ul class="sidebarmenu">']            
           }                  
     },
+    { domain:/.stackoverflow.com/i,
+      target:{selector:'#sidebar'
+          }                  
+    }
   ]
   
   cdsy.options = {
@@ -77,10 +81,8 @@ var codesy={};
     var dfd = new $.Deferred(),
     url = location.toString() || dfd.reject('No url defined') 
     
-    pages.forEach(function(value){
-      if (value.domain.test(url)){
-        dfd.resolve(value);
-      }      
+    pages.forEach(function(page){
+      page.domain.test(url) & $(page.target.selector).length >0 && dfd.resolve(page);
     })
 
     return dfd.promise();
