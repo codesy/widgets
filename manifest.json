@@ -28,16 +28,14 @@
 
   "content_scripts" : [
     {
-      "matches" : [
-        "https://github.com/*/*/issues/*"
-      ],
+      "matches" : ["<all_urls>"],
       "css" : [
-        "github.css"
+        "css/codesy.css"
       ],
       "js" : [
         "js/jquery-2.0.3.min.js",
         "js/codesy.js",        
-        "js/github.js"
+        "js/launch.js"
       ],
       "run_at" : "document_idle",
       "all_frames" : false
