@@ -17,15 +17,14 @@
     "storage",
     "https://codesy-dev.herokuapp.com/",
     "https://codesy-stage.herokuapp.com/",
+    "https://codesy-groovecoder.herokuapp.com/",
     "https://api.codesy.io/"
   ],
 
   "web_accessible_resources": [
-      "img/codesy-100x27.png",
       "js/jquery-2.0.3.min.js",
       "js/jquery-2.0.3.min.map"
   ],
-
   "content_scripts" : [
     {
       "matches" : ["<all_urls>"],
@@ -34,12 +33,12 @@
       ],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/codesy.js",        
-        "js/launch.js"
+        "js/codesy.js"
       ],
-      "run_at" : "document_idle",
+      "run_at" : "document_end",
       "all_frames" : false
     }
   ]
 
 }
+

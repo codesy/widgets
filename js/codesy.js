@@ -1,122 +1,77 @@
-"use strict";
+var call_map, codesy, value, _fn, _i, _len;
 
-var codesy={};
+codesy = {};
 
-(function (cdsy){
-  var pages = [
-    { domain:/.github.com/i,
-      target:{selector:'.discussion-sidebar'},
-      before_append:function(){},
-      after_append:function(){}
-    },
-    { domain:/.bitbucket.org/i,
-      target:{selector:'dl.issue-attrs',
-              containers: ['<div class="issue-attr">']  }
-    },
-    { domain:/.sourceforge.net/i,
-      target:{selector:'#sidebar',
-            containers:['<li>','<ul class="sidebarmenu">']            
-          }                  
-    },
-    { domain:/.stackoverflow.com/i,
-      target:{selector:'#sidebar'
-          }                  
-    }
-  ]
-  
-  cdsy.options = {
-    endpoint: '/api',
-    version: '/v1',
-    domain: 'codesy-dev.herokuapp.com'
-  }
+codesy.api = {};
 
+codesy.options = {
+  endpoint: "/api",
+  version: "/v1",
+  domain: "codesy-groovecoder.herokuapp.com"
+};
 
-  cdsy.appendForm = function(mission,codesyImgUrl, csrfToken) {
-    var dfd = new $.Deferred(),
-    
-    $codesy_link = $('<a href="http://codesy.io" target="_new"><img src="' + codesyImgUrl + '"/></a>' ),
+chrome.storage.local.set({
+  options: codesy.options
+});
 
-    $codesy_form = $('<form>'),  
+codesy.api.raw = function(resource, ajax_params) {
+  ajax_params = ajax_params || {};
+  return $.ajax({
+    type: "get",
+    url: "https://" + codesy.options.domain + resource,
+    data: ajax_params,
+    dataType: "html"
+  });
+};
 
-    $submit_button = $('<button>')
-      .attr('class','button minibutton')
-      .text('Bid')
-      .click(function(){$codesy_form.submit();});
+call_map = [["bid_form", "/bids"]];
 
-    $codesy_form
-      .attr('id', 'codesy')
-      .attr('action', 'https://' + cdsy.options.domain + '/bids')
-      .attr('method', 'POST')
-      .append('<input name="authenticity_token" type="hidden" value="' + csrfToken + '" />')
-      .append('<input type="hidden" name="bid[url]" value="' + window.location + '" />')
-      .append('<input type="text" placeholder="offer amount" id="bid_offer" name="bid[offer]"/><br/>')
-      .append('<input type="text" placeholder="ask amount" id="bid_ask" name="bid[ask]"/><br/>')
-      .append($submit_button);
-
-    var $codesy_widget = $('<div id="codesy-widget" >')
-      .append('<hr/>')
-      .append($codesy_link)
-      .append($codesy_form);
-
-    if(mission.target.containers){
-      mission.target.containers.forEach(function(elem){
-        $codesy_widget = $(elem).append($codesy_widget)
-      })
-    } 
-
-    $(mission.target.selector).first()
-      .append($codesy_widget)
-
-
-    if($('#codesy-widget').length > 0){
-      dfd.resolve()
-    } else {
-      dfd.reject()
-    }
-
-    return dfd.promise()
-  }
-
-  cdsy.match = function(location){
-    var dfd = new $.Deferred(),
-    url = location.toString() || dfd.reject('No url defined') 
-    
-    pages.forEach(function(value){
-      if (value.domain.test(url)){
-        dfd.resolve(value);
-      }      
-    })
-
-    return dfd.promise();
-  }
-
-  //generic call
-  var call_api = function(resource, ajax_params) {
-    ajax_params = ajax_params || {};
-    return $.ajax({
-      type: "get",
-      url: "https://" + cdsy.options.domain + cdsy.options.endpoint + cdsy.options.version+resource,
-      data: ajax_params,
-      dataType: 'json'
-    })
+_fn = function(value) {
+  return codesy.api[value[0]] = function(params) {
+    return codesy.api.raw(value[1], params);
   };
+};
+for (_i = 0, _len = call_map.length; _i < _len; _i++) {
+  value = call_map[_i];
+  _fn(value);
+}
 
-  function API(domain){
-    cdsy.options.domain = domain || cdsy.options.domain;
-    var call_map = [
-      ['csrf_token','/csrf_token.json'],
-      ['bids', '/bids.json']
-    ];
-    call_map.forEach(function(value) {
-      this.prototype[value[0]] = function(params) {
-        return call_api(value[1], params)
-      }
-    },API);
+codesy.appendForm = function(select, cdsyForm, containers) {
+  var dfd;
+  dfd = new $.Deferred();
+  $(select).first().append(cdsyForm);
+  if ($("#codesy-widget").length > 0) {
+    dfd.resolve();
+  } else {
+    dfd.reject();
+  }
+  return dfd.promise();
+};
 
-  }  
-  
-  cdsy.api = new API;
+codesy.href = window.location.href;
 
-}(codesy));
+codesy.ask = function(url) {
+  return codesy.api.bid_form(window.location.href).done(function(data) {
+    var container, selector;
+    console.log('data received');
+    selector = $(data).data('selector');
+    container = $(data).data('container');
+    if ($(selector).length > 0) {
+      return codesy.appendForm(selector, data, container);
+    }
+  }).fail(function(data) {
+    console.log("$.ajax failed.");
+    return console.log(data);
+  });
+};
 
+codesy.ask(codesy.href);
 
+codesy.watch = function() {
+  if (codesy.href !== window.location.href) {
+    codesy.href = window.location.href;
+    return codesy.ask(codesy.href);
+  }
+};
+
+window.setInterval(codesy.watch, 500);
