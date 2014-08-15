@@ -1,4 +1,8 @@
-var call_map, codesy, value, _fn, _i, _len;
+var call_map, codesy, event, value, _fn, _i, _len;
+
+event = new Event('hide_install');
+
+document.dispatchEvent(event);
 
 codesy = {};
 
@@ -7,7 +11,7 @@ codesy.api = {};
 codesy.options = {
   endpoint: "/api",
   version: "/v1",
-  domain: "codesy-groovecoder.herokuapp.com"
+  domain: "127.0.0.1:5000"
 };
 
 chrome.storage.local.set({
@@ -24,7 +28,7 @@ codesy.api.raw = function(resource, ajax_params) {
   });
 };
 
-call_map = [["bid_form", "/bids"]];
+call_map = [["bids", "/bids"]];
 
 _fn = function(value) {
   return codesy.api[value[0]] = function(params) {
@@ -48,12 +52,16 @@ codesy.appendForm = function(select, cdsyForm, containers) {
   return dfd.promise();
 };
 
+document.addEventListener('install_check', codesy.install_check);
+
 codesy.href = window.location.href;
 
 codesy.ask = function(url) {
-  return codesy.api.bid_form(window.location.href).done(function(data) {
+  return codesy.api.bids(window.location.href).done(function(data) {
     var container, selector;
-    console.log('data received');
+    console.log({
+      codesy: data
+    });
     selector = $(data).data('selector');
     container = $(data).data('container');
     if ($(selector).length > 0) {

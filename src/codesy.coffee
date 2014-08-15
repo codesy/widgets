@@ -1,3 +1,8 @@
+
+event = new Event 'hide_install'
+document.dispatchEvent event
+
+
 codesy = {}
 
 codesy.api ={}
@@ -5,7 +10,7 @@ codesy.api ={}
 codesy.options =
   endpoint: "/api"
   version: "/v1"
-  domain: "codesy-groovecoder.herokuapp.com"
+  domain: "127.0.0.1:5000"
   
 chrome.storage.local.set options:codesy.options
 
@@ -19,32 +24,33 @@ codesy.api.raw = (resource, ajax_params) ->
 
 call_map = [
     [
-      "bid_form"
+      "bids"
       "/bids"
     ]
   ]
-  
+
 for value in call_map
   do(value)->  
     codesy.api[value[0]] = (params) -> codesy.api.raw value[1], params 
 
 codesy.appendForm = (select,cdsyForm,containers) ->
-    dfd = new $.Deferred()
-    $(select).first().append cdsyForm
+  dfd = new $.Deferred()
+  $(select).first().append cdsyForm
+  if $("#codesy-widget").length > 0
+    dfd.resolve()
+  else
+    dfd.reject()
+  dfd.promise()  
 
-    if $("#codesy-widget").length > 0
-      dfd.resolve()
-    else
-      dfd.reject()
-    dfd.promise()
+document.addEventListener 'install_check',codesy.install_check
 
+      
 codesy.href = window.location.href
 
 codesy.ask = (url) ->
-  codesy.api.bid_form(window.location.href)
+  codesy.api.bids(window.location.href)
     .done((data) ->
-      console.log 'data received'
-      # console.log data
+      console.log {codesy:data}
       selector = $(data).data('selector')
       container= $(data).data('container')
       if $(selector).length > 0
@@ -55,11 +61,11 @@ codesy.ask = (url) ->
       console.log data
     )
     
-codesy.ask (codesy.href)
+codesy.ask(codesy.href)
 
 codesy.watch = ->
   if codesy.href isnt window.location.href 
     codesy.href = window.location.href
-    codesy.ask(codesy.href )
+    codesy.ask(codesy.href)
 
 window.setInterval codesy.watch,500
