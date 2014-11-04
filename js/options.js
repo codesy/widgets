@@ -30,7 +30,7 @@ loadOptions = function() {
   });
 };
 
-domains = ["api.codesy.io", "codesy-stage.herokuapp.com", "codesy-dev.herokuapp.com", "codesy-jdungan.herokuapp.com", "codesy-groovecoder.herokuapp.com"];
+domains = ["api.codesy.io", "codesy-stage.herokuapp.com", "127.0.0.1:8000"];
 
 document.addEventListener("DOMContentLoaded", loadOptions);
 

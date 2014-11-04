@@ -1,71 +1,89 @@
-
-event = new Event 'hide_install'
-document.dispatchEvent event
-
-
-codesy = {}
-
-codesy.api ={}
-
-codesy.options =
-  endpoint: "/api"
-  version: "/v1"
-  domain: "127.0.0.1:5000"
+fake_form =
+  """
+    <style type="text/css">
+      div { border: solid red;  max-width: 70ex; }
+      h4  { float: left;  margin: 0; }
+    </style> 
+    <form id="fake_form" action="/bids/" method="post" data-selector=".discussion-sidebar" data-container="">
+      {% csrf_token %}
+      <input name="url" type="hidden" value="{{ bid.url }}"></input>
+      <p>
+      <input name="ask" type="text" placeholder="ask" value="{{ bid.ask }}"></input>
+      </p>
+      <p>
+      <input name="offer" type="text" placeholder="offer" value="{{ bid.offer }}"></input>
+      </p>
+      <input type="submit" value="Bid" />
+    </form>
+ """
+codesy =
+  options :
+    endpoint: "/api"
+    version: "/v1"
+    domain: "127.0.0.1:8000"
+    url: ->
+      "https://" + @domain
+  api:{}
   
 chrome.storage.local.set options:codesy.options
 
 codesy.api.raw = (resource, ajax_params) ->
-    ajax_params = ajax_params or {}
-    $.ajax
-        type: "get"
-        url: "https://" + codesy.options.domain + resource
-        data: ajax_params
-        dataType: "html"
+  ajax_params = ajax_params or {}
+  $.ajax
+    type: "get"
+    url:  codesy.options.url() + resource
+    data: ajax_params
+    dataType: "html"
 
 call_map = [
-    [
-      "bids"
-      "/bids"
-    ]
+    ["bids","/bids"],
+    ["bid","/bid/" ]
   ]
-
+  
+#build api 
 for value in call_map
   do(value)->  
     codesy.api[value[0]] = (params) -> codesy.api.raw value[1], params 
 
 codesy.appendForm = (select,cdsyForm,containers) ->
   dfd = new $.Deferred()
-  $(select).first().append cdsyForm
+  $("body").append cdsyForm
   if $("#codesy-widget").length > 0
     dfd.resolve()
   else
     dfd.reject()
   dfd.promise()  
 
-document.addEventListener 'install_check',codesy.install_check
-
-      
-codesy.href = window.location.href
-
 codesy.ask = (url) ->
-  codesy.api.bids(window.location.href)
+  console.log "checking "+codesy.current.url
+  codesy.appendForm "body",fake_form
+  return
+  codesy.api.bid({url:codesy.current.url})
     .done((data) ->
       console.log {codesy:data}
-      selector = $(data).data('selector')
-      container= $(data).data('container')
-      if $(selector).length > 0
-          codesy.appendForm selector,data,container
+      codesy.appendForm data
     )  
     .fail((data) ->
       console.log "$.ajax failed."
-      console.log data
+      # console.log data
     )
-    
-codesy.ask(codesy.href)
 
-codesy.watch = ->
-  if codesy.href isnt window.location.href 
-    codesy.href = window.location.href
-    codesy.ask(codesy.href)
+codesy.current=
+  url:null
+  
+codesy.launch = ()->
+  console.log codesy.current.url?="null"  +" = "+ window.location.href 
+  if window.location.href isnt codesy.current.url
+    codesy.current.url = window.location.href    
+    codesy.ask()  
 
-window.setInterval codesy.watch,500
+chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
+   console.log "xhr received"
+   if msg.action is "xhr"
+     codesy.launch()
+     
+window.onpopstate = ->
+  console.log "popstate"
+  codesy.launch()
+
+codesy.launch()

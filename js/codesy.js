@@ -1,17 +1,17 @@
-var call_map, codesy, event, value, _fn, _i, _len;
+var call_map, codesy, fake_form, value, _fn, _i, _len;
 
-event = new Event('hide_install');
+fake_form = "<style type=\"text/css\">\n  div { border: solid red;  max-width: 70ex; }\n  h4  { float: left;  margin: 0; }\n</style> \n<form id=\"fake_form\" action=\"/bids/\" method=\"post\" data-selector=\".discussion-sidebar\" data-container=\"\">\n  {% csrf_token %}\n  <input name=\"url\" type=\"hidden\" value=\"{{ bid.url }}\"></input>\n  <p>\n  <input name=\"ask\" type=\"text\" placeholder=\"ask\" value=\"{{ bid.ask }}\"></input>\n  </p>\n  <p>\n  <input name=\"offer\" type=\"text\" placeholder=\"offer\" value=\"{{ bid.offer }}\"></input>\n  </p>\n  <input type=\"submit\" value=\"Bid\" />\n</form>";
 
-document.dispatchEvent(event);
-
-codesy = {};
-
-codesy.api = {};
-
-codesy.options = {
-  endpoint: "/api",
-  version: "/v1",
-  domain: "127.0.0.1:5000"
+codesy = {
+  options: {
+    endpoint: "/api",
+    version: "/v1",
+    domain: "127.0.0.1:8000",
+    url: function() {
+      return "https://" + this.domain;
+    }
+  },
+  api: {}
 };
 
 chrome.storage.local.set({
@@ -22,13 +22,13 @@ codesy.api.raw = function(resource, ajax_params) {
   ajax_params = ajax_params || {};
   return $.ajax({
     type: "get",
-    url: "https://" + codesy.options.domain + resource,
+    url: codesy.options.url() + resource,
     data: ajax_params,
     dataType: "html"
   });
 };
 
-call_map = [["bids", "/bids"]];
+call_map = [["bids", "/bids"], ["bid", "/bid/"]];
 
 _fn = function(value) {
   return codesy.api[value[0]] = function(params) {
@@ -43,7 +43,7 @@ for (_i = 0, _len = call_map.length; _i < _len; _i++) {
 codesy.appendForm = function(select, cdsyForm, containers) {
   var dfd;
   dfd = new $.Deferred();
-  $(select).first().append(cdsyForm);
+  $("body").append(cdsyForm);
   if ($("#codesy-widget").length > 0) {
     dfd.resolve();
   } else {
@@ -52,34 +52,45 @@ codesy.appendForm = function(select, cdsyForm, containers) {
   return dfd.promise();
 };
 
-document.addEventListener('install_check', codesy.install_check);
-
-codesy.href = window.location.href;
-
 codesy.ask = function(url) {
-  return codesy.api.bids(window.location.href).done(function(data) {
-    var container, selector;
+  console.log("checking " + codesy.current.url);
+  codesy.appendForm("body", fake_form);
+  return;
+  return codesy.api.bid({
+    url: codesy.current.url
+  }).done(function(data) {
     console.log({
       codesy: data
     });
-    selector = $(data).data('selector');
-    container = $(data).data('container');
-    if ($(selector).length > 0) {
-      return codesy.appendForm(selector, data, container);
-    }
+    return codesy.appendForm(data);
   }).fail(function(data) {
-    console.log("$.ajax failed.");
-    return console.log(data);
+    return console.log("$.ajax failed.");
   });
 };
 
-codesy.ask(codesy.href);
+codesy.current = {
+  url: null
+};
 
-codesy.watch = function() {
-  if (codesy.href !== window.location.href) {
-    codesy.href = window.location.href;
-    return codesy.ask(codesy.href);
+codesy.launch = function() {
+  var _base;
+  console.log((_base = codesy.current).url != null ? _base.url : _base.url = "null" + " = " + window.location.href);
+  if (window.location.href !== codesy.current.url) {
+    codesy.current.url = window.location.href;
+    return codesy.ask();
   }
 };
 
-window.setInterval(codesy.watch, 500);
+chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+  console.log("xhr received");
+  if (msg.action === "xhr") {
+    return codesy.launch();
+  }
+});
+
+window.onpopstate = function() {
+  console.log("popstate");
+  return codesy.launch();
+};
+
+codesy.launch();
