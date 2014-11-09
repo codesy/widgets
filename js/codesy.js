@@ -11,7 +11,10 @@ codesy = {
       return "https://" + this.domain;
     }
   },
-  api: {}
+  api: {},
+  current: {
+    url: null
+  }
 };
 
 chrome.storage.local.set({
@@ -40,10 +43,15 @@ for (_i = 0, _len = call_map.length; _i < _len; _i++) {
   _fn(value);
 }
 
+codesy.isIssue = function(url) {
+  var rx;
+  rx = /https:\/\/github.com\/.*\/issues\//g;
+  return rx.test(url);
+};
+
 codesy.appendForm = function(select, cdsyForm, containers) {
   var dfd;
   dfd = new $.Deferred();
-  $("body").append(cdsyForm);
   if ($("#codesy-widget").length > 0) {
     dfd.resolve();
   } else {
@@ -54,7 +62,7 @@ codesy.appendForm = function(select, cdsyForm, containers) {
 
 codesy.ask = function(url) {
   console.log("checking " + codesy.current.url);
-  codesy.appendForm("body", fake_form);
+  $("body").append(fake_form);
   return;
   return codesy.api.bid({
     url: codesy.current.url
@@ -68,16 +76,25 @@ codesy.ask = function(url) {
   });
 };
 
-codesy.current = {
-  url: null
+codesy.iframe = function() {
+  var iframe;
+  iframe = document.createElement("iframe");
+  iframe.setAttribute("src", "https://codesy.io");
+  iframe.setAttribute("style", "border:none; width:150px; height:30px");
+  iframe.setAttribute("scrolling", "no");
+  iframe.setAttribute("frameborder", "0");
+  return document.body.appendChild(iframe);
 };
 
 codesy.launch = function() {
   var _base;
   console.log((_base = codesy.current).url != null ? _base.url : _base.url = "null" + " = " + window.location.href);
-  if (window.location.href !== codesy.current.url) {
+  if (codesy.isIssue(window.location.href)) {
+    console.log("an issue!");
     codesy.current.url = window.location.href;
-    return codesy.ask();
+    return codesy.iframe();
+  } else {
+    return console.log("not an issue");
   }
 };
 
@@ -94,3 +111,5 @@ window.onpopstate = function() {
 };
 
 codesy.launch();
+
+console.log("content js loaded");

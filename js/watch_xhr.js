@@ -1,8 +1,8 @@
 var filter, watch;
 
 watch = function(details) {
-  console.log("xhr sent");
   return chrome.tabs.getSelected(null, function(tabs) {
+    console.log("xhr sent to: " + tabs.url + ":" + tabs.id);
     return chrome.tabs.sendMessage(tabs.id, {
       action: "xhr"
     });
@@ -12,7 +12,7 @@ watch = function(details) {
 filter = {
   url: [
     {
-      originAndPathMatches: ".*/github.com/.*/.*/issues/.*"
+      originAndPathMatches: ".*/github.com/.*/.*/issues/*"
     }
   ]
 };

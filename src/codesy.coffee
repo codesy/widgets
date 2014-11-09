@@ -24,6 +24,7 @@ codesy =
     url: ->
       "https://" + @domain
   api:{}
+  current:{url:null}
   
 chrome.storage.local.set options:codesy.options
 
@@ -45,9 +46,13 @@ for value in call_map
   do(value)->  
     codesy.api[value[0]] = (params) -> codesy.api.raw value[1], params 
 
+codesy.isIssue = (url)->
+  rx = /https:\/\/github.com\/.*\/issues\//g
+  rx.test url
+  
 codesy.appendForm = (select,cdsyForm,containers) ->
   dfd = new $.Deferred()
-  $("body").append cdsyForm
+  # $("body").append cdsyForm
   if $("#codesy-widget").length > 0
     dfd.resolve()
   else
@@ -56,7 +61,7 @@ codesy.appendForm = (select,cdsyForm,containers) ->
 
 codesy.ask = (url) ->
   console.log "checking "+codesy.current.url
-  codesy.appendForm "body",fake_form
+  $("body").append fake_form
   return
   codesy.api.bid({url:codesy.current.url})
     .done((data) ->
@@ -68,22 +73,33 @@ codesy.ask = (url) ->
       # console.log data
     )
 
-codesy.current=
-  url:null
+codesy.iframe = ->
+  iframe = document.createElement("iframe");
+  iframe.setAttribute("src", "https://codesy.io");
+  iframe.setAttribute("style", "border:none; width:150px; height:30px");
+  iframe.setAttribute("scrolling", "no");
+  iframe.setAttribute("frameborder", "0");
+  document.body.appendChild(iframe);
   
 codesy.launch = ()->
   console.log codesy.current.url?="null"  +" = "+ window.location.href 
-  if window.location.href isnt codesy.current.url
+  if codesy.isIssue(window.location.href)
+    console.log "an issue!"
     codesy.current.url = window.location.href    
-    codesy.ask()  
+    codesy.iframe()      
+  else
+    console.log "not an issue"
+  # if window.location.href isnt codesy.current.url
 
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
-   console.log "xhr received"
-   if msg.action is "xhr"
-     codesy.launch()
+  console.log "xhr received"
+  if msg.action is "xhr"
+    codesy.launch()
      
 window.onpopstate = ->
   console.log "popstate"
   codesy.launch()
 
 codesy.launch()
+
+console.log "content js loaded"
