@@ -11,7 +11,10 @@ codesy =
   form: null
   api:{}
   current:{url:null}
-  
+
+chrome.storage.local.get (data)->
+  codesy.options.domain = data.domain 
+ 
 codesy.api.get = (resource, ajax_params) ->
   ajax_params = ajax_params or {}
   $.ajax

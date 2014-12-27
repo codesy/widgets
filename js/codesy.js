@@ -20,6 +20,10 @@ codesy = {
   }
 };
 
+chrome.storage.local.get(function(data) {
+  return codesy.options.domain = data.domain;
+});
+
 codesy.api.get = function(resource, ajax_params) {
   ajax_params = ajax_params || {};
   return $.ajax({
