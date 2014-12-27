@@ -20,7 +20,7 @@ codesy = {
   }
 };
 
-codesy.api.raw = function(resource, ajax_params) {
+codesy.api.get = function(resource, ajax_params) {
   ajax_params = ajax_params || {};
   return $.ajax({
     type: "get",
@@ -31,7 +31,26 @@ codesy.api.raw = function(resource, ajax_params) {
 };
 
 codesy.api.bid = function(params) {
-  return codesy.api.raw('/bid/', params);
+  return codesy.api.get('/bid/', params);
+};
+
+codesy.api.put = function(form) {
+  return $.ajax({
+    beforeSend: function(xhr, settings) {
+      xhr.setRequestHeader("X-CSRFToken", $('input[name="csrfmiddlewaretoken"]').value);
+      return xhr.setRequestHeader("Referer", codesy.options.domain);
+    },
+    type: form.attr('method'),
+    url: form.attr('action'),
+    data: form.serialize(),
+    dataType: "html",
+    success: function() {
+      return codesy.newpage();
+    },
+    error: function(err) {
+      return console.log(err);
+    }
+  });
 };
 
 codesy.isIssue = function(url) {
@@ -52,7 +71,7 @@ codesy.positionForm = function() {
     });
   } else {
     return codesy.form.css({
-      position: "stati97yc",
+      position: "static",
       top: footerTop,
       left: footerLeft
     });
@@ -79,9 +98,14 @@ codesy.newpage = function() {
   if (codesy.isIssue(window.location.href)) {
     return codesy.api.bid({
       url: window.location.href
-    }).done(function(data) {
-      console.log(data);
-      return codesy.appendForm(data);
+    }).done(function(html_form) {
+      console.log(html_form);
+      return codesy.appendForm(html_form).done(function() {
+        return codesy.form.submit(function(e) {
+          codesy.api.put(codesy.form);
+          return false;
+        });
+      });
     }).fail(function(data) {
       return console.log("$.ajax failed.");
     });

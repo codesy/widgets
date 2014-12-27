@@ -12,7 +12,7 @@ codesy =
   api:{}
   current:{url:null}
   
-codesy.api.raw = (resource, ajax_params) ->
+codesy.api.get = (resource, ajax_params) ->
   ajax_params = ajax_params or {}
   $.ajax
     type: "get"
@@ -21,7 +21,22 @@ codesy.api.raw = (resource, ajax_params) ->
     dataType: "html"
   
 codesy.api.bid = (params) -> 
-  codesy.api.raw '/bid/',params 
+  codesy.api.get '/bid/',params 
+  
+codesy.api.put = (form) ->
+  $.ajax
+    beforeSend: (xhr,settings) ->
+      xhr.setRequestHeader("X-CSRFToken",$('input[name="csrfmiddlewaretoken"]').value)
+      xhr.setRequestHeader("Referer",codesy.options.domain)
+    type: form.attr('method')
+    url: form.attr('action')
+    data: form.serialize()
+    dataType: "html"
+    success:  ->
+      codesy.newpage()
+    error: (err)->
+      console.log err
+
 
 codesy.isIssue = (url)->
   rx = /https:\/\/github.com\/.*\/issues\/./g
@@ -33,8 +48,7 @@ codesy.positionForm = () ->
   if ($(document.body).height()+footerTop) > $(window).height() 
      codesy.form.css {position: "absolute", top: footerTop,left:footerLeft}
   else
-     codesy.form.css {position: "stati97yc", top: footerTop,left:footerLeft}
-  
+     codesy.form.css {position: "static", top: footerTop,left:footerLeft}
 
 codesy.appendForm = (cdsyForm) ->
   dfd = new $.Deferred()
@@ -54,9 +68,15 @@ codesy.newpage = ()->
   $("#codesy_bid_form").remove()
   if codesy.isIssue window.location.href
     codesy.api.bid({url:window.location.href}) 
-      .done((data) ->
-        console.log data
-        codesy.appendForm data
+      .done((html_form) ->
+        console.log html_form
+        codesy.appendForm(html_form)
+          .done( ->
+            codesy.form.submit( (e)->
+              codesy.api.put(codesy.form)
+              false
+              )
+            )
       )  
       .fail((data) ->
         console.log "$.ajax failed."
