@@ -1,33 +1,37 @@
-var domains=['api.codesy.io','codesy-stage.herokuapp.com','codesy-dev.herokuapp.com']
-  
-function saveOptions() {
-  var domain = $('#domain_list').val();
-  chrome.storage.local.set({"domain": domain});
-  
-  var status = document.getElementById("status");
-  status.innerHTML = "Saved.";
-  
-  setTimeout(function() {
-    status.innerHTML = "";
-  }, 750);
-}
+var domains, loadOptions, saveOptions;
 
-
-function loadOptions() {
-    $.each(domains,function(i,v){
-        $('#domain_list').append(
-            $('<option>')
-            .attr('value',v)
-            .text(v)
-        );
-    })
-  chrome.storage.local.get(function(options){
-    var domain = options.domain;
-    if (!domain) { domain = "api.codesy.io"; }
-    $("#domain_list").val(domain);
+saveOptions = function() {
+  var domain, status;
+  domain = $("#domain_list").val();
+  chrome.storage.local.set({
+    domain: domain
   });
-  
-}
+  chrome.storage.local.get(function(options) {
+    return codesy.options = options;
+  });
+  status = document.getElementById("status");
+  status.innerHTML = "Saving ...";
+  setTimeout((function() {
+    return status.innerHTML = "";
+  }), 750);
+};
 
-document.addEventListener('DOMContentLoaded', loadOptions);
-document.querySelector('button#save').addEventListener('click', saveOptions);
+loadOptions = function() {
+  $.each(domains, function(i, v) {
+    return $("#domain_list").append($("<option>").attr("value", v).text(v));
+  });
+  return chrome.storage.local.get(function(options) {
+    var domain;
+    domain = options.domain;
+    if (!domain) {
+      domain = "api.codesy.io";
+    }
+    return $("#domain_list").val(domain);
+  });
+};
+
+domains = ["codesy.io", "127.0.0.1:5000"];
+
+document.addEventListener("DOMContentLoaded", loadOptions);
+
+document.querySelector("button#save").addEventListener("click", saveOptions);
