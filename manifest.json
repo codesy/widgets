@@ -14,32 +14,37 @@
   "options_page": "options.html",
 
   "permissions": [
-    "storage",
+    "https://codesy.io/",
     "https://codesy-dev.herokuapp.com/",
-    "https://codesy-stage.herokuapp.com/",
-    "https://api.codesy.io/"
+    "https://mysterious-badlands-8311.herokuapp.com/",
+    "storage",
+    "tabs",
+    "webNavigation"
   ],
 
   "web_accessible_resources": [
-      "img/codesy-100x27.png",
       "js/jquery-2.0.3.min.js",
       "js/jquery-2.0.3.min.map"
   ],
-
+  "background": {
+    "scripts": ["js/watch_xhr.js"],
+    "persistent": false
+  
+  },
   "content_scripts" : [
     {
-      "matches" : ["<all_urls>"],
+      "matches" : ["*://*.github.com/*"],
       "css" : [
         "css/codesy.css"
       ],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/codesy.js",        
-        "js/launch.js"
+        "js/codesy.js"
       ],
       "run_at" : "document_idle",
-      "all_frames" : false
+      "all_frames" : true
     }
   ]
 
 }
+
