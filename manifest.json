@@ -15,8 +15,8 @@
 
   "permissions": [
     "https://codesy.io/",
-    "https://api.codesy.io/",
-    "https://127.0.0.1:8000/",
+    "https://codesy-dev.herokuapp.com/",
+    "https://mysterious-badlands-8311.herokuapp.com/",
     "storage",
     "tabs",
     "webNavigation"

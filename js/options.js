@@ -10,7 +10,7 @@ saveOptions = function() {
     return codesy.options = options;
   });
   status = document.getElementById("status");
-  status.innerHTML = "Saved.";
+  status.innerHTML = "Saving ...";
   setTimeout((function() {
     return status.innerHTML = "";
   }), 750);
@@ -30,7 +30,7 @@ loadOptions = function() {
   });
 };
 
-domains = ["api.codesy.io", "codesy-stage.herokuapp.com", "127.0.0.1:8000"];
+domains = ["codesy.io", "127.0.0.1:5000"];
 
 document.addEventListener("DOMContentLoaded", loadOptions);
 

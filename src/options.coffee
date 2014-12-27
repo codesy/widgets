@@ -5,7 +5,7 @@ saveOptions = ->
     codesy.options=options
     
   status = document.getElementById("status")
-  status.innerHTML = "Saved."
+  status.innerHTML = "Saving ..."
   setTimeout (->
     status.innerHTML = ""
   ), 750
@@ -16,13 +16,12 @@ loadOptions = ->
     $("#domain_list").append $("<option>").attr("value", v).text(v)    
   chrome.storage.local.get (options) ->
     domain = options.domain
-    domain = "api.codesy.io"  unless domain
+    domain = "api.codesy.io" unless domain
     $("#domain_list").val domain
     
 domains = [
-  "api.codesy.io"
-  "codesy-stage.herokuapp.com"
-  "127.0.0.1:8000"
+  "codesy.io"
+  "127.0.0.1:5000"
 ]
 
 document.addEventListener "DOMContentLoaded", loadOptions

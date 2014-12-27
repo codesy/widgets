@@ -1,12 +1,10 @@
-var call_map, codesy, fake_form, value, _fn, _i, _len;
-
-fake_form = "<style type=\"text/css\">\n  div { border: solid red;  max-width: 70ex; }\n  h4  { float: left;  margin: 0; }\n</style> \n<form id=\"fake_form\" action=\"/bids/\" method=\"post\" data-selector=\".discussion-sidebar\" data-container=\"\">\n  {% csrf_token %}\n  <input name=\"url\" type=\"hidden\" value=\"{{ bid.url }}\"></input>\n  <p>\n  <input name=\"ask\" type=\"text\" placeholder=\"ask\" value=\"{{ bid.ask }}\"></input>\n  </p>\n  <p>\n  <input name=\"offer\" type=\"text\" placeholder=\"offer\" value=\"{{ bid.offer }}\"></input>\n  </p>\n  <input type=\"submit\" value=\"Bid\" />\n</form>";
+var codesy;
 
 codesy = {
   options: {
     endpoint: "/api",
     version: "/v1",
-    domain: "127.0.0.1:8000",
+    domain: "mysterious-badlands-8311.herokuapp.com/",
     url: function() {
       return "https://" + this.domain;
     }
@@ -17,8 +15,8 @@ codesy = {
   }
 };
 
-chrome.storage.local.set({
-  options: codesy.options
+chrome.storage.local.get(function(data) {
+  return codesy.options.domain = data.domain;
 });
 
 codesy.api.raw = function(resource, ajax_params) {
@@ -31,27 +29,20 @@ codesy.api.raw = function(resource, ajax_params) {
   });
 };
 
-call_map = [["bids", "/bids"], ["bid", "/bid/"]];
-
-_fn = function(value) {
-  return codesy.api[value[0]] = function(params) {
-    return codesy.api.raw(value[1], params);
-  };
+codesy.api.bid = function(params) {
+  return codesy.api.raw('/bid/', params);
 };
-for (_i = 0, _len = call_map.length; _i < _len; _i++) {
-  value = call_map[_i];
-  _fn(value);
-}
 
 codesy.isIssue = function(url) {
   var rx;
-  rx = /https:\/\/github.com\/.*\/issues\//g;
+  rx = /https:\/\/github.com\/.*\/issues\/./g;
   return rx.test(url);
 };
 
-codesy.appendForm = function(select, cdsyForm, containers) {
+codesy.appendForm = function(cdsyForm) {
   var dfd;
   dfd = new $.Deferred();
+  $("body").append(cdsyForm);
   if ($("#codesy-widget").length > 0) {
     dfd.resolve();
   } else {
@@ -60,56 +51,30 @@ codesy.appendForm = function(select, cdsyForm, containers) {
   return dfd.promise();
 };
 
-codesy.ask = function(url) {
-  console.log("checking " + codesy.current.url);
-  $("body").append(fake_form);
-  return;
-  return codesy.api.bid({
-    url: codesy.current.url
-  }).done(function(data) {
-    console.log({
-      codesy: data
-    });
-    return codesy.appendForm(data);
-  }).fail(function(data) {
-    return console.log("$.ajax failed.");
-  });
-};
-
-codesy.iframe = function() {
-  var iframe;
-  iframe = document.createElement("iframe");
-  iframe.setAttribute("src", "https://codesy.io");
-  iframe.setAttribute("style", "border:none; width:150px; height:30px");
-  iframe.setAttribute("scrolling", "no");
-  iframe.setAttribute("frameborder", "0");
-  return document.body.appendChild(iframe);
-};
-
-codesy.launch = function() {
-  var _base;
-  console.log((_base = codesy.current).url != null ? _base.url : _base.url = "null" + " = " + window.location.href);
+codesy.newpage = function() {
+  $("#codesy_form").remove();
   if (codesy.isIssue(window.location.href)) {
-    console.log("an issue!");
-    codesy.current.url = window.location.href;
-    return codesy.iframe();
-  } else {
-    return console.log("not an issue");
+    return codesy.api.bid({
+      url: window.location.href
+    }).done(function(data) {
+      console.log(data);
+      return codesy.appendForm(data);
+    }).fail(function(data) {
+      return console.log("$.ajax failed.");
+    });
   }
 };
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
   console.log("xhr received");
-  if (msg.action === "xhr") {
-    return codesy.launch();
+  if (msg.url) {
+    return codesy.newpage();
   }
 });
 
 window.onpopstate = function() {
   console.log("popstate");
-  return codesy.launch();
+  return codesy.newpage();
 };
 
-codesy.launch();
-
-console.log("content js loaded");
+codesy.newpage();

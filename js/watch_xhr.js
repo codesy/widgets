@@ -2,9 +2,9 @@ var filter, watch;
 
 watch = function(details) {
   return chrome.tabs.getSelected(null, function(tabs) {
-    console.log("xhr sent to: " + tabs.url + ":" + tabs.id);
+    console.log("xhr sent: " + tabs.url);
     return chrome.tabs.sendMessage(tabs.id, {
-      action: "xhr"
+      url: tabs.url
     });
   });
 };
@@ -12,7 +12,7 @@ watch = function(details) {
 filter = {
   url: [
     {
-      originAndPathMatches: ".*/github.com/.*/.*/issues/*"
+      originAndPathMatches: ".*/github.com/.*/.*"
     }
   ]
 };
