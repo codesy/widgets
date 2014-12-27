@@ -2,14 +2,15 @@ codesy =
   options :
     endpoint: "/api"
     version: "/v1"
-    domain: "mysterious-badlands-8311.herokuapp.com/"
+    domain: "mysterious-badlands-8311.herokuapp.com/",
+    form:
+      heigth: 100
+      width: 100
     url: ->
       "https://" + @domain
+  form: null
   api:{}
   current:{url:null}
-
-chrome.storage.local.get (data)->
-  codesy.options.domain = data.domain  
   
 codesy.api.raw = (resource, ajax_params) ->
   ajax_params = ajax_params or {}
@@ -26,17 +27,31 @@ codesy.isIssue = (url)->
   rx = /https:\/\/github.com\/.*\/issues\/./g
   rx.test url
   
+codesy.positionForm = () ->
+  footerTop = $(window).scrollTop()+$(window).height()-codesy.options.form.heigth
+  footerLeft = $(window).width()-codesy.options.form.width
+  if ($(document.body).height()+footerTop) > $(window).height() 
+     codesy.form.css {position: "absolute", top: footerTop,left:footerLeft}
+  else
+     codesy.form.css {position: "stati97yc", top: footerTop,left:footerLeft}
+  
+
 codesy.appendForm = (cdsyForm) ->
   dfd = new $.Deferred()
   $("body").append cdsyForm
-  if $("#codesy-widget").length > 0
+  if $("#codesy_bid_form").length > 0
+    codesy.form = $("#codesy_bid_form")
+    $(window)
+      .scroll(codesy.positionForm)
+      .resize(codesy.positionForm)
+    codesy.positionForm()
     dfd.resolve()
   else
     dfd.reject()
   dfd.promise()  
   
 codesy.newpage = ()->
-  $("#codesy_form").remove()
+  $("#codesy_bid_form").remove()
   if codesy.isIssue window.location.href
     codesy.api.bid({url:window.location.href}) 
       .done((data) ->
@@ -51,6 +66,7 @@ chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "xhr received"
   if msg.url
     codesy.newpage()
+
      
 window.onpopstate = ->
   console.log "popstate"

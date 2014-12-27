@@ -5,19 +5,20 @@ codesy = {
     endpoint: "/api",
     version: "/v1",
     domain: "mysterious-badlands-8311.herokuapp.com/",
+    form: {
+      heigth: 100,
+      width: 100
+    },
     url: function() {
       return "https://" + this.domain;
     }
   },
+  form: null,
   api: {},
   current: {
     url: null
   }
 };
-
-chrome.storage.local.get(function(data) {
-  return codesy.options.domain = data.domain;
-});
 
 codesy.api.raw = function(resource, ajax_params) {
   ajax_params = ajax_params || {};
@@ -39,11 +40,33 @@ codesy.isIssue = function(url) {
   return rx.test(url);
 };
 
+codesy.positionForm = function() {
+  var footerLeft, footerTop;
+  footerTop = $(window).scrollTop() + $(window).height() - codesy.options.form.heigth;
+  footerLeft = $(window).width() - codesy.options.form.width;
+  if (($(document.body).height() + footerTop) > $(window).height()) {
+    return codesy.form.css({
+      position: "absolute",
+      top: footerTop,
+      left: footerLeft
+    });
+  } else {
+    return codesy.form.css({
+      position: "stati97yc",
+      top: footerTop,
+      left: footerLeft
+    });
+  }
+};
+
 codesy.appendForm = function(cdsyForm) {
   var dfd;
   dfd = new $.Deferred();
   $("body").append(cdsyForm);
-  if ($("#codesy-widget").length > 0) {
+  if ($("#codesy_bid_form").length > 0) {
+    codesy.form = $("#codesy_bid_form");
+    $(window).scroll(codesy.positionForm).resize(codesy.positionForm);
+    codesy.positionForm();
     dfd.resolve();
   } else {
     dfd.reject();
@@ -52,7 +75,7 @@ codesy.appendForm = function(cdsyForm) {
 };
 
 codesy.newpage = function() {
-  $("#codesy_form").remove();
+  $("#codesy_bid_form").remove();
   if (codesy.isIssue(window.location.href)) {
     return codesy.api.bid({
       url: window.location.href

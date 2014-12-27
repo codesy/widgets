@@ -11,8 +11,6 @@
    "128": "img/icon128.png"
   },
 
-  "options_page": "options.html",
-
   "permissions": [
     "https://codesy.io/",
     "https://codesy-dev.herokuapp.com/",
