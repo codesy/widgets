@@ -1,37 +1,23 @@
-var domains, loadOptions, saveOptions;
+var loadOptions, saveOptions;
+
+loadOptions = function() {
+  return chrome.storage.local.get(function(options) {
+    return $("#auth_token").val(options.auth_token);
+  });
+};
+
+document.addEventListener("DOMContentLoaded", loadOptions);
 
 saveOptions = function() {
-  var domain, status;
-  domain = $("#domain_list").val();
+  var status;
   chrome.storage.local.set({
-    domain: domain
-  });
-  chrome.storage.local.get(function(options) {
-    return codesy.options = options;
+    auth_token: $("#auth_token").val()
   });
   status = document.getElementById("status");
   status.innerHTML = "Saving ...";
-  setTimeout((function() {
+  return setTimeout((function() {
     return status.innerHTML = "";
   }), 750);
 };
-
-loadOptions = function() {
-  $.each(domains, function(i, v) {
-    return $("#domain_list").append($("<option>").attr("value", v).text(v));
-  });
-  return chrome.storage.local.get(function(options) {
-    var domain;
-    domain = options.domain;
-    if (!domain) {
-      domain = "api.codesy.io";
-    }
-    return $("#domain_list").val(domain);
-  });
-};
-
-domains = ["codesy.io", "127.0.0.1:5000"];
-
-document.addEventListener("DOMContentLoaded", loadOptions);
 
 document.querySelector("button#save").addEventListener("click", saveOptions);
