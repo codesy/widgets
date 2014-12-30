@@ -13,7 +13,7 @@ codesy =
   current:{url:null}
 
 chrome.storage.local.get (data)->
-  codesy.options.domain = data.domain 
+  codesy.options.auth_token = data.auth_token 
  
 codesy.api.get = (resource, ajax_params) ->
   ajax_params = ajax_params or {}
@@ -23,11 +23,17 @@ codesy.api.get = (resource, ajax_params) ->
     data: ajax_params
     dataType: "html"
 
+codesy.auth_token = ->
+  if codesy.options.auth_token
+    codesy.options.auth_token
+  else
+    codesy.getAuthOption()
+
+
 codesy.api.put = (form) ->
   $.ajax
     beforeSend: (xhr,settings) ->
-      xhr.setRequestHeader("X-CSRFToken",$('input[name="csrfmiddlewaretoken"]').value)
-      xhr.setRequestHeader("Referer",codesy.options.domain)
+      xhr.setRequestHeader("Authorization","Token "+codesy.auth_token())
     type: form.attr('method')
     url: form.attr('action')
     data: form.serialize()

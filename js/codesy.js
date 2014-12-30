@@ -21,7 +21,7 @@ codesy = {
 };
 
 chrome.storage.local.get(function(data) {
-  return codesy.options.domain = data.domain;
+  return codesy.options.auth_token = data.auth_token;
 });
 
 codesy.api.get = function(resource, ajax_params) {
@@ -34,11 +34,18 @@ codesy.api.get = function(resource, ajax_params) {
   });
 };
 
+codesy.auth_token = function() {
+  if (codesy.options.auth_token) {
+    return codesy.options.auth_token;
+  } else {
+    return codesy.getAuthOption();
+  }
+};
+
 codesy.api.put = function(form) {
   return $.ajax({
     beforeSend: function(xhr, settings) {
-      xhr.setRequestHeader("X-CSRFToken", $('input[name="csrfmiddlewaretoken"]').value);
-      return xhr.setRequestHeader("Referer", codesy.options.domain);
+      return xhr.setRequestHeader("Authorization", "Token " + codesy.auth_token());
     },
     type: form.attr('method'),
     url: form.attr('action'),
@@ -48,7 +55,7 @@ codesy.api.put = function(form) {
       return codesy.newpage();
     },
     error: function(err) {
-      return void 0;
+      return console.log(err);
     }
   });
 };
@@ -103,7 +110,7 @@ codesy.newpage = function() {
     return codesy.api.bid({
       url: window.location.href
     }).done(function(html_form) {
-      void 0;
+      console.log(html_form);
       return codesy.appendForm(html_form).done(function() {
         return codesy.form.submit(function(e) {
           codesy.api.put(codesy.form);
@@ -111,20 +118,20 @@ codesy.newpage = function() {
         });
       });
     }).fail(function(data) {
-      return void 0;
+      return console.log("$.ajax failed.");
     });
   }
 };
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
-  void 0;
+  console.log("xhr received");
   if (msg.url) {
     return codesy.newpage();
   }
 });
 
 window.onpopstate = function() {
-  void 0;
+  console.log("popstate");
   return codesy.newpage();
 };
 
