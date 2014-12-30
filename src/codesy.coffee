@@ -22,10 +22,7 @@ codesy.api.get = (resource, ajax_params) ->
     url:  codesy.options.url() + resource
     data: ajax_params
     dataType: "html"
-  
-codesy.api.bid = (params) -> 
-  codesy.api.get '/bid/',params 
-  
+
 codesy.api.put = (form) ->
   $.ajax
     beforeSend: (xhr,settings) ->
@@ -39,7 +36,10 @@ codesy.api.put = (form) ->
       codesy.newpage()
     error: (err)->
       console.log err
-
+  
+codesy.api.bid = (params) -> 
+  codesy.api.get '/bid/',params 
+  
 
 codesy.isIssue = (url)->
   rx = /https:\/\/github.com\/.*\/issues\/./g

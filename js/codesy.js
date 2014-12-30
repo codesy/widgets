@@ -34,10 +34,6 @@ codesy.api.get = function(resource, ajax_params) {
   });
 };
 
-codesy.api.bid = function(params) {
-  return codesy.api.get('/bid/', params);
-};
-
 codesy.api.put = function(form) {
   return $.ajax({
     beforeSend: function(xhr, settings) {
@@ -52,9 +48,13 @@ codesy.api.put = function(form) {
       return codesy.newpage();
     },
     error: function(err) {
-      return console.log(err);
+      return void 0;
     }
   });
+};
+
+codesy.api.bid = function(params) {
+  return codesy.api.get('/bid/', params);
 };
 
 codesy.isIssue = function(url) {
@@ -103,7 +103,7 @@ codesy.newpage = function() {
     return codesy.api.bid({
       url: window.location.href
     }).done(function(html_form) {
-      console.log(html_form);
+      void 0;
       return codesy.appendForm(html_form).done(function() {
         return codesy.form.submit(function(e) {
           codesy.api.put(codesy.form);
@@ -111,20 +111,20 @@ codesy.newpage = function() {
         });
       });
     }).fail(function(data) {
-      return console.log("$.ajax failed.");
+      return void 0;
     });
   }
 };
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
-  console.log("xhr received");
+  void 0;
   if (msg.url) {
     return codesy.newpage();
   }
 });
 
 window.onpopstate = function() {
-  console.log("popstate");
+  void 0;
   return codesy.newpage();
 };
 

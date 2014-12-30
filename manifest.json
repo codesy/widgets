@@ -40,7 +40,6 @@
         "js/jquery-2.0.3.min.js",
         "js/codesy.js"
       ],
-      "run_at" : "document_idle",
       "all_frames" : true
     }
   ]

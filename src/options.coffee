@@ -1,6 +1,6 @@
 loadOptions = ->
   chrome.storage.local.get (options) ->
-    $("#auth_token").val(options.auth_token)
+   $("#auth_token").val(options.auth_token)
     
 document.addEventListener "DOMContentLoaded", loadOptions
 
