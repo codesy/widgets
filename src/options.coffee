@@ -1,3 +1,5 @@
+
+
 loadOptions = ->
   chrome.storage.local.get (options) ->
    $("#auth_token").val(options.auth_token)
@@ -5,7 +7,9 @@ loadOptions = ->
 document.addEventListener "DOMContentLoaded", loadOptions
 
 saveOptions = ->
-  chrome.storage.local.set auth_token: $("#auth_token").val()
+  auth_token =  $("#auth_token").val()
+  chrome.storage.local.set auth_token: auth_token
+  codesy.options.auth_token = auth_token
   status = document.getElementById("status")
   status.innerHTML = "Saving ..."
   setTimeout( (-> status.innerHTML = ""), 750)

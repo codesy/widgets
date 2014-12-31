@@ -1,20 +1,17 @@
 var codesy;
 
+console.time('load');
+
 codesy = {
   options: {
-    endpoint: "/api",
-    version: "/v1",
-    domain: "mysterious-badlands-8311.herokuapp.com/",
     form: {
       heigth: 100,
       width: 100
     },
-    url: function() {
-      return "https://" + this.domain;
-    }
+    url: "https://mysterious-badlands-8311.herokuapp.com"
   },
   form: null,
-  api: {},
+  bid: {},
   current: {
     url: null
   }
@@ -24,25 +21,32 @@ chrome.storage.local.get(function(data) {
   return codesy.options.auth_token = data.auth_token;
 });
 
-codesy.api.get = function(resource, ajax_params) {
+codesy.bid.get = function(ajax_params) {
   ajax_params = ajax_params || {};
   return $.ajax({
+    beforeSend: function(xhr, settings) {
+      return xhr.setRequestHeader("Authorization", "Token " + codesy.auth_token());
+    },
     type: "get",
-    url: codesy.options.url() + resource,
+    url: codesy.options.url + '/bid/',
     data: ajax_params,
     dataType: "html"
   });
+};
+
+codesy.openOptions = function() {
+  return chrome.runtime.sendMessage("openOptions");
 };
 
 codesy.auth_token = function() {
   if (codesy.options.auth_token) {
     return codesy.options.auth_token;
   } else {
-    return codesy.getAuthOption();
+
   }
 };
 
-codesy.api.put = function(form) {
+codesy.bid.update = function(form) {
   return $.ajax({
     beforeSend: function(xhr, settings) {
       return xhr.setRequestHeader("Authorization", "Token " + codesy.auth_token());
@@ -58,10 +62,6 @@ codesy.api.put = function(form) {
       return console.log(err);
     }
   });
-};
-
-codesy.api.bid = function(params) {
-  return codesy.api.get('/bid/', params);
 };
 
 codesy.isIssue = function(url) {
@@ -89,14 +89,19 @@ codesy.positionForm = function() {
   }
 };
 
-codesy.appendForm = function(cdsyForm) {
+codesy.appendForm = function(form_html) {
   var dfd;
   dfd = new $.Deferred();
-  $("body").append(cdsyForm);
+  $("body").append(form_html);
   if ($("#codesy_bid_form").length > 0) {
     codesy.form = $("#codesy_bid_form");
-    $(window).scroll(codesy.positionForm).resize(codesy.positionForm);
     codesy.positionForm();
+    codesy.form.submit(function(e) {
+      e.preventDefault();
+      codesy.bid.update(codesy.form);
+      return false;
+    });
+    $(window).scroll(codesy.positionForm).resize(codesy.positionForm);
     dfd.resolve();
   } else {
     dfd.reject();
@@ -107,16 +112,11 @@ codesy.appendForm = function(cdsyForm) {
 codesy.newpage = function() {
   $("#codesy_bid_form").remove();
   if (codesy.isIssue(window.location.href)) {
-    return codesy.api.bid({
+    return codesy.bid.get({
       url: window.location.href
-    }).done(function(html_form) {
-      console.log(html_form);
-      return codesy.appendForm(html_form).done(function() {
-        return codesy.form.submit(function(e) {
-          codesy.api.put(codesy.form);
-          return false;
-        });
-      });
+    }).done(function(data) {
+      codesy.appendForm(data);
+      return console.log(data);
     }).fail(function(data) {
       return console.log("$.ajax failed.");
     });
@@ -136,3 +136,5 @@ window.onpopstate = function() {
 };
 
 codesy.newpage();
+
+console.timeEnd('load');

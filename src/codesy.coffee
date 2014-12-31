@@ -1,36 +1,38 @@
+console.time 'load'
+
 codesy =
   options :
-    endpoint: "/api"
-    version: "/v1"
-    domain: "mysterious-badlands-8311.herokuapp.com/",
     form:
       heigth: 100
       width: 100
-    url: ->
-      "https://" + @domain
+    url: "https://mysterious-badlands-8311.herokuapp.com"
   form: null
-  api:{}
+  bid:{}
   current:{url:null}
 
 chrome.storage.local.get (data)->
   codesy.options.auth_token = data.auth_token 
  
-codesy.api.get = (resource, ajax_params) ->
+codesy.bid.get = (ajax_params) ->
   ajax_params = ajax_params or {}
   $.ajax
+    beforeSend: (xhr,settings) ->
+      xhr.setRequestHeader("Authorization","Token "+codesy.auth_token())
     type: "get"
-    url:  codesy.options.url() + resource
+    url:  codesy.options.url +  '/bid/'
     data: ajax_params
     dataType: "html"
+
+codesy.openOptions = ->
+  chrome.runtime.sendMessage "openOptions"
 
 codesy.auth_token = ->
   if codesy.options.auth_token
     codesy.options.auth_token
   else
-    codesy.getAuthOption()
+    # chrome.tabs.create({url: "options.html"});
 
-
-codesy.api.put = (form) ->
+codesy.bid.update = (form) ->
   $.ajax
     beforeSend: (xhr,settings) ->
       xhr.setRequestHeader("Authorization","Token "+codesy.auth_token())
@@ -42,10 +44,6 @@ codesy.api.put = (form) ->
       codesy.newpage()
     error: (err)->
       console.log err
-  
-codesy.api.bid = (params) -> 
-  codesy.api.get '/bid/',params 
-  
 
 codesy.isIssue = (url)->
   rx = /https:\/\/github.com\/.*\/issues\/./g
@@ -59,37 +57,40 @@ codesy.positionForm = () ->
   else
      codesy.form.css {position: "static", top: footerTop,left:footerLeft}
 
-codesy.appendForm = (cdsyForm) ->
+codesy.appendForm = (form_html) ->
   dfd = new $.Deferred()
-  $("body").append cdsyForm
+  $("body").append form_html
   if $("#codesy_bid_form").length > 0
+
+    # add the form and position it
     codesy.form = $("#codesy_bid_form")
+    codesy.positionForm()
+
+    # wait for submit
+    codesy.form.submit (e)->
+      e.preventDefault()
+      codesy.bid.update(codesy.form)
+      false
+
+    #listen for changes
     $(window)
       .scroll(codesy.positionForm)
-      .resize(codesy.positionForm)
-    codesy.positionForm()
+      .resize(codesy.positionForm)    
     dfd.resolve()
   else
     dfd.reject()
-  dfd.promise()  
+
+  dfd.promise()
   
 codesy.newpage = ()->
   $("#codesy_bid_form").remove()
   if codesy.isIssue window.location.href
-    codesy.api.bid({url:window.location.href}) 
-      .done((html_form) ->
-        console.log html_form
-        codesy.appendForm(html_form)
-          .done( ->
-            codesy.form.submit( (e)->
-              codesy.api.put(codesy.form)
-              false
-              )
-            )
-      )  
-      .fail((data) ->
+    codesy.bid.get {url:window.location.href}
+      .done (data) ->
+        codesy.appendForm data
+        console.log data
+      .fail (data) ->
         console.log "$.ajax failed."
-      )
 
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "xhr received"
@@ -102,3 +103,7 @@ window.onpopstate = ->
   codesy.newpage()
 
 codesy.newpage()
+
+console.timeEnd 'load'
+
+
