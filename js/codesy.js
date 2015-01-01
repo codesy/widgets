@@ -17,11 +17,8 @@ codesy = {
   }
 };
 
-chrome.storage.local.get(function(data) {
-  return codesy.options.auth_token = data.auth_token;
-});
-
 codesy.bid.get = function(ajax_params) {
+  console.log(codesy.options.auth_token);
   ajax_params = ajax_params || {};
   return $.ajax({
     beforeSend: function(xhr, settings) {
@@ -55,7 +52,7 @@ codesy.bid.update = function(form) {
     url: form.attr('action'),
     data: form.serialize(),
     dataType: "html",
-    success: function() {
+    success: function(data) {
       return codesy.newpage();
     },
     error: function(err) {
@@ -66,6 +63,7 @@ codesy.bid.update = function(form) {
 
 codesy.isIssue = function(url) {
   var rx;
+  console.log('isIssue : ' + url);
   rx = /https:\/\/github.com\/.*\/issues\/./g;
   return rx.test(url);
 };
@@ -110,18 +108,27 @@ codesy.appendForm = function(form_html) {
 };
 
 codesy.newpage = function() {
+  console.time("request bid form");
   $("#codesy_bid_form").remove();
   if (codesy.isIssue(window.location.href)) {
     return codesy.bid.get({
       url: window.location.href
     }).done(function(data) {
+      console.timeEnd("request bid form");
       codesy.appendForm(data);
       return console.log(data);
     }).fail(function(data) {
-      return console.log("$.ajax failed.");
+      console.timeEnd("request bid form");
+      console.log("$.ajax failed.");
+      return console.log(data);
     });
   }
 };
+
+chrome.storage.local.get(function(data) {
+  codesy.options.auth_token = data.auth_token;
+  return codesy.newpage();
+});
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
   console.log("xhr received");
@@ -134,7 +141,5 @@ window.onpopstate = function() {
   console.log("popstate");
   return codesy.newpage();
 };
-
-codesy.newpage();
 
 console.timeEnd('load');

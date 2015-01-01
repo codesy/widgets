@@ -14,7 +14,6 @@ saveOptions = function() {
   chrome.storage.local.set({
     auth_token: auth_token
   });
-  codesy.options.auth_token = auth_token;
   status = document.getElementById("status");
   status.innerHTML = "Saving ...";
   return setTimeout((function() {

@@ -9,11 +9,9 @@ codesy =
   form: null
   bid:{}
   current:{url:null}
-
-chrome.storage.local.get (data)->
-  codesy.options.auth_token = data.auth_token 
- 
+   
 codesy.bid.get = (ajax_params) ->
+  console.log codesy.options.auth_token
   ajax_params = ajax_params or {}
   $.ajax
     beforeSend: (xhr,settings) ->
@@ -40,12 +38,13 @@ codesy.bid.update = (form) ->
     url: form.attr('action')
     data: form.serialize()
     dataType: "html"
-    success:  ->
+    success: (data) ->
       codesy.newpage()
     error: (err)->
       console.log err
 
 codesy.isIssue = (url)->
+  console.log 'isIssue : '+ url
   rx = /https:\/\/github.com\/.*\/issues\/./g
   rx.test url
   
@@ -83,14 +82,23 @@ codesy.appendForm = (form_html) ->
   dfd.promise()
   
 codesy.newpage = ()->
+  console.time "request bid form"
   $("#codesy_bid_form").remove()
   if codesy.isIssue window.location.href
     codesy.bid.get {url:window.location.href}
       .done (data) ->
+        console.timeEnd "request bid form"
         codesy.appendForm data
         console.log data
       .fail (data) ->
+        console.timeEnd "request bid form"
         console.log "$.ajax failed."
+        console.log data
+
+chrome.storage.local.get (data)->
+  codesy.options.auth_token = data.auth_token 
+  codesy.newpage()
+        
 
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "xhr received"
@@ -102,7 +110,6 @@ window.onpopstate = ->
   console.log "popstate"
   codesy.newpage()
 
-codesy.newpage()
 
 console.timeEnd 'load'
 
