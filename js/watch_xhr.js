@@ -17,6 +17,4 @@ filter = {
   ]
 };
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-  return alert("codesy msg received");
-});
+chrome.webNavigation.onHistoryStateUpdated.addListener(watch, filter);

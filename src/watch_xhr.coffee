@@ -6,7 +6,4 @@ watch = (details)->
 filter =
    url: [{originAndPathMatches:".*/github.com/.*/.*"}]
 
-
-
-
-chrome.runtime.onMessage.addListener (message, sender, sendResponse)-> alert "codesy msg received"
+chrome.webNavigation.onHistoryStateUpdated.addListener watch, filter

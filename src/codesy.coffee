@@ -1,4 +1,4 @@
-console.time 'load'
+console.time 'codesy load'
 
 codesy =
   options :
@@ -9,20 +9,6 @@ codesy =
   form: null
   bid:{}
   current:{url:null}
-   
-codesy.bid.get = (ajax_params) ->
-  console.log codesy.options.auth_token
-  ajax_params = ajax_params or {}
-  $.ajax
-    beforeSend: (xhr,settings) ->
-      xhr.setRequestHeader("Authorization","Token "+codesy.auth_token())
-    type: "get"
-    url:  codesy.options.url +  '/bid/'
-    data: ajax_params
-    dataType: "html"
-
-codesy.openOptions = ->
-  chrome.runtime.sendMessage "openOptions"
 
 codesy.auth_token = ->
   if codesy.options.auth_token
@@ -30,10 +16,20 @@ codesy.auth_token = ->
   else
     # chrome.tabs.create({url: "options.html"});
 
-codesy.bid.update = (form) ->
+codesy.bid.get = (ajax_params) ->
+  console.log 'codesy: '+ codesy.options.auth_token
+  ajax_params = ajax_params or {}
   $.ajax
-    beforeSend: (xhr,settings) ->
-      xhr.setRequestHeader("Authorization","Token "+codesy.auth_token())
+    beforeSend: (xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.options.auth_token)
+    type: "get"
+    url:  codesy.options.url +  '/bid/'
+    data: ajax_params
+    dataType: "html"
+
+codesy.bid.update = (form) ->
+  form = form or {}
+  $.ajax
+    beforeSend: (xhr,settings) -> xhr.setRequestHeader("Authorization","Token " +codesy.options.auth_token)
     type: form.attr('method')
     url: form.attr('action')
     data: form.serialize()
@@ -41,10 +37,11 @@ codesy.bid.update = (form) ->
     success: (data) ->
       codesy.newpage()
     error: (err)->
+      console.log 'codesy: bid update failed' 
       console.log err
 
 codesy.isIssue = (url)->
-  console.log 'isIssue : '+ url
+  console.log 'codesy isIssue : '+ url
   rx = /https:\/\/github.com\/.*\/issues\/./g
   rx.test url
   
@@ -82,35 +79,33 @@ codesy.appendForm = (form_html) ->
   dfd.promise()
   
 codesy.newpage = ()->
-  console.time "request bid form"
   $("#codesy_bid_form").remove()
   if codesy.isIssue window.location.href
+    console.log 'codesy: needs bid form'
+    console.time "codesy: request form"
     codesy.bid.get {url:window.location.href}
       .done (data) ->
-        console.timeEnd "request bid form"
+        console.timeEnd "codesy: request form"
         codesy.appendForm data
-        console.log data
+        # console.log data
       .fail (data) ->
-        console.timeEnd "request bid form"
-        console.log "$.ajax failed."
+        console.timeEnd "codesy: request form"
+        console.log "codesy: $.ajax failed."
         console.log data
 
 chrome.storage.local.get (data)->
   codesy.options.auth_token = data.auth_token 
   codesy.newpage()
-        
 
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
-  console.log "xhr received"
+  console.log "codesy: xhr received"
   if msg.url
     codesy.newpage()
-
      
 window.onpopstate = ->
-  console.log "popstate"
+  console.log "codesy: popstate"
   codesy.newpage()
 
-
-console.timeEnd 'load'
+console.timeEnd 'codesy load'
 
 
