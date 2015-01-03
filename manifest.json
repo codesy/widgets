@@ -12,9 +12,7 @@
   },
 
   "permissions": [
-    "https://codesy.io/",
-    "https://codesy-dev.herokuapp.com/",
-    "https://mysterious-badlands-8311.herokuapp.com/",
+    "https://api.codesy.io/",
     "storage",
     "tabs",
     "webNavigation"

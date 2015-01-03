@@ -1,6 +1,6 @@
 form#codesy_bid_form{ 
-  position: absolute;
+  position: fixed;
   background: silver;
-  margin-bottom: .5em; 
-
+  bottom: .5em; 
+  right: .5em;
 }

@@ -66,38 +66,17 @@ codesy.isIssue = function(url) {
   return rx.test(url);
 };
 
-codesy.positionForm = function() {
-  var footerLeft, footerTop;
-  footerTop = $(window).scrollTop() + $(window).height() - codesy.options.form.heigth;
-  footerLeft = $(window).width() - codesy.options.form.width;
-  if (($(document.body).height() + footerTop) > $(window).height()) {
-    return codesy.form.css({
-      position: "absolute",
-      top: footerTop,
-      left: footerLeft
-    });
-  } else {
-    return codesy.form.css({
-      position: "static",
-      top: footerTop,
-      left: footerLeft
-    });
-  }
-};
-
 codesy.appendForm = function(form_html) {
   var dfd;
   dfd = new $.Deferred();
   $("body").append(form_html);
   if ($("#codesy_bid_form").length > 0) {
     codesy.form = $("#codesy_bid_form");
-    codesy.positionForm();
     codesy.form.submit(function(e) {
       e.preventDefault();
       codesy.bid.update(codesy.form);
       return false;
     });
-    $(window).scroll(codesy.positionForm).resize(codesy.positionForm);
     dfd.resolve();
   } else {
     dfd.reject();

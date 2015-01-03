@@ -45,14 +45,6 @@ codesy.isIssue = (url)->
   rx = /https:\/\/github.com\/.*\/issues\/./g
   rx.test url
   
-codesy.positionForm = () ->
-  footerTop = $(window).scrollTop()+$(window).height()-codesy.options.form.heigth
-  footerLeft = $(window).width()-codesy.options.form.width
-  if ($(document.body).height()+footerTop) > $(window).height() 
-     codesy.form.css {position: "absolute", top: footerTop,left:footerLeft}
-  else
-     codesy.form.css {position: "static", top: footerTop,left:footerLeft}
-
 codesy.appendForm = (form_html) ->
   dfd = new $.Deferred()
   $("body").append form_html
@@ -60,7 +52,6 @@ codesy.appendForm = (form_html) ->
 
     # add the form and position it
     codesy.form = $("#codesy_bid_form")
-    codesy.positionForm()
 
     # wait for submit
     codesy.form.submit (e)->
@@ -68,10 +59,6 @@ codesy.appendForm = (form_html) ->
       codesy.bid.update(codesy.form)
       false
 
-    #listen for changes
-    $(window)
-      .scroll(codesy.positionForm)
-      .resize(codesy.positionForm)    
     dfd.resolve()
   else
     dfd.reject()

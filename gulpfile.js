@@ -7,10 +7,6 @@ var stripDebug = require('gulp-strip-debug');
 var zip = require('gulp-zip');
 
 
-gulp.task('default', function() {
-  // place code for your default task here
-});
-
 gulp.task('coffee', function() {
   gulp.src('src/*.coffee')
     .pipe(coffee({bare: true}).on('error', gutil.log))
