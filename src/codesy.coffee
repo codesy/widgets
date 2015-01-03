@@ -5,7 +5,7 @@ codesy =
     form:
       heigth: 100
       width: 100
-    url: "https://mysterious-badlands-8311.herokuapp.com"
+    url: "https://api.codesy.io/"
   form: null
   bid:{}
   current:{url:null}
