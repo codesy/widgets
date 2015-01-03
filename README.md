@@ -13,11 +13,18 @@ Getting Started with Development
 3. Fiddle with the code
 4. Reload the extension page in Chrome
 
-Developing with patronage
--------------------------
 
-By default, the extension communicates with
-[api.codesy.io](http://api.codesy.io). You should use the
-[codesy-dev.herokuapp.com](https://codesy-dev.herokuapp.com) dev site while you
-work on the extension. Configure the extension to use domain
-`codesy-dev.herokuapp.com` in the extension Options.
+Working with Gulp
+=================
+
+) node install gulp
+
+) npm install to install dependencies
+
+) gulp watch
+
+Publish
+=======
+ 
+) gulp publish ot create zip for the chrome store
+

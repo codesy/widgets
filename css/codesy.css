@@ -1,1 +1,6 @@
-form#codesy input { width: 100%; margin-bottom: .5em; }
+form#codesy_bid_form{ 
+  position: fixed;
+  background: silver;
+  bottom: .5em; 
+  right: .5em;
+}
