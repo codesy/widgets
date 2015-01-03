@@ -1,0 +1,36 @@
+{
+  "name": "codesy-chrome-extension",
+  "version": "0.0.0",
+  "description": "View codesy bids while on github issue pages",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jdungan/chrome-extension.git"
+  },
+  "keywords": [
+    "github",
+    "codesy",
+    "bid",
+    "fix",
+    "issues"
+  ],
+  "author": "John Dungan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jdungan/chrome-extension/issues"
+  },
+  "homepage": "https://github.com/jdungan/chrome-extension",
+  "dependencies": {
+    "gulp": "^3.8.6",
+    "gulp-util": "^3.0.1",
+    "gulp-coffee": "*",
+    "gulp-watch": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-strip-debug": "*",
+    "gulp-zip": "*"
+  }
+}
+

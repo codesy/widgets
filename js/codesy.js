@@ -1,118 +1,143 @@
-"use strict";
+var codesy;
 
-var codesy={};
+console.time('codesy load');
 
-(function (cdsy){
-  var pages = [
-    { domain:/.github.com/i,
-      target:{selector:'.discussion-sidebar'},
-      before_append:function(){},
-      after_append:function(){}
+codesy = {
+  options: {
+    form: {
+      heigth: 100,
+      width: 100
     },
-    { domain:/.bitbucket.org/i,
-      target:{selector:'dl.issue-attrs',
-              containers: ['<div class="issue-attr">']  }
-    },
-    { domain:/.sourceforge.net/i,
-      target:{selector:'#sidebar',
-            containers:['<li>','<ul class="sidebarmenu">']            
-          }                  
-    },
-  ]
-  
-  cdsy.options = {
-    endpoint: '/api',
-    version: '/v1',
-    domain: 'codesy-dev.herokuapp.com'
+    url: "https://api.codesy.io/"
+  },
+  form: null,
+  bid: {},
+  current: {
+    url: null
   }
+};
 
+codesy.auth_token = function() {
+  if (codesy.options.auth_token) {
+    return codesy.options.auth_token;
+  } else {
 
-  cdsy.appendForm = function(mission,codesyImgUrl, csrfToken) {
-    var dfd = new $.Deferred(),
-    
-    $codesy_link = $('<a href="http://codesy.io" target="_new"><img src="' + codesyImgUrl + '"/></a>' ),
+  }
+};
 
-    $codesy_form = $('<form>'),  
+codesy.bid.get = function(ajax_params) {
+  console.log('codesy: ' + codesy.options.auth_token);
+  ajax_params = ajax_params || {};
+  return $.ajax({
+    beforeSend: function(xhr, settings) {
+      return xhr.setRequestHeader("Authorization", "Token " + codesy.options.auth_token);
+    },
+    type: "get",
+    url: codesy.options.url + '/bid/',
+    data: ajax_params,
+    dataType: "html"
+  });
+};
 
-    $submit_button = $('<button>')
-      .attr('class','button minibutton')
-      .text('Bid')
-      .click(function(){$codesy_form.submit();});
-
-    $codesy_form
-      .attr('id', 'codesy')
-      .attr('action', 'https://' + cdsy.options.domain + '/bids')
-      .attr('method', 'POST')
-      .append('<input name="authenticity_token" type="hidden" value="' + csrfToken + '" />')
-      .append('<input type="hidden" name="bid[url]" value="' + window.location + '" />')
-      .append('<input type="text" placeholder="offer amount" id="bid_offer" name="bid[offer]"/><br/>')
-      .append('<input type="text" placeholder="ask amount" id="bid_ask" name="bid[ask]"/><br/>')
-      .append($submit_button);
-
-    var $codesy_widget = $('<div id="codesy-widget" >')
-      .append('<hr/>')
-      .append($codesy_link)
-      .append($codesy_form);
-
-    if(mission.target.containers){
-      mission.target.containers.forEach(function(elem){
-        $codesy_widget = $(elem).append($codesy_widget)
-      })
-    } 
-
-    $(mission.target.selector).first()
-      .append($codesy_widget)
-
-
-    if($('#codesy-widget').length > 0){
-      dfd.resolve()
-    } else {
-      dfd.reject()
+codesy.bid.update = function(form) {
+  form = form || {};
+  return $.ajax({
+    beforeSend: function(xhr, settings) {
+      return xhr.setRequestHeader("Authorization", "Token " + codesy.options.auth_token);
+    },
+    type: form.attr('method'),
+    url: form.attr('action'),
+    data: form.serialize(),
+    dataType: "html",
+    success: function(data) {
+      return codesy.newpage();
+    },
+    error: function(err) {
+      console.log('codesy: bid update failed');
+      return console.log(err);
     }
+  });
+};
 
-    return dfd.promise()
+codesy.isIssue = function(url) {
+  var rx;
+  console.log('codesy isIssue : ' + url);
+  rx = /https:\/\/github.com\/.*\/issues\/./g;
+  return rx.test(url);
+};
+
+codesy.positionForm = function() {
+  var footerLeft, footerTop;
+  footerTop = $(window).scrollTop() + $(window).height() - codesy.options.form.heigth;
+  footerLeft = $(window).width() - codesy.options.form.width;
+  if (($(document.body).height() + footerTop) > $(window).height()) {
+    return codesy.form.css({
+      position: "absolute",
+      top: footerTop,
+      left: footerLeft
+    });
+  } else {
+    return codesy.form.css({
+      position: "static",
+      top: footerTop,
+      left: footerLeft
+    });
   }
+};
 
-  cdsy.match = function(location){
-    var dfd = new $.Deferred(),
-    url = location.toString() || dfd.reject('No url defined') 
-    
-    pages.forEach(function(value){
-      if (value.domain.test(url)){
-        dfd.resolve(value);
-      }      
-    })
-
-    return dfd.promise();
+codesy.appendForm = function(form_html) {
+  var dfd;
+  dfd = new $.Deferred();
+  $("body").append(form_html);
+  if ($("#codesy_bid_form").length > 0) {
+    codesy.form = $("#codesy_bid_form");
+    codesy.positionForm();
+    codesy.form.submit(function(e) {
+      e.preventDefault();
+      codesy.bid.update(codesy.form);
+      return false;
+    });
+    $(window).scroll(codesy.positionForm).resize(codesy.positionForm);
+    dfd.resolve();
+  } else {
+    dfd.reject();
   }
+  return dfd.promise();
+};
 
-  //generic call
-  var call_api = function(resource, ajax_params) {
-    ajax_params = ajax_params || {};
-    return $.ajax({
-      type: "get",
-      url: "https://" + cdsy.options.domain + cdsy.options.endpoint + cdsy.options.version+resource,
-      data: ajax_params,
-      dataType: 'json'
-    })
-  };
+codesy.newpage = function() {
+  $("#codesy_bid_form").remove();
+  if (codesy.isIssue(window.location.href)) {
+    console.log('codesy: needs bid form');
+    console.time("codesy: request form");
+    return codesy.bid.get({
+      url: window.location.href
+    }).done(function(data) {
+      console.timeEnd("codesy: request form");
+      return codesy.appendForm(data);
+    }).fail(function(data) {
+      console.timeEnd("codesy: request form");
+      console.log("codesy: $.ajax failed.");
+      return console.log(data);
+    });
+  }
+};
 
-  function API(domain){
-    cdsy.options.domain = domain || cdsy.options.domain;
-    var call_map = [
-      ['csrf_token','/csrf_token.json'],
-      ['bids', '/bids.json']
-    ];
-    call_map.forEach(function(value) {
-      this.prototype[value[0]] = function(params) {
-        return call_api(value[1], params)
-      }
-    },API);
+chrome.storage.local.get(function(data) {
+  codesy.options.auth_token = data.auth_token;
+  return codesy.newpage();
+});
 
-  }  
-  
-  cdsy.api = new API;
+chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+  console.log("codesy: xhr received");
+  if (msg.url) {
+    return codesy.newpage();
+  }
+});
 
-}(codesy));
+window.onpopstate = function() {
+  console.log("codesy: popstate");
+  return codesy.newpage();
+};
 
-
+console.timeEnd('codesy load');
