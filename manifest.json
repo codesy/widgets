@@ -20,7 +20,7 @@
       "js/jquery-2.0.3.min.map"
   ],
   "background": {
-    "scripts": ["js/watch_xhr.js"],
+    "scripts": ["js/codesy_xhr.js"],
     "persistent": false
   },
   "content_scripts" : [
@@ -38,7 +38,7 @@
         ["*://*.codesy.io/*","*://127.0.0.1:*/*"],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/watch_token.js"
+        "js/codesy_token.js"
       ],
       "all_frames" : true
     }    
