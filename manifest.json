@@ -1,24 +1,21 @@
 {
   "manifest_version": 2,
-
   "name": "codesy.io",
   "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
-  "version": "1.0",
-
+  "version": "2.0",
   "icons": {
     "16": "img/icon16.png",
     "48": "img/icon48.png",
    "128": "img/icon128.png"
   },
-
   "permissions": [
     "https://api.codesy.io/",
+    "https://127.0.0.1:8443/",
     "storage",
     "tabs",
     "webNavigation"
   ],
   "options_page":"options.html",
-
   "web_accessible_resources": [
       "js/jquery-2.0.3.min.js",
       "js/jquery-2.0.3.min.map"
@@ -26,21 +23,27 @@
   "background": {
     "scripts": ["js/watch_xhr.js"],
     "persistent": false
-  
   },
   "content_scripts" : [
-    {
-      "matches" : ["*://*.github.com/*"],
+    { "matches" : ["*://*.github.com/*"],
       "css" : [
-        "css/codesy.css"
+        "css/codesy.css",
+        "css/bootstrap.min.css"
       ],
       "js" : [
         "js/jquery-2.0.3.min.js",
         "js/codesy.js"
       ],
       "all_frames" : true
-    }
+    },
+    { "matches" : 
+        ["*://*.codesy.io/*","*://127.0.0.1:*/*"],
+      "js" : [
+        "js/jquery-2.0.3.min.js",
+        "js/watch_token.js"
+      ],
+      "all_frames" : true
+    }    
   ]
-
 }
 

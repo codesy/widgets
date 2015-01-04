@@ -5,7 +5,7 @@ codesy =
     form:
       heigth: 100
       width: 100
-    url: "https://api.codesy.io/"
+    url: "https://127.0.0.1:8443"
   form: null
   bid:{}
   current:{url:null}
