@@ -15,7 +15,6 @@
     "tabs",
     "webNavigation"
   ],
-  "options_page":"options.html",
   "web_accessible_resources": [
       "js/jquery-2.0.3.min.js",
       "js/jquery-2.0.3.min.map"
@@ -27,8 +26,7 @@
   "content_scripts" : [
     { "matches" : ["*://*.github.com/*"],
       "css" : [
-        "css/codesy.css",
-        "css/bootstrap.min.css"
+        "css/codesy.css"
       ],
       "js" : [
         "js/jquery-2.0.3.min.js",
