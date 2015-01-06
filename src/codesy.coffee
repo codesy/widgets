@@ -5,7 +5,7 @@ codesy =
     form:
       heigth: 100
       width: 100
-    url: "https://127.0.0.1:8443"
+    url: "https://" + chrome.runtime.getManifest().bid_domain
   form: null
   bid:{}
   current:{url:null}
