@@ -33,7 +33,7 @@ gulp publish
 ) Creates a zip file for uploading to the chrome store
 
 gulp dev-start
------------
+--------------
 1) Creates a manifest.json file in the project root for loading the extension unpacked.
 2) Appends development server to appropriate locations in the TEMPORARY manifest.json
 
@@ -43,7 +43,6 @@ gulp dev-stop
 
 gulp watch
 ----------
-watches coffee files for changes
-
+watches coffee files for changes and recompiles .js files 
 
 Important NOTE:  prod directory contain the manifest document that will ship to the chrome store.

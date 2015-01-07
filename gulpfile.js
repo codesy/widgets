@@ -18,11 +18,11 @@ gulp.task('watch', function() {
   gulp.watch('./src/*.coffee',['coffee'])
 });
 
-gulp.task('prod_manifest',function () {
+prod_manifest = function () {
   return gulp.src([
-       'manifest.json'
-        ], { cwd : "./prod"})
-})
+    'manifest.json'
+    ], { cwd : "./prod"})
+};
 
 gulp.task('dev-start', function() {
   manifest = require('./prod/manifest.json')
@@ -49,10 +49,8 @@ gulp.task('dev-start', function() {
 });
 
 gulp.task('dev-stop',function () {
-  gulp.src([
-         'manifest.json'
-          ], { cwd : "./prod"})
-      .pipe(gulp.dest("./"))
+  prod_manifest()
+    .pipe(gulp.dest("./"))
 })
 
 gulp.task('strip_debug',function () {
@@ -62,20 +60,17 @@ gulp.task('strip_debug',function () {
 })
 
 gulp.task('zip_extension', function () { 
-  manifest = gulp.src([
-       'manifest.json'
-        ], { cwd : "./prod"})
-     
+  manifest = prod_manifest()
   others = gulp.src([
-       'css/*',
-       'img/*',
-       'js/*.js',
-       'options.html',
-      ], { base : "."})
+    'css/*',
+    'img/*',
+    'js/*.js',
+    'options.html',
+    ], { base : "."})
       
-    merge (manifest,others)  
+  merge (manifest,others)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('prod'));
 });
 
-gulp.task('publish',['coffee','strip_debug','zip_extension'])
+gulp.task('publish',['coffee','strip_debug','zip_extension']);
