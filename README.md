@@ -28,9 +28,11 @@ Gulp Tasks
 
 gulp publish
 ------------
-) runs coffee
-) removes debug lines e.g. console.log
-) Creates a zip file for uploading to the chrome store
+) runs gulp coffee to compile .js files
+
+) removes debug lines from .js files e.g. console.log
+
+) Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
 
 gulp dev-start
 --------------
