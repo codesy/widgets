@@ -26,15 +26,18 @@ gulp.task('prod_manifest',function () {
 
 gulp.task('dev-start', function() {
   manifest = require('./prod/manifest.json')
-  dev_domain  = "127.0.0.1:8443"
   permissions = manifest.permissions || []
   content_scripts = manifest.content_scripts || []
-  permissions.push("https://" + dev_domain +"/")
-  content_scripts[1].matches.push("*://"+dev_domain+"/*")
+  
+  dev_domain  = "127.0.0.1"
+  dev_port = '8443'
+
+  permissions.push("https://" + dev_domain +":"+dev_port+"/")
+  content_scripts[1].matches.push("*://"+dev_domain+":*/*")
   
   gulp.src("./prod/manifest.json")
     .pipe(jeditor({
-      'bid_domain': dev_domain
+      'bid_domain': dev_domain +":"+dev_port
     }))
     .pipe(jeditor({
       'permissions': permissions
