@@ -30,7 +30,9 @@
     "gulp-watch": "*",
     "gulp-sourcemaps": "*",
     "gulp-strip-debug": "*",
-    "gulp-zip": "*"
+    "gulp-zip": "*",
+    "gulp-json-editor": "*",
+    "merge-stream":"*"
   }
 }
 

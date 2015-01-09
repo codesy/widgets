@@ -1,4 +1,7 @@
 *.swp
 node_modules
-pkg
+manifest.json
+prod/codesy.zip
 .DS_Store
+js/codesy*.js
+

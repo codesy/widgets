@@ -23,8 +23,28 @@ Working with Gulp
 
 ) gulp watch
 
-Publish
-=======
- 
-) gulp publish ot create zip for the chrome store
+Gulp Tasks
+==========
 
+gulp publish
+------------
+) runs gulp coffee to compile .js files
+
+) removes debug lines from .js files e.g. console.log
+
+) Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
+
+gulp dev-start
+--------------
+1) Creates a manifest.json file in the project root for loading the extension unpacked.
+2) Appends development server to appropriate locations in the TEMPORARY manifest.json
+
+gulp dev-stop
+-------------
+1) Over writes the dev manifest.json for testing agains the production server
+
+gulp watch
+----------
+watches coffee files for changes and recompiles .js files 
+
+Important NOTE:  prod directory contain the manifest document that will ship to the chrome store.
