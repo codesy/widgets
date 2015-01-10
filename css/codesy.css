@@ -1,6 +1,24 @@
-form#codesy_bid_form{ 
+div#codesy_bid{
+  width:25em;
+  height:5em; 
   position: fixed;
-  background: silver;
-  bottom: .5em; 
-  right: .5em;
+  border-style:ridge;
+  background: antiquewhite;
+  bottom: .25em; 
+  right: .25em;
+}
+
+#codesy_bid_form fieldset input{
+  width: 10em;
+  heigth: .5em;
+  font-size: 80%;
+}
+
+#codesy_bid_form fieldset label{
+  font-size: 90%;
+}
+
+#codesy_bid_form #submit_bid{
+  width:48px;
+  font-size: 100% ;
 }

@@ -48,11 +48,8 @@ codesy.isIssue = (url)->
 codesy.appendForm = (form_html) ->
   dfd = new $.Deferred()
   $("body").append form_html
-  if $("#codesy_bid_form").length > 0
-
-    # add the form and position it
+  if $("#codesy_bid").length > 0
     codesy.form = $("#codesy_bid_form")
-
     # wait for submit
     codesy.form.submit (e)->
       e.preventDefault()
@@ -66,7 +63,7 @@ codesy.appendForm = (form_html) ->
   dfd.promise()
   
 codesy.newpage = ()->
-  $("#codesy_bid_form").remove()
+  $("#codesy_bid").remove()
   if codesy.isIssue window.location.href
     console.log 'codesy: needs bid form'
     console.time "codesy: request form"
