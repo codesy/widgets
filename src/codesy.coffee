@@ -2,11 +2,7 @@ console.time 'codesy load'
 
 codesy =
   options :
-    form:
-      heigth: 100
-      width: 100
     url: "https://" + chrome.runtime.getManifest().bid_domain
-  form: null
   bid:{}
   events:{}
 
@@ -16,7 +12,6 @@ class CodesyAjax
     @dataType ="html"
     @
 
-    
 codesy.auth_token = ->
   if codesy.options.auth_token
     codesy.options.auth_token
