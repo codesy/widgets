@@ -1,6 +1,6 @@
 # replace the install instructions with a check mark
 
-if $("#install-step").length > 0
+if $("#installed").length > 0
   $("#install-step").hide()
   $("#installed").show()
 
