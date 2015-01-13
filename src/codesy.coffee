@@ -64,10 +64,10 @@ codesy.newpage = ()->
         console.timeEnd "codesy: request form"
         codesy.appendForm data
         # console.log data
-      .fail (data) ->
+      .fail (err) ->
         console.timeEnd "codesy: request form"
-        console.log "codesy: $.ajax failed."
-        console.log data
+        if err.status = 401
+          codesy.appendForm err.responseText
 
 chrome.storage.local.get (data)->
   codesy.options.auth_token = data.auth_token 
