@@ -8,8 +8,14 @@ codesy =
     url: "https://" + chrome.runtime.getManifest().bid_domain
   form: null
   bid:{}
-  current:{url:null}
 
+class CodesyAjax
+  constructor: ->
+    @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.options.auth_token))()
+    @dataType ="html"
+    @
+
+    
 codesy.auth_token = ->
   if codesy.options.auth_token
     codesy.options.auth_token
@@ -17,28 +23,26 @@ codesy.auth_token = ->
     # chrome.tabs.create({url: "options.html"});
 
 codesy.bid.get = (ajax_params) ->
-  console.log 'codesy: '+ codesy.options.auth_token
-  ajax_params = ajax_params or {}
-  $.ajax
-    beforeSend: (xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.options.auth_token)
-    type: "get"
-    url:  codesy.options.url +  '/bid/'
-    data: ajax_params
-    dataType: "html"
+  ajax_options = new CodesyAjax
+  ajax_options.data = ajax_params or {}
+  ajax_options.type = "get"
+  ajax_options.url = codesy.options.url +  '/bid/'
+  $.ajax ajax_options
 
 codesy.bid.update = (form) ->
   form = form or {}
-  $.ajax
-    beforeSend: (xhr,settings) -> xhr.setRequestHeader("Authorization","Token " +codesy.options.auth_token)
-    type: form.attr('method')
-    url: form.attr('action')
-    data: form.serialize()
-    dataType: "html"
-    success: (data) ->
-      codesy.newpage()
-    error: (err)->
+  ajax_options = new CodesyAjax
+  ajax_options.data = form.serialize()
+  ajax_options.type = form.attr('method')
+  ajax_options.url = form.attr('action')
+  $.ajax ajax_options
+    .done (data) -> 
+        console.log 'codesy: bid update successful'
+        codesy.newpage()
+    .fail (err)->
       console.log 'codesy: bid update failed' 
       console.log err
+
 
 codesy.isIssue = (url)->
   console.log 'codesy isIssue : '+ url
