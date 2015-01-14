@@ -4,11 +4,6 @@
   "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
   "version": "2.0",
   "bid_domain" : "api.codesy.io",
-  "icons": {
-    "16": "img/icon16.png",
-    "48": "img/icon48.png",
-   "128": "img/icon128.png"
-  },
   "permissions": [
     "https://api.codesy.io/",
     "storage",

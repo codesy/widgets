@@ -63,7 +63,6 @@ gulp.task('zip_extension', function () {
   manifest = prod_manifest()
   others = gulp.src([
     'css/*',
-    'img/*',
     'js/*.js',
     'options.html',
     ], { base : "."})
