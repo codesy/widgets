@@ -25,12 +25,12 @@ codesy.bid.get = (ajax_params) ->
   ajax_options.url = codesy.options.url +  '/bid/'
   $.ajax ajax_options
 
-codesy.bid.update = (form) ->
-  form = form or {}
+codesy.bid.update = ($form) ->
+  $form = $form or []
   ajax_options = new CodesyAjax
-  ajax_options.data = form.serialize()
-  ajax_options.type = form.attr('method')
-  ajax_options.url = form.attr('action')
+  ajax_options.data = $form.serialize()
+  ajax_options.type = $form.attr('method')
+  ajax_options.url = $form.attr('action')
   $.ajax ajax_options
 
 codesy.isIssue = (url)->
@@ -40,7 +40,7 @@ codesy.isIssue = (url)->
   
 codesy.events.submit = (e)->
   e.preventDefault()
-  codesy.bid.update(codesy.form)
+  codesy.bid.update $ @
     .done (data) -> 
         console.log 'codesy: bid update successful'
         codesy.newpage()
@@ -64,10 +64,10 @@ codesy.newpage = ()->
         console.timeEnd "codesy: request form"
         codesy.appendForm data
         # console.log data
-      .fail (data) ->
+      .fail (err) ->
         console.timeEnd "codesy: request form"
-        console.log "codesy: $.ajax failed."
-        console.log data
+        if err.status = 401
+          codesy.appendForm err.responseText
 
 chrome.storage.local.get (data)->
   codesy.options.auth_token = data.auth_token 
