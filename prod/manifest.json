@@ -35,7 +35,7 @@
         ["*://*.codesy.io/*"],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/codesy_token.js"
+        "js/codesy_home.js"
       ],
       "all_frames" : true
     }    
