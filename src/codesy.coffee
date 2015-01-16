@@ -35,7 +35,7 @@ codesy.bid.update = ($form) ->
 
 codesy.isIssue = (url)->
   console.log 'codesy isIssue : '+ url
-  rx = /https:\/\/github.com\/.*\/issues\/./g
+  rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/g
   rx.test url
   
 codesy.events.submit = (e)->
