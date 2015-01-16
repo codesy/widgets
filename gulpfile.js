@@ -24,7 +24,7 @@ prod_manifest = function () {
     ], { cwd : "./prod"})
 };
 
-gulp.task('dev-start', function() {
+gulp.task('dev-manifest', function() {
   manifest = require('./prod/manifest.json')
   permissions = manifest.permissions || []
   content_scripts = manifest.content_scripts || []
@@ -46,7 +46,10 @@ gulp.task('dev-start', function() {
       'content_scripts': content_scripts
     }))
     .pipe(gulp.dest("./"));
+
 });
+
+gulp.task('dev-start',['coffee','dev-manifest'])
 
 gulp.task('dev-stop',function () {
   prod_manifest()
