@@ -1,28 +1,22 @@
 console.time 'codesy load'
 
 codesy =
-  options :
-    url: "https://" + chrome.runtime.getManifest().bid_domain
+  url : ""
+  auth_token : ""
   bid:{}
   events:{}
 
 class CodesyAjax
   constructor: ->
-    @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.options.auth_token))()
+    @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth_token))()
     @dataType ="html"
     @
-
-codesy.auth_token = ->
-  if codesy.options.auth_token
-    codesy.options.auth_token
-  else
-    # chrome.tabs.create({url: "options.html"});
 
 codesy.bid.get = (ajax_params) ->
   ajax_options = new CodesyAjax
   ajax_options.data = ajax_params or {}
   ajax_options.type = "get"
-  ajax_options.url = codesy.options.url +  '/bid/'
+  ajax_options.url = codesy.url +  'bid/'
   $.ajax ajax_options
 
 codesy.bid.update = ($form) ->
@@ -69,9 +63,18 @@ codesy.newpage = ()->
         if err.status = 401
           codesy.appendForm err.responseText
 
-chrome.storage.local.get (data)->
-  codesy.options.auth_token = data.auth_token 
+codesy.setDomain = (domain) ->
+  codesy.auth_token = domain.token
+  codesy.url = domain.domain
   codesy.newpage()
+
+chrome.storage.local.get (data)->
+  if data.domains[0].domain isnt codesy.url
+    codesy.setDomain(data.domains[0])
+  
+chrome.storage.onChanged.addListener (changes, namespace) ->
+  if changes.domains.newValue[0].domain isnt codesy.url
+    codesy.setDomain(changes.domains.newValue[0])
 
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "codesy: xhr received"
