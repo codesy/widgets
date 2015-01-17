@@ -37,7 +37,7 @@ gulp.task('dev-manifest', function() {
   
   gulp.src("./prod/manifest.json")
     .pipe(jeditor({
-      'bid_domain': dev_domain +":"+dev_port
+      'DEV_WARNING': 'THIS IS NOT the production manifest; use prod/manifest.json for permanent changes to manifest.json'
     }))
     .pipe(jeditor({
       'permissions': permissions
