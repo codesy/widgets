@@ -14,9 +14,6 @@ gulp.task('coffee', function() {
     .pipe(gulp.dest('js/'))
 });
 
-gulp.task('watch', function() {
-  gulp.watch('./src/*.coffee',['coffee'])
-});
 
 prod_manifest = function () {
   return gulp.src([
@@ -49,11 +46,9 @@ gulp.task('dev-manifest', function() {
 
 });
 
-gulp.task('dev-start',['coffee','dev-manifest'])
-
-gulp.task('dev-stop',function () {
-  prod_manifest()
-    .pipe(gulp.dest("./"))
+gulp.task('dev-start',['coffee','dev-manifest'],function () {
+    gulp.watch('./src/*.coffee',['coffee'])
+    gulp.watch('./prod/manifest.json',['dev-manifest'])  
 })
 
 gulp.task('strip_debug',function () {

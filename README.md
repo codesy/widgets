@@ -8,43 +8,40 @@ Getting Started with Development
 --------------------------------
 
 1. Clone this repo
-2. [Load the unpacked extension into
++=================
+
+
+2. Set up Gulp
+==+===========
+
+) node install gulp
+
+) 'npm install' to install dependencies
+
+
+3. Run 'gulp dev-start'
+======================
+1) Creates a manifest.json file in the project root for loading the extension unpacked.
+2) Appends development server to appropriate locations in the TEMPORARY manifest.json
+3) starts watching changes to src/coffee and prod/manifest
+
+
+4 [Load the unpacked extension into
+===================================
   Chrome](http://developer.chrome.com/extensions/getstarted.html#unpacked)
 3. Fiddle with the code
 4. Reload the extension page in Chrome
 
 
-Working with Gulp
-=================
 
-) node install gulp
+When you are ready to publish
+=============================
 
-) npm install to install dependencies
+Run 'gulp publish'
 
-) gulp watch
-
-Gulp Tasks
-==========
-
-gulp publish
-------------
 ) runs gulp coffee to compile .js files
 
 ) removes debug lines from .js files e.g. console.log
 
 ) Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
 
-gulp dev-start
---------------
-1) Creates a manifest.json file in the project root for loading the extension unpacked.
-2) Appends development server to appropriate locations in the TEMPORARY manifest.json
-
-gulp dev-stop
--------------
-1) Over writes the dev manifest.json for testing agains the production server
-
-gulp watch
-----------
-watches coffee files for changes and recompiles .js files 
-
-Important NOTE:  prod directory contain the manifest document that will ship to the chrome store.
