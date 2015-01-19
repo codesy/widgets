@@ -9,13 +9,9 @@ var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 
 gulp.task('coffee', function() {
-  gulp.src('src/*.coffee')
+  return gulp.src('src/*.coffee')
     .pipe(coffee({bare: true}).on('error', gutil.log))
     .pipe(gulp.dest('js/'))
-});
-
-gulp.task('watch', function() {
-  gulp.watch('./src/*.coffee',['coffee'])
 });
 
 prod_manifest = function () {
@@ -37,7 +33,7 @@ gulp.task('dev-manifest', function() {
   
   gulp.src("./prod/manifest.json")
     .pipe(jeditor({
-      'bid_domain': dev_domain +":"+dev_port
+      'DEV_WARNING': 'THIS IS NOT the production manifest; use prod/manifest.json for permanent changes to manifest.json'
     }))
     .pipe(jeditor({
       'permissions': permissions
@@ -49,20 +45,18 @@ gulp.task('dev-manifest', function() {
 
 });
 
-gulp.task('dev-start',['coffee','dev-manifest'])
-
-gulp.task('dev-stop',function () {
-  prod_manifest()
-    .pipe(gulp.dest("./"))
+gulp.task('dev-start',['coffee','dev-manifest'],function () {
+    gulp.watch('./src/*.coffee',['coffee'])
+    gulp.watch('./prod/manifest.json',['dev-manifest'])  
 })
 
-gulp.task('strip_debug',function () {
-  gulp.src('js/*.js')
+gulp.task('strip-debug',['coffee'],function () {
+  return gulp.src('js/*.js')
     .pipe(stripDebug())
     .pipe(gulp.dest('js/'))
 })
 
-gulp.task('zip_extension', function () { 
+gulp.task('publish',['strip-debug'],function () {
   manifest = prod_manifest()
   others = gulp.src([
     'css/*',
@@ -74,6 +68,5 @@ gulp.task('zip_extension', function () {
   merge (manifest,others)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('prod'));
+  
 });
-
-gulp.task('publish',['coffee','strip_debug','zip_extension']);
