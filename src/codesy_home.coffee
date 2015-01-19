@@ -11,18 +11,21 @@ if $("#api_token_pass").length > 0
   if token_found isnt "" 
     console.log("codesy: found token");
     new_token = 
-      'domain': window.location.href,
+      'domain': window.location.href
       'token': token_found
       
     chrome.storage.local.get (data) ->
-      data.domains = data.domains || []
+      console.log "codesy: local data"
+      console.dir data
+      data.domains = data.domains or []
       isSaved = data.domains
         .map((item) -> item.domain)
-          .indexOf(new_token.domain);
-      if isSaved isnt 0
-        if isSaved isnt -1
-          data.domains.splice(isSaved, 1)
-        data.domains.unshift(new_token)
-        chrome.storage.local.set(data);
+          .indexOf(new_token.domain)
+      if isSaved isnt -1
+        data.domains.splice(isSaved, 1)
+      data.domains.unshift(new_token)
+      console.log "codesy: new local data"
+      console.dir data
+      chrome.storage.local.set(data);
 
 console.timeEnd("codesy: check token");
