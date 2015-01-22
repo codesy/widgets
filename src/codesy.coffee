@@ -13,6 +13,7 @@ class CodesyAjax
     @
 
 codesy.bid.get = (ajax_params) ->
+  console.log "CODESY URL: " + codesy.url
   ajax_options = new CodesyAjax
   ajax_options.data = ajax_params or {}
   ajax_options.type = "get"
@@ -48,38 +49,45 @@ codesy.appendForm = (form_html) ->
   if $("#codesy_bid_form").length > 0
     $("#codesy_bid_form").submit codesy.events.submit
   
+codesy.setDomain = (domain) ->
+  console.log "codesy: new domain is " + domain.domain
+  codesy.auth_token = domain.token
+  codesy.url = domain.domain
+  codesy.newpage()
+
 codesy.newpage = ()->
   $("#codesy_bid").remove()
   if codesy.isIssue window.location.href
     console.log 'codesy: needs bid form'
     console.time "codesy: request form"
-    codesy.bid.get {url:window.location.href}
-      .done (data) ->
-        console.timeEnd "codesy: request form"
-        codesy.appendForm data
-        # console.log data
-      .fail (err) ->
-        console.timeEnd "codesy: request form"
-        if err.status = 401
-          codesy.appendForm err.responseText
+    chrome.storage.local.get (data)->
+      if data.domains[0].domain isnt codesy.url
+        codesy.setDomain(data.domains[0])
+        codesy.bid.get {url:window.location.href}
+          .done (data) ->
+            console.timeEnd "codesy: request form"
+            console.log "codesy: form request success"
+            codesy.appendForm data
+          .fail (err) ->
+            console.timeEnd "codesy: request form"
+            if err.status = 401
+              codesy.appendForm err.responseText
+            else
+              console.log "codesy: form request failed"
+              console.log err
 
-codesy.setDomain = (domain) ->
-  codesy.auth_token = domain.token
-  codesy.url = domain.domain
-  codesy.newpage()
+codesy.newpage()
 
-chrome.storage.local.get (data)->
-  if data.domains[0].domain isnt codesy.url
-    codesy.setDomain(data.domains[0])
-  
+
 chrome.storage.onChanged.addListener (changes, namespace) ->
-  if changes.domains.newValue[0].domain isnt codesy.url
+  console.log "codesy: token changed"
+  if changes.domains.newValue[0].domain
     codesy.setDomain(changes.domains.newValue[0])
 
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "codesy: xhr received"
   if msg.url
-    codesy.newpage()
+      codesy.newpage()
      
 window.onpopstate = ->
   console.log "codesy: popstate"
