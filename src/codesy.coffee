@@ -13,7 +13,6 @@ class CodesyAjax
     @
 
 codesy.bid.get = (ajax_params) ->
-  console.log "CODESY URL: " + codesy.url
   ajax_options = new CodesyAjax
   ajax_options.data = ajax_params or {}
   ajax_options.type = "get"
@@ -70,14 +69,13 @@ codesy.newpage = ()->
             codesy.appendForm data
           .fail (err) ->
             console.timeEnd "codesy: request form"
+            console.log "codesy: form request failed"
             if err.status = 401
               codesy.appendForm err.responseText
             else
-              console.log "codesy: form request failed"
               console.log err
 
 codesy.newpage()
-
 
 chrome.storage.onChanged.addListener (changes, namespace) ->
   console.log "codesy: token changed"
@@ -87,7 +85,7 @@ chrome.storage.onChanged.addListener (changes, namespace) ->
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "codesy: xhr received"
   if msg.url
-      codesy.newpage()
+    codesy.newpage()
      
 window.onpopstate = ->
   console.log "codesy: popstate"
