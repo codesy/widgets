@@ -1,22 +1,23 @@
 console.time 'codesy load'
 
 codesy =
-  url : ""
-  auth_token : ""
+  auth :
+    domain : ""
+    token : ""
   bid:{}
   events:{}
 
 class CodesyAjax
   constructor: ->
-    @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth_token))()
+    @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
     @dataType ="html"
     @
-
+  
 codesy.bid.get = (ajax_params) ->
   ajax_options = new CodesyAjax
   ajax_options.data = ajax_params or {}
   ajax_options.type = "get"
-  ajax_options.url = codesy.url +  'bid/'
+  ajax_options.url = codesy.auth.domain +  'bid/'
   $.ajax ajax_options
 
 codesy.bid.update = ($form) ->
@@ -27,10 +28,10 @@ codesy.bid.update = ($form) ->
   ajax_options.url = $form.attr('action')
   $.ajax ajax_options
 
-codesy.isIssue = (url)->
-  console.log 'codesy isIssue : '+ url
+codesy.isIssue = (href)->
+  console.log 'codesy isIssue : '+ href
   rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/g
-  rx.test url
+  rx.test href
   
 codesy.events.submit = (e)->
   e.preventDefault()
@@ -40,48 +41,47 @@ codesy.events.submit = (e)->
         codesy.newpage()
     .fail (err)->
       console.log 'codesy: bid update failed' 
-      console.log err  
+      console.dir err
+      console.dir codesy  
   false
 
-codesy.appendForm = (form_html) ->
+codesy.append = (form_html) ->
   $("body").append form_html
   if $("#codesy_bid_form").length > 0
     $("#codesy_bid_form").submit codesy.events.submit
   
-codesy.setDomain = (domain) ->
-  console.log "codesy: new domain is " + domain.domain
-  codesy.auth_token = domain.token
-  codesy.url = domain.domain
-  codesy.newpage()
-
 codesy.newpage = ()->
   $("#codesy_bid").remove()
   if codesy.isIssue window.location.href
     console.log 'codesy: needs bid form'
     console.time "codesy: request form"
-    chrome.storage.local.get (data)->
-      if data.domains[0].domain isnt codesy.url
-        codesy.setDomain(data.domains[0])
-        codesy.bid.get {url:window.location.href}
-          .done (data) ->
-            console.timeEnd "codesy: request form"
-            console.log "codesy: form request success"
-            codesy.appendForm data
-          .fail (err) ->
-            console.timeEnd "codesy: request form"
-            console.log "codesy: form request failed"
-            if err.status = 401
-              codesy.appendForm err.responseText
-            else
-              console.log err
+    codesy.bid.get {url:window.location.href}
+      .done (data) ->
+        console.timeEnd "codesy: request form"
+        console.log "codesy: form request success"
+        codesy.append data
+      .fail (err) ->
+        console.timeEnd "codesy: request form"
+        console.log "codesy: form request failed"
+        if err.status is 401
+          codesy.append err.responseText
+        else
+          console.log err
 
-codesy.newpage()
+codesy.auth.set = (auth) ->
+  console.log "codesy: new domain is " + auth.domain
+  codesy.auth.token = auth.token
+  codesy.auth.domain = auth.domain
+  codesy.newpage()
+
+chrome.storage.local.get (data)->
+  codesy.auth.set(data.domains[0])
 
 chrome.storage.onChanged.addListener (changes, namespace) ->
   console.log "codesy: token changed"
   if changes.domains.newValue[0].domain
-    codesy.setDomain(changes.domains.newValue[0])
-
+    codesy.auth.set(changes.domains.newValue[0])
+  
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
   console.log "codesy: xhr received"
   if msg.url
