@@ -63,7 +63,7 @@ codesy.newpage = ()->
       .fail (err) ->
         console.timeEnd "codesy: request form"
         console.log "codesy: form request failed"
-        if err.status = 401
+        if err.status is 401
           codesy.append err.responseText
         else
           console.log err
