@@ -1,7 +1,6 @@
 *.swp
 node_modules
-manifest.json
-prod/codesy.zip
 .DS_Store
-js/codesy*.js
+firefox
+chrome
 

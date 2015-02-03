@@ -1,15 +1,24 @@
-The Chrome Extension for codesy.io
+The codesy.io widget
 ==================================
-The codesy.io Chrome Extension adds codesy.io information to open-source bugs
+The codesy.io widget is Chrome Extension and Firefox addon the adds codesy.io information to open-source bugs
 you visit.
 
 
-To use the extension 'unpacked'
--------------------------------
+To use the 'unpacked' Chrome Extension
+--------------------------------------
 1. Clone this repo
-2. Copy the prod/manifest.json into the root of the project
-   (You can also run gulp dev-start)   
-3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked)
+2. Run gulp dev-start   
+3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) the unpacked chrome extension is in ./chrome/dev.
+
+Firefox SDK
+-----------
+
+Install firefox addon-sdk
+
+
+
+1. Run gulp dev-start
+
 
 
 Development
@@ -30,6 +39,8 @@ Development
 4. Load the unpacked extension (see above)
 5. Make changes the coffee script files in ./src and the ./prod/manifest.json files
 6. Reload the extension page (chrome://extensions/)
+
+
 
 
 When you are ready to publish

@@ -1,38 +1,39 @@
 {
-  "name": "codesy-chrome-extension",
-  "version": "0.0.0",
-  "description": "View codesy bids while on github issue pages",
-  "main": "gulpfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jdungan/chrome-extension.git"
-  },
-  "keywords": [
-    "github",
-    "codesy",
-    "bid",
-    "fix",
-    "issues"
-  ],
-  "author": "John Dungan",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/jdungan/chrome-extension/issues"
-  },
-  "homepage": "https://github.com/jdungan/chrome-extension",
-  "dependencies": {
-    "gulp": "^3.8.6",
-    "gulp-util": "^3.0.1",
-    "gulp-coffee": "*",
-    "gulp-watch": "*",
-    "gulp-sourcemaps": "*",
-    "gulp-strip-debug": "*",
-    "gulp-zip": "*",
-    "gulp-json-editor": "*",
-    "merge-stream":"*"
-  }
+    "license": "ISC", 
+    "name": "codesy-chrome-extension", 
+    "repository": {
+        "url": "https://github.com/jdungan/chrome-extension.git", 
+        "type": "git"
+    }, 
+    "author": "John Dungan", 
+    "bugs": {
+        "url": "https://github.com/jdungan/chrome-extension/issues"
+    }, 
+    "version": "0.0.0", 
+    "dependencies": {
+        "merge-stream": "*", 
+        "gulp-strip-debug": "*", 
+        "gulp-sourcemaps": "*", 
+        "gulp-watch": "*", 
+        "gulp-coffee": "*", 
+        "gulp": "^3.8.6", 
+        "gulp-util": "^3.0.1", 
+        "gulp-zip": "*", 
+        "gulp-json-editor": "*",
+        "gulp-shell" : "0.2.11"
+    }, 
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }, 
+    "keywords": [
+        "github", 
+        "codesy", 
+        "bid", 
+        "fix", 
+        "issues"
+    ], 
+    "main": "gulpfile.js", 
+    "homepage": "https://github.com/jdungan/chrome-extension", 
+    "id": "jid1-c7AoVz4RhpFuGA", 
+    "description": "View codesy bids while on github issue pages"
 }
-
