@@ -26,7 +26,7 @@
     { "matches" : ["*://*.github.com/*"],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/content.js",
+        "js/issue.js",
         "js/events.js"
       ],
       "all_frames" : true

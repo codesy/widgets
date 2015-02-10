@@ -6,33 +6,32 @@ if $(".installed").length > 0
    $(".installed").show()
 
 codesy={}
-  
-codesy.find = (domains,domain) ->
-  domains.map((item) -> item.domain).indexOf(domain)
+
+chrome = chrome ? false
 
 if chrome 
+  codesy.find = (domains,domain) ->
+    domains.map((item) -> item.domain).indexOf(domain)
+
   codesy.save = (domain)->
     chrome.storage.local.get (data) ->
       console.log "codesy: local data"
       data.domains = data.domains or []
-      isSaved = codesy.find(data.domains,domain.domain)
-      data.domains.splice(isSaved, 1) if isSaved isnt -1
+      idx = codesy.find(data.domains,domain.domain)
+      data.domains.splice(idx, 1) if idx isnt -1
       data.domains.unshift(domain)
       chrome.storage.local.set(data);
-  
+
+# firefox
 else
   codesy.save = (domain)->
-    data = JSON.parse(localStorage.getItem('data')) or {}
-    data.domains = data.domains or []
-    isSaved = codesy.find(data.domains,domain.domain)
-    data.domains.splice(isSaved, 1) if isSaved isnt -1
-    data.domains.unshift(new_token)
-    localStorage.setItem('data',JSON.stringify(data))
+    self.port.emit "newDomain", domain
 
-new_token = 
+
+new_domain = 
   'domain': window.location.href
   'token': $("#api_token_pass").val() or ""
       
-codesy.save(new_token)
+codesy.save(new_domain)
 
 console.log "codesy: home page script loaded"

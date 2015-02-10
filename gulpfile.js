@@ -21,13 +21,13 @@ gulp.task('chrome-coffee', function(event) {
 gulp.task('firefox-coffee', function(event) {
   return gulp.src(['./src/firefox/*.coffee','./src/*.coffee'])
     .pipe(coffee({bare: true}).on('error', gutil.log))
-    .pipe(gulp.dest('./firefox/js'))
+    .pipe(gulp.dest('./firefox/data/js'))
 });
 
 gulp.task('load-static',function () {
   static_files = gulp.src (['js/*.js','img/*.png'],{ base : "."})
   static_files.pipe(gulp.dest('chrome'))
-  static_files.pipe(gulp.dest('firefox'))  
+  static_files.pipe(gulp.dest('firefox/data'))  
 })
 
 
@@ -42,7 +42,7 @@ gulp.task('chrome-manifest', function() {
   
   gulp.src('./src/chrome/manifest.json')
     .pipe(jeditor({
-      'DEV_WARNING': 'THIS IS NOT the production manifest; use chrome/prod/manifest.json for permanent changes'
+      'DEV_WARNING': 'THIS IS NOT the production manifest; use src/chrome/manifest.json for permanent changes'
     }))
     .pipe(jeditor({
       'permissions': permissions
@@ -58,7 +58,7 @@ gulp.task('firefox-package', function() {
 
   gulp.src('./src/firefox/package.json')
     .pipe(jeditor({
-      'DEV_WARNING': 'THIS IS NOT the production package; use firefox/prod/package.json for permanent changes'
+      'DEV_WARNING': 'THIS IS NOT the production package; use src/firefox/package.json for permanent changes'
     }))
     .pipe(gulp.dest("./firefox"));
 
@@ -72,7 +72,7 @@ gulp.task('dev-chrome',['load-static','chrome-manifest','chrome-coffee'],functio
 
 gulp.task('dev-firefox',['load-static','firefox-package','firefox-coffee'],function () {
     gulp.watch('./src/firefox/package.json',['firefox-package'])
-    gulp.watch(['./src/firefox/*.coffee','.src/*.coffee'],['firefox-coffee'])  
+    gulp.watch(['./src/firefox/*.coffee','./src/*.coffee'],['firefox-coffee'])  
 
 })
 
@@ -85,7 +85,7 @@ gulp.task('go-ff',function () {
 
 // publish related tasks
 
-gulp.task('strip-debug',['coffee'],function () {
+gulp.task('strip-debug',['chrome-coffee'],function () {
   return gulp.src('js/*.js')
     .pipe(stripDebug())
     .pipe(gulp.dest('js/'))

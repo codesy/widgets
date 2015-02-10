@@ -1,6 +1,6 @@
 *.swp
 node_modules
 .DS_Store
-firefox
-chrome
+/firefox
+/chrome
 

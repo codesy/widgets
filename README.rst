@@ -7,17 +7,18 @@ you visit.
 To use the 'unpacked' Chrome Extension
 --------------------------------------
 1. Clone this repo
-2. Run gulp dev-start   
+2. Run gulp dev-chrome   
 3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) the unpacked chrome extension is in ./chrome/dev.
+
 
 Firefox SDK
 -----------
 
-Install firefox addon-sdk
-
-
-
-1. Run gulp dev-start
+Pre-requistes
+-Install cfx
+-brew install firefox-addon 
+-npm install jpm
+-Run gulp dev-firefox
 
 
 
@@ -29,15 +30,9 @@ Development
    * node install gulp
    * 'npm install' to install dependencies
 
-3. Run 'gulp dev-start' to:
-
-   * Create a manifest.json file in the project root for loading the extension unpacked.
-   * Appends development server to appropriate locations in the TEMPORARY manifest.json
-     Go here to set up the development server (http://codesy.readthedocs.org/en/latest/development.html)
-   * Starts watching changes to src/coffee and prod/manifest
-
+3. Run 'gulp dev' to:
 4. Load the unpacked extension (see above)
-5. Make changes the coffee script files in ./src and the ./prod/manifest.json files
+5. Make changes the coffee script files in ./src
 6. Reload the extension page (chrome://extensions/)
 
 
