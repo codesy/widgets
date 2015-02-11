@@ -25,7 +25,7 @@ gulp.task('firefox-coffee', function(event) {
 });
 
 gulp.task('load-static',function () {
-  static_files = gulp.src (['js/*.js','img/*.png'],{ base : "."})
+  static_files = gulp.src (['css/*','js/*.js','img/*.png'],{ base : "."})
   static_files.pipe(gulp.dest('chrome'))
   static_files.pipe(gulp.dest('firefox/data'))  
 })

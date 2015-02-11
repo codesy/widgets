@@ -10,7 +10,7 @@
   "permissions": {
     "cross-domain-content": [
       "https://api.codesy.io/",
-      "https://127.0.0.1:8443/"
+      "https://localhost:8443/"
     ]
     }
 }

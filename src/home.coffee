@@ -22,11 +22,9 @@ if chrome
       data.domains.unshift(domain)
       chrome.storage.local.set(data);
 
-# firefox
-else
+else # firefox
   codesy.save = (domain)->
     self.port.emit "newDomain", domain
-
 
 new_domain = 
   'domain': window.location.href

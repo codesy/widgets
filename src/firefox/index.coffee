@@ -8,8 +8,6 @@ notify = (msg,dat) ->
   note {
     title: "codesy"
     text: msg
-    onClick: () -> 
-      console.dir dat
   }
 
 auths =
@@ -18,30 +16,35 @@ auths =
   add : (auth)->
     domains = ss.storage.domains ? []
     idx = auths.find(domains,auth.domain)
-    notify "idx: " + idx
+    notify "token: " + auth.token
     domains.splice(idx, 1) if idx isnt -1
     domains.unshift(auth)
     ss.storage.domains = domains
   get: ->
     domains = ss.storage.domains ? []
-    notify "auths get "+domains,domains
-    domains[0]
+    domains[0] ?= {}
 
 # github issues
 pageMod.PageMod {
   include: /.*github.*/
+  contentStyleFile:[
+    './css/styles.css'
+    './css/pure-min.css'
+  ]
   contentScriptFile : [
     data.url('./js/jquery-2.0.3.min.js')
     data.url('./js/issue.js')
   ]
   onAttach: (worker)->
     worker.port.on "getDomain", ->      
+      notify "get auth: "+ auths.get().token
+      
       worker.port.emit "domain", auths.get()
   }
 
 # codesy home page
 pageMod.PageMod {
-  include: [/.*localhost.*/,/.*codesy.*/]
+  include: [/.*localhost.*/,/.*codesy.io.*/]
   contentScriptFile : [
     data.url('./js/jquery-2.0.3.min.js')
     data.url('./js/home.js')
@@ -49,5 +52,6 @@ pageMod.PageMod {
   onAttach: (worker) ->
     worker.port.on "newDomain", (domain)->
       auths.add domain
+      notify "new auth: "+domain.token
       worker.port.emit "domain", domain
   }
