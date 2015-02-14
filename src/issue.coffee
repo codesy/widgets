@@ -92,7 +92,7 @@ codesy.urlChange = () ->
     codesy.href = window.location.href
     codesy.getAuth()
   
-  window.setTimeout codesy.urlChange, 200
+  window.setTimeout codesy.urlChange, 600
 
 codesy.urlChange()
 

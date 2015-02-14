@@ -16,7 +16,6 @@ auths =
   add : (auth)->
     domains = ss.storage.domains ? []
     idx = auths.find(domains,auth.domain)
-    # notify "token: " + auth.token
     domains.splice(idx, 1) if idx isnt -1
     domains.unshift(auth)
     ss.storage.domains = domains
@@ -37,11 +36,8 @@ pageMod.PageMod {
     data.url('./js/issue.js')
   ]
   onAttach: (worker)->
-    notify "attached"
     worker.port.on "getDomain", ->      
-      notify "get auth: "+ auths.get().token
       worker.port.emit "domain", auths.get()
-
 }
 
 # codesy home page
@@ -54,6 +50,5 @@ pageMod.PageMod {
   onAttach: (worker) ->
     worker.port.on "newDomain", (domain)->
       auths.add domain
-      # notify "new auth: "+domain.token
       worker.port.emit "domain", domain
   }
