@@ -1,6 +1,7 @@
 console.time 'codesy load'
 
 codesy =
+  href : ""
   auth :
     domain : ""
     token : ""
@@ -22,11 +23,12 @@ if chrome
       codesy.auth.set data.domains[0]
 
 else # firefox
+  self.port.on "domain", (domain)->
+    codesy.auth.set domain
+    
   codesy.getAuth = () ->
-    self.port.on "domain", (domain)->
-      codesy.auth.set domain
     self.port.emit "getDomain"
-
+          
 class CodesyAjax
   constructor: ->
     @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
@@ -85,7 +87,18 @@ codesy.newpage = ()->
         else
           console.log err
 
-codesy.getAuth()
+codesy.urlChange = () ->
+  if codesy.href isnt window.location.href
+    codesy.href = window.location.href
+    codesy.getAuth()
+  
+  window.setTimeout codesy.urlChange, 200
+
+codesy.urlChange()
+
+window.onpopstate = ->
+  console.log "codesy: popstate"
+  codesy.getAuth()
 
 console.timeEnd 'codesy load'
 

@@ -4,29 +4,10 @@ The codesy.io widget is Chrome Extension and Firefox addon the adds codesy.io in
 you visit.
 
 
-To use the 'unpacked' Chrome Extension
---------------------------------------
-1. Clone this repo
-2. Run gulp dev-chrome   
-3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) the unpacked chrome extension is in ./chrome/dev.
-
-
-Firefox SDK
------------
-
-Pre-requistes
--Install cfx
--brew install firefox-addon 
--npm install jpm
--Run gulp dev-firefox
-
-
-
 Development
 -----------
 1. Clone this repo
 2. Set up Gulp
-
    * node install gulp
    * 'npm install' to install dependencies
 
@@ -36,6 +17,19 @@ Development
 6. Reload the extension page (chrome://extensions/)
 
 
+To use the 'unpacked' Chrome Extension
+--------------------------------------
+1. Clone this repo
+2. Run gulp dev-chrome   
+3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) the unpacked chrome extension is in ./chrome/dev.
+
+
+Firefox SDK
+-----------
+Pre-requistes
+* npm install jpm
+* Run gulp dev-firefox
+* run jpm
 
 
 When you are ready to publish
