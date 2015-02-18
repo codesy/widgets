@@ -7,7 +7,7 @@ codesy =
     token : ""
   bid:{}
   events:{}
-  
+
 codesy.auth.set = (auth) ->
   console.log "codesy: new domain is " + auth.domain
   if auth?
@@ -17,17 +17,49 @@ codesy.auth.set = (auth) ->
 
 chrome = chrome ? false
 
+codesy.events.submit = (e)->
+  e.preventDefault()
+  codesy.bid.update $ @
+    .done (data) -> 
+        console.log 'codesy: bid update successful'
+        codesy.newpage()
+    .fail (err)->
+      console.log 'codesy: bid update failed' 
+      console.dir err
+      console.dir codesy  
+  false
+
+
+codesy.rawAppend = (html)->
+    $new_bid = $(html)    
+    $('body').append($new_bid)        
+    $('form',$new_bid).submit codesy.events.submit
+    $new_bid
+
 if chrome 
   codesy.getAuth = () -> 
     chrome.storage.local.get (data)->
       codesy.auth.set data.domains[0]
 
+  codesy.append = (form_html) ->
+    codesy.rawAppend form_html
+    
 else # firefox
   self.port.on "domain", (domain)->
     codesy.auth.set domain
     
   codesy.getAuth = () ->
     self.port.emit "getDomain"
+
+  self.port.on "icon",(icon)->
+    codesy.$icon.attr('src',icon)
+    
+  codesy.append = (form_html) ->
+    $new_form = codesy.rawAppend(form_html)
+    $new_form.css('z-index', 999)
+    codesy.$icon = $('img',$new_form)
+    self.port.emit 'getIcon'
+
           
 class CodesyAjax
   constructor: ->
@@ -39,7 +71,7 @@ codesy.bid.get = (ajax_params) ->
   ajax_options = new CodesyAjax
   ajax_options.data = ajax_params or {}
   ajax_options.type = "get"
-  ajax_options.url = codesy.auth.domain +  'bid/'
+  ajax_options.url = codesy.auth.domain +  '/bid/'
   $.ajax ajax_options
 
 codesy.bid.update = ($form) ->
@@ -54,24 +86,7 @@ codesy.isIssue = (href)->
   console.log 'codesy isIssue : '+ href
   rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/g
   rx.test href
-  
-codesy.events.submit = (e)->
-  e.preventDefault()
-  codesy.bid.update $ @
-    .done (data) -> 
-        console.log 'codesy: bid update successful'
-        codesy.newpage()
-    .fail (err)->
-      console.log 'codesy: bid update failed' 
-      console.dir err
-      console.dir codesy  
-  false
-
-codesy.append = (form_html) ->
-  $("body").append form_html
-  if $("#codesy_bid_form").length > 0
-    $("#codesy_bid_form").submit codesy.events.submit
-  
+    
 codesy.newpage = ()->
   $("#codesy_bid").remove()
   if codesy.isIssue window.location.href

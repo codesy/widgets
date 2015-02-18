@@ -38,6 +38,11 @@ pageMod.PageMod {
   onAttach: (worker)->
     worker.port.on "getDomain", ->      
       worker.port.emit "domain", auths.get()
+
+    codesy_icon = data.url('./img/icon48.png')    
+    worker.port.on "getIcon",->
+      worker.port.emit "icon", codesy_icon
+
 }
 
 # codesy home page
@@ -50,5 +55,5 @@ pageMod.PageMod {
   onAttach: (worker) ->
     worker.port.on "newDomain", (domain)->
       auths.add domain
-      worker.port.emit "domain", domain
+      worker.port.emit "domain", auths.get()
   }

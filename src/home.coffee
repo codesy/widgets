@@ -27,7 +27,7 @@ else # firefox
     self.port.emit "newDomain", domain
 
 new_domain = 
-  'domain': window.location.href
+  'domain': window.location.origin
   'token': $("#api_token_pass").val() or ""
       
 codesy.save(new_domain)

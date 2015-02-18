@@ -1,6 +1,6 @@
 The codesy.io widget
-==================================
-The codesy.io widget is Chrome Extension and Firefox addon the adds codesy.io information to open-source bugs
+====================
+The codesy.io widget is Chrome Extension and Firefox Addon the adds codesy.io information to open-source bugs
 you visit.
 
 
@@ -10,30 +10,31 @@ Development
 2. Set up Gulp
    * node install gulp
    * 'npm install' to install dependencies
-
-3. Run 'gulp dev' to:
-4. Load the unpacked extension (see above)
-5. Make changes the coffee script files in ./src
-6. Reload the extension page (chrome://extensions/)
+3. For firefox run 'npm install jpm'
 
 
 To use the 'unpacked' Chrome Extension
 --------------------------------------
-1. Clone this repo
-2. Run gulp dev-chrome   
-3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) the unpacked chrome extension is in ./chrome/dev.
+1. Run 'gulp dev-chrome'   
+2. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) 
+3. Point to the unpacked codesy chrome extension in ./chrome.
+4. Reload the extension page (chrome://extensions/)
 
 
-Firefox SDK
------------
-Pre-requistes
-* npm install jpm
-* Run gulp dev-firefox
-* run jpm
+To use the Firefox Addon
+------------------------
+1. Run 'gulp dev-firefox'   
+2. Run 'jpm run --profile default'  (this runs a new instance of firefox with your default profile so your bookmarks, etc. are available)
 
 
-When you are ready to publish
------------------------------
+To work on Chrome and Firefox at the same time
+----------------------------------------------
+1. Run 'gulp dev'
+
+
+
+When you are ready to publish (Chrome only -- FIX THIS)
+-------------------------------------------------------
 1. Run 'gulp publish'
 
    * Runs gulp coffee to compile .js files
