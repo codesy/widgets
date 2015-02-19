@@ -9,7 +9,7 @@ var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var shell = require('gulp-shell');
 
-dev_domain  = "127.0.0.1"
+dev_domain  = "localhost"
 dev_port = '8443'
 
 gulp.task('chrome-coffee', function(event) {
@@ -54,12 +54,28 @@ gulp.task('chrome-manifest', function() {
 
 });
 
+// "permissions": {
+//   "cross-domain-content": [
+//     "https://api.codesy.io/",
+//   ]
+//   }
+
+
 gulp.task('firefox-package', function() {
+  
+  packagejson = require('./src/firefox/package.json')
+  permissions = manifest.permissions || []
+  permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
+  
+  
 
   gulp.src('./src/firefox/package.json')
     .pipe(jeditor({
       'DEV_WARNING': 'THIS IS NOT the production package; use src/firefox/package.json for permanent changes'
     }))
+    .pipe(jeditor({
+      'permissions': permissions
+    }))    
     .pipe(gulp.dest("./firefox"));
 
 });
