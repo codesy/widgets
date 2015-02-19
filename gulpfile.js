@@ -54,20 +54,11 @@ gulp.task('chrome-manifest', function() {
 
 });
 
-// "permissions": {
-//   "cross-domain-content": [
-//     "https://api.codesy.io/",
-//   ]
-//   }
-
-
 gulp.task('firefox-package', function() {
   
   packagejson = require('./src/firefox/package.json')
-  permissions = manifest.permissions || []
+  permissions = packagejson.permissions || {}
   permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
-  
-  
 
   gulp.src('./src/firefox/package.json')
     .pipe(jeditor({

@@ -55,7 +55,7 @@ else # firefox
     codesy.$icon.attr('src',icon)
     
   codesy.append = (form_html) ->
-    $new_form = codesy.rawAppend(form_html)
+    $new_form = codesy.rawAppend form_html 
     $new_form.css('z-index', 999)
     codesy.$icon = $('img',$new_form)
     self.port.emit 'getIcon'

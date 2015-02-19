@@ -4,12 +4,14 @@ The codesy.io widget is Chrome Extension and Firefox Addon the adds codesy.io in
 you visit.
 
 
-Development
------------
+Set up your local environment
+-----------------------------
 1. Clone this repo
 2. Set up Gulp
+
    * node install gulp
-   * 'npm install' to install dependencies
+   * npm install to install dependencies
+
 3. For firefox run 'npm install jpm'
 
 
@@ -23,13 +25,19 @@ To use the 'unpacked' Chrome Extension
 
 To use the Firefox Addon
 ------------------------
-1. Run 'gulp dev-firefox'   
-2. Run 'jpm run --profile default'  (this runs a new instance of firefox with your default profile so your bookmarks, etc. are available)
+1. Run 'gulp dev-firefox'.  This starts a watch for changes to *.coffee files and package.json
+
+A  new directory called firefox will be created. In a new terminal window:
+
+2. cd firefox     
+3. run 'jpm run --profile your-profile'  (this runs a new instance of firefox with your default profile so your bookmarks, etc. are available)
 
 
 To work on Chrome and Firefox at the same time
 ----------------------------------------------
-1. Run 'gulp dev'
+1. Run 'gulp dev'  This starts a watch for changes to *.coffee files and manifest.json
+
+2. You must manually refesh the extension page (chrome://extensions/) to see changes
 
 
 

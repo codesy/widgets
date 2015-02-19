@@ -9,8 +9,7 @@
   "main" : "./data/js/index.js",
   "permissions": {
     "cross-domain-content": [
-      "https://api.codesy.io/",
-      "https://localhost:8443/"
+      "https://api.codesy.io/"
     ]
     }
 }
