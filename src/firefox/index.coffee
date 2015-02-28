@@ -1,8 +1,7 @@
 data    = require("sdk/self").data
 pageMod = require('sdk/page-mod')
 ss      = require("sdk/simple-storage")
-
-note = require("sdk/notifications").notify
+note    = require("sdk/notifications").notify
 
 notify = (msg) ->
   note {
@@ -11,7 +10,7 @@ notify = (msg) ->
   }
 
 auths =
-  callme : []
+  onAdd : []
   find : (domains,domain) ->
     domains.map((item) -> item.domain).indexOf(domain)
   add : (auth)->
@@ -20,7 +19,10 @@ auths =
     domains.splice(idx, 1) if idx isnt -1
     domains.unshift(auth)
     ss.storage.domains = domains
-    
+    for  callback in auths.onAdd
+      do (auth)->
+        callback auth
+      
   get : ->
     domains = ss.storage.domains ? []
     domains[0] ?= {}
@@ -41,12 +43,15 @@ pageMod.PageMod {
     domainChange = (domain) ->
       worker.port.emit "domain", auths.get()
     
+    auths.onAdd.push domainChange
+    
     worker.port.on "getDomain", ->      
       worker.port.emit "domain", auths.get()
-      
+
     codesy_icon = data.url('./img/icon48.png')    
     worker.port.on "getIcon",->
       worker.port.emit "icon", codesy_icon
+
 }
 
 # codesy home page
