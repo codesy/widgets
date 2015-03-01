@@ -29,8 +29,7 @@ codesy.events.submit = (e)->
       console.dir codesy  
   false
 
-
-codesy.rawAppend = (html)->
+codesy.append = (html)->
     $new_bid = $(html)    
     $('body').append($new_bid)        
     $('form',$new_bid).submit codesy.events.submit
@@ -40,9 +39,6 @@ if chrome
   codesy.getAuth = () -> 
     chrome.storage.local.get (data)->
       codesy.auth.set data.domains[0]
-
-  codesy.append = (form_html) ->
-    codesy.rawAppend form_html
     
 else # firefox
   self.port.on "domain", (domain)->
@@ -53,13 +49,15 @@ else # firefox
 
   self.port.on "icon",(icon)->
     codesy.$icon.attr('src',icon)
-    
-  codesy.append = (form_html) ->
-    $new_form = codesy.rawAppend form_html 
+
+  codesy.plain_append = codesy.append
+  
+  codesy.append = (html) ->
+    $new_form = codesy.plain_append html    
     $new_form.css('z-index', 999)
     codesy.$icon = $('img',$new_form)
     self.port.emit 'getIcon'
-
+    $new_form
           
 class CodesyAjax
   constructor: ->

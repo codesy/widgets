@@ -21,13 +21,12 @@ auths =
     ss.storage.domains = domains
     for  callback in auths.onAdd
       do (auth)->
-        callback auth
-      
+        callback auth      
   get : ->
     domains = ss.storage.domains ? []
     domains[0] ?= {}
 
-# github issues
+# github issue pages
 pageMod.PageMod {
   include: /.*github.*/
   contentScriptWhen : "end"
@@ -40,18 +39,18 @@ pageMod.PageMod {
     data.url('./js/issue.js')
   ]
   onAttach: (worker)->
-    domainChange = (domain) ->
-      worker.port.emit "domain", auths.get()
+    emitDomain = (domain) ->
+      worker.port.emit "domain", domain
     
-    auths.onAdd.push domainChange
+    auths.onAdd.push emitDomain
     
+    # event from issue asking for domain
     worker.port.on "getDomain", ->      
-      worker.port.emit "domain", auths.get()
+      emitDomain auths.get()
 
     codesy_icon = data.url('./img/icon48.png')    
     worker.port.on "getIcon",->
       worker.port.emit "icon", codesy_icon
-
 }
 
 # codesy home page
