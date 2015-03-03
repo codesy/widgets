@@ -12,8 +12,6 @@ Set up your local environment
    * node install gulp
    * npm install to install dependencies
 
-3. For firefox run 'npm install jpm'
-
 
 To use the 'unpacked' Chrome Extension
 --------------------------------------
@@ -30,7 +28,7 @@ To use the Firefox Addon
 A  new directory called firefox will be created. In a new terminal window:
 
 2. cd firefox     
-3. run 'jpm run --profile your-profile'  (this runs a new instance of firefox with your default profile so your bookmarks, etc. are available)
+3. run '../node_modules/.bin jpm run --profile your-profile'  (this runs a new instance of firefox with your default profile so your bookmarks, etc. are available)
 
 
 To work on Chrome and Firefox at the same time

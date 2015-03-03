@@ -9,7 +9,7 @@ var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var shell = require('gulp-shell');
 
-dev_domain  = "localhost"
+dev_domain  = "127.0.0.1"
 dev_port = '8443'
 
 gulp.task('chrome-coffee', function(event) {
