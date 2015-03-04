@@ -2,6 +2,7 @@ console.time 'codesy load'
 
 codesy =
   href : ""
+  div_name : "codesy_ext"
   auth :
     domain : ""
     token : ""
@@ -19,7 +20,7 @@ chrome = chrome ? false
 
 codesy.events.submit = (e)->
   e.preventDefault()
-  codesy.bid.update $ @
+  codesy.bid.submit $ @
     .done (data) -> 
         console.log 'codesy: bid update successful'
         codesy.newpage()
@@ -30,7 +31,7 @@ codesy.events.submit = (e)->
   false
 
 codesy.append = (html)->
-    $new_bid = $(html)    
+    $new_bid = $('<div>').attr('id',codesy.div_name).html(html)    
     $('body').append($new_bid)        
     $('form',$new_bid).submit codesy.events.submit
     $new_bid
@@ -72,7 +73,7 @@ codesy.bid.get = (ajax_params) ->
   ajax_options.url = codesy.auth.domain +  '/bid/'
   $.ajax ajax_options
 
-codesy.bid.update = ($form) ->
+codesy.bid.submit = ($form) ->
   $form = $form or []
   ajax_options = new CodesyAjax
   ajax_options.data = $form.serialize()
@@ -86,7 +87,7 @@ codesy.isIssue = (href)->
   rx.test href
     
 codesy.newpage = ()->
-  $("#codesy_bid").remove()
+  $("#"+codesy.div_name).remove()
   if codesy.isIssue window.location.href
     console.time "codesy: request form"
     codesy.bid.get {url:window.location.href}
@@ -114,5 +115,3 @@ window.onpopstate = ->
   codesy.getAuth()
 
 console.timeEnd 'codesy load'
-
-
