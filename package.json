@@ -11,6 +11,7 @@
     }, 
     "version": "0.0.0", 
     "dependencies": {
+        "jpm": "0.0.23",
         "merge-stream": "*", 
         "gulp-strip-debug": "*", 
         "gulp-sourcemaps": "*", 
