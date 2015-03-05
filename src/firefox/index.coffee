@@ -56,7 +56,7 @@ pageMod.PageMod {
 # codesy home page
 pageMod.PageMod {
   include : [
-    /.*localhost.*/
+    /.*127.0.0.1.*/
     /.*codesy.io.*/
   ]
   contentScriptFile : [
