@@ -1,0 +1,15 @@
+{
+  "name": "codesy",
+  "title": "codesy.io",
+  "id": "codesy@codesy.io",
+  "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
+  "author": "Luke Crouch",
+  "license": "MPL 2.0",
+  "version": "0.0.9",
+  "main" : "./data/js/index.js",
+  "permissions": {
+    "cross-domain-content": [
+      "https://api.codesy.io/"
+    ]
+    }
+}

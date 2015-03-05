@@ -1,0 +1,42 @@
+/* codesy site styles */
+.glyphicon-ok {
+  color: #5CB85C;
+}
+
+iframe {
+  margin-top: 20px;
+}
+
+.spin {
+  -webkit-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+}
+
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* codesy widget styles */
+
+/* override pure CSS list styling that breaks github lists */
+menu, ol, ul {
+  padding: 0 !important;
+}
+
+#codesy_widget {
+  position: fixed;
+  bottom: 2em;
+  right: .25em;
+  border-style:ridge;
+  background: antiquewhite;
+}
+
+#codesy_widget input[type="text"] {
+  min-height: 0;
+}

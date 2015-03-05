@@ -7,33 +7,42 @@ var stripDebug = require('gulp-strip-debug');
 var merge = require('merge-stream');
 var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
+var shell = require('gulp-shell');
 
-gulp.task('coffee', function() {
-  return gulp.src('src/*.coffee')
+dev_domain  = "127.0.0.1"
+dev_port = '8443'
+
+gulp.task('chrome-coffee', function(event) {
+  return gulp.src(['./src/chrome/*.coffee','./src/*.coffee'])
     .pipe(coffee({bare: true}).on('error', gutil.log))
-    .pipe(gulp.dest('js/'))
+    .pipe(gulp.dest('./chrome/js'))
 });
 
-prod_manifest = function () {
-  return gulp.src([
-    'manifest.json'
-    ], { cwd : "./prod"})
-};
+gulp.task('firefox-coffee', function(event) {
+  return gulp.src(['./src/firefox/*.coffee','./src/*.coffee'])
+    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(gulp.dest('./firefox/data/js'))
+});
 
-gulp.task('dev-manifest', function() {
-  manifest = require('./prod/manifest.json')
+gulp.task('load-static',function () {
+  static_files = gulp.src (['css/*','js/*.js','img/*.png'],{ base: "./static", cwd : "./static"})
+  static_files.pipe(gulp.dest('chrome'))
+  static_files.pipe(gulp.dest('firefox/data'))  
+})
+
+
+gulp.task('chrome-manifest', function() {
+  
+  manifest = require('./src/chrome/manifest.json')
   permissions = manifest.permissions || []
   content_scripts = manifest.content_scripts || []
-  
-  dev_domain  = "127.0.0.1"
-  dev_port = '8443'
 
   permissions.push("https://" + dev_domain +":"+dev_port+"/")
   content_scripts[1].matches.push("*://"+dev_domain+":*/*")
   
-  gulp.src("./prod/manifest.json")
+  gulp.src('./src/chrome/manifest.json')
     .pipe(jeditor({
-      'DEV_WARNING': 'THIS IS NOT the production manifest; use prod/manifest.json for permanent changes to manifest.json'
+      'DEV_WARNING': 'THIS IS NOT the production manifest; use src/chrome/manifest.json for permanent changes'
     }))
     .pipe(jeditor({
       'permissions': permissions
@@ -41,29 +50,60 @@ gulp.task('dev-manifest', function() {
     .pipe(jeditor({
       'content_scripts': content_scripts
     }))
-    .pipe(gulp.dest("./"));
+    .pipe(gulp.dest("./chrome"));
 
 });
 
-gulp.task('dev-start',['coffee','dev-manifest'],function () {
-    gulp.watch('./src/*.coffee',['coffee'])
-    gulp.watch('./prod/manifest.json',['dev-manifest'])  
+gulp.task('firefox-package', function() {
+  
+  packagejson = require('./src/firefox/package.json')
+  permissions = packagejson.permissions || {}
+  permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
+
+  gulp.src('./src/firefox/package.json')
+    .pipe(jeditor({
+      'DEV_WARNING': 'THIS IS NOT the production package; use src/firefox/package.json for permanent changes'
+    }))
+    .pipe(jeditor({
+      'permissions': permissions
+    }))    
+    .pipe(gulp.dest("./firefox"));
+
+});
+
+
+gulp.task('dev-chrome',['load-static','chrome-manifest','chrome-coffee'],function () {
+    gulp.watch('./src/chrome/manifest.json',['chrome-manifest'])  
+    gulp.watch(['./src/chrome/*.coffee','./src/*.coffee'],['chrome-coffee'])
 })
 
-gulp.task('strip-debug',['coffee'],function () {
+gulp.task('dev-firefox',['load-static','firefox-package','firefox-coffee'],function () {
+    gulp.watch('./src/firefox/package.json',['firefox-package'])
+    gulp.watch(['./src/firefox/*.coffee','./src/*.coffee'],['firefox-coffee'])  
+
+})
+
+gulp.task('dev',['dev-chrome','dev-firefox'])
+
+
+gulp.task('go-ff',function () {
+    shell.task(['echo howdy','echo world'])  
+})
+
+// publish related tasks
+
+gulp.task('strip-debug',['chrome-coffee'],function () {
   return gulp.src('js/*.js')
     .pipe(stripDebug())
     .pipe(gulp.dest('js/'))
 })
 
-gulp.task('publish',['strip-debug'],function () {
-  manifest = prod_manifest()
+gulp.task('publish-chrome',['strip-debug'],function () {
+  manifest = src('./src/chrome/manifest.json')
   others = gulp.src([
-    'css/*',
     'img/*',
     'js/*.js',
-    'options.html',
-    ], { base : "."})
+  ], { base : "."})
       
   merge (manifest,others)
     .pipe(zip('codesy.zip'))

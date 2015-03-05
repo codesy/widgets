@@ -1,39 +1,46 @@
-The Chrome Extension for codesy.io
-==================================
-The codesy.io Chrome Extension adds codesy.io information to open-source bugs
+The codesy.io widget
+====================
+The codesy.io widget is Chrome Extension and Firefox Addon the adds codesy.io information to open-source bugs
 you visit.
 
 
-To use the extension 'unpacked'
--------------------------------
-1. Clone this repo
-2. Copy the prod/manifest.json into the root of the project
-   (You can also run gulp dev-start)   
-3. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked)
-
-
-Development
------------
+Set up your local environment
+-----------------------------
 1. Clone this repo
 2. Set up Gulp
 
    * node install gulp
-   * 'npm install' to install dependencies
-
-3. Run 'gulp dev-start' to:
-
-   * Create a manifest.json file in the project root for loading the extension unpacked.
-   * Appends development server to appropriate locations in the TEMPORARY manifest.json
-     Go here to set up the development server (http://codesy.readthedocs.org/en/latest/development.html)
-   * Starts watching changes to src/coffee and prod/manifest
-
-4. Load the unpacked extension (see above)
-5. Make changes the coffee script files in ./src and the ./prod/manifest.json files
-6. Reload the extension page (chrome://extensions/)
+   * npm install to install dependencies
 
 
-When you are ready to publish
------------------------------
+To use the 'unpacked' Chrome Extension
+--------------------------------------
+1. Run 'gulp dev-chrome'   
+2. Follow these instructions (http://developer.chrome.com/extensions/getstarted.html#unpacked) 
+3. Point to the unpacked codesy chrome extension in ./chrome.
+4. Reload the extension page (chrome://extensions/)
+
+
+To use the Firefox Addon
+------------------------
+1. Run 'gulp dev-firefox'.  This starts a watch for changes to *.coffee files and package.json
+
+A  new directory called firefox will be created. In a new terminal window:
+
+2. cd firefox     
+3. run '../node_modules/.bin jpm run --profile your-profile'  (this runs a new instance of firefox with your default profile so your bookmarks, etc. are available)
+
+
+To work on Chrome and Firefox at the same time
+----------------------------------------------
+1. Run 'gulp dev'  This starts a watch for changes to *.coffee files and manifest.json
+
+2. You must manually refesh the extension page (chrome://extensions/) to see changes
+
+
+
+When you are ready to publish (Chrome only -- FIX THIS)
+-------------------------------------------------------
 1. Run 'gulp publish'
 
    * Runs gulp coffee to compile .js files

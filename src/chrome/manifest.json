@@ -18,15 +18,12 @@
       "js/jquery-2.0.3.min.js",
       "js/jquery-2.0.3.min.map"
   ],
-  "background": {
-    "scripts": ["js/codesy_xhr.js"],
-    "persistent": false
-  },
   "content_scripts" : [
     { "matches" : ["*://*.github.com/*"],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/codesy.js"
+        "js/issue.js",
+        "js/events.js"
       ],
       "all_frames" : true
     },
@@ -34,7 +31,7 @@
         ["*://*.codesy.io/*"],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/codesy_home.js"
+        "js/home.js"
       ],
       "all_frames" : true
     }    
