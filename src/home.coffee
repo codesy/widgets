@@ -26,10 +26,14 @@ else # firefox
   codesy.save = (domain)->
     self.port.emit "newDomain", domain
 
+
+$token = $("#api_token_pass")
+      
 new_domain = 
   'domain': window.location.origin
-  'token': $("#api_token_pass").val() or ""
-      
-codesy.save(new_domain)
+  'token': $token.val() or ""
+
+if $token.length > 0
+  codesy.save(new_domain)
 
 console.log "codesy: home page script loaded"
