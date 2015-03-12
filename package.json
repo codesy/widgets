@@ -1,27 +1,27 @@
 {
     "license": "ISC", 
-    "name": "codesy-chrome-extension", 
+    "name": "codesy-widgets",
     "repository": {
-        "url": "https://github.com/jdungan/chrome-extension.git", 
+        "url": "https://github.com/codesy/widgets.git",
         "type": "git"
     }, 
     "author": "John Dungan", 
     "bugs": {
-        "url": "https://github.com/jdungan/chrome-extension/issues"
+        "url": "https://github.com/codesy/widgets/issues"
     }, 
-    "version": "0.0.0", 
+    "version": "1.0.0",
     "dependencies": {
-        "jpm": "0.0.23",
-        "merge-stream": "*", 
-        "gulp-strip-debug": "*", 
-        "gulp-sourcemaps": "*", 
-        "gulp-watch": "*", 
-        "gulp-coffee": "*", 
         "gulp": "^3.8.6", 
-        "gulp-util": "^3.0.1", 
-        "gulp-zip": "*", 
+        "gulp-coffee": "*",
         "gulp-json-editor": "*",
-        "gulp-shell" : "0.2.11"
+        "gulp-shell" : "0.2.11",
+        "gulp-sourcemaps": "*",
+        "gulp-strip-debug": "*",
+        "gulp-util": "^3.0.1", 
+        "gulp-watch": "*",
+        "gulp-zip": "*", 
+        "jpm": "0.0.23",
+        "merge-stream": "*"
     }, 
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
