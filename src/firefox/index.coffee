@@ -48,9 +48,8 @@ pageMod.PageMod {
     worker.port.on "getDomain", ->      
       emitDomain auths.get()
 
-    codesy_icon = data.url('./img/icon48.png')    
-    worker.port.on "getIcon",->
-      worker.port.emit "icon", codesy_icon
+    worker.port.on "getLocal",(file)->
+      worker.port.emit "replace", data.url('./img/'+file) 
 }
 
 # codesy home page

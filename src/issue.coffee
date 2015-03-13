@@ -48,16 +48,18 @@ else # firefox
   codesy.getAuth = () ->
     self.port.emit "getDomain"
 
-  self.port.on "icon",(icon)->
-    codesy.$icon.attr('src',icon)
+  self.port.on "replace",(src)->
+    codesy.$icon.attr('src',src)
 
   codesy.plain_append = codesy.append
   
   codesy.append = (html) ->
     $new_form = codesy.plain_append html    
-    $new_form.css('z-index', 999)
+    $('div',$new_form).css('z-index', 999)
     codesy.$icon = $('img',$new_form)
-    self.port.emit 'getIcon'
+    r = /[^/\\]+(?:jpg|gif|png)/gi
+    file_name = codesy.$icon.attr('src').match(r)[0]
+    self.port.emit 'getLocal', file_name
     $new_form
           
 class CodesyAjax
