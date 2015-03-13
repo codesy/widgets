@@ -99,10 +99,9 @@ gulp.task('strip-debug',['chrome-coffee'],function () {
 })
 
 gulp.task('publish-chrome',['strip-debug'],function () {
-  manifest = src('./src/chrome/manifest.json')
+  manifest = gulp.src('./src/chrome/manifest.json')
   others = gulp.src([
-    'img/*',
-    'js/*.js',
+    'static/js/*.js'
   ], { base : "."})
       
   merge (manifest,others)
