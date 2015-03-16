@@ -33,7 +33,6 @@ new_domain =
   'domain': window.location.origin
   'token': $token.val() or ""
 
-if $token.length > 0
-  codesy.save(new_domain)
+codesy.save(new_domain)
 
 console.log "codesy: home page script loaded"

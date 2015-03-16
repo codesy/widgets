@@ -55,8 +55,8 @@ pageMod.PageMod {
 # codesy home page
 pageMod.PageMod {
   include : [
-    /.*127.0.0.1.*/
-    /.*codesy.io.*/
+    /.*127.0.0.1:8443\//
+    /.*codesy.io\//
   ]
   contentScriptFile : [
     data.url('./js/jquery-2.0.3.min.js')
