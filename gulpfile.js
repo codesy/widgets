@@ -8,15 +8,21 @@ var merge = require('merge-stream');
 var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var shell = require('gulp-shell');
+var rename = require('gulp-rename')
 
 dev_domain  = "127.0.0.1"
 dev_port = '8443'
 
-gulp.task('chrome-coffee', function(event) {
+
+compile_chrome = function (event) {
   return gulp.src(['./src/chrome/*.coffee','./src/*.coffee'])
     .pipe(coffee({bare: true}).on('error', gutil.log))
-    .pipe(gulp.dest('./chrome/js'))
+};
+
+gulp.task('chrome-coffee', function(event) {
+    compile_chrome().pipe(gulp.dest('./chrome/js'))
 });
+
 
 gulp.task('firefox-coffee', function(event) {
   return gulp.src(['./src/firefox/*.coffee','./src/*.coffee'])
@@ -86,26 +92,17 @@ gulp.task('dev-firefox',['load-static','firefox-package','firefox-coffee'],funct
 gulp.task('dev',['dev-chrome','dev-firefox'])
 
 
-gulp.task('go-ff',function () {
-    shell.task(['echo howdy','echo world'])  
-})
-
 // publish related tasks
-
-gulp.task('strip-debug',['chrome-coffee'],function () {
-  return gulp.src('js/*.js')
-    .pipe(stripDebug())
-    .pipe(gulp.dest('js/'))
-})
-
-gulp.task('publish-chrome',['strip-debug'],function () {
-  manifest = src('./src/chrome/manifest.json')
-  others = gulp.src([
-    'img/*',
-    'js/*.js',
-  ], { base : "."})
+gulp.task('publish-chrome', function () {
+  manifest = gulp.src('./src/chrome/manifest.json')
+  clean_js = compile_chrome()
+    .pipe(stripDebug())   
+    .pipe(rename(function (path) {
+      path.dirname += "/js";
+    }))
+  static_files = gulp.src(['static/js/*.js'], { base : "./static"})
       
-  merge (manifest,others)
+  merge (manifest,clean_js,static_files)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('prod'));
   
