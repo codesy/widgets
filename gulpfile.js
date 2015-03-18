@@ -44,7 +44,7 @@ gulp.task('chrome-manifest', function() {
   content_scripts = manifest.content_scripts || []
 
   permissions.push("https://" + dev_domain +":"+dev_port+"/")
-  content_scripts[1].matches.push("*://"+dev_domain+":*/*")
+  content_scripts[1].matches.push("*://"+dev_domain+":*/")
   
   gulp.src('./src/chrome/manifest.json')
     .pipe(jeditor({

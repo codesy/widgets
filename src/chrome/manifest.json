@@ -28,7 +28,7 @@
       "all_frames" : true
     },
     { "matches" : 
-        ["*://*.codesy.io/*"],
+        ["*://*.codesy.io/"],
       "js" : [
         "js/jquery-2.0.3.min.js",
         "js/home.js"
