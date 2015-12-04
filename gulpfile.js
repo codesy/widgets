@@ -10,7 +10,7 @@ var jeditor = require("gulp-json-editor");
 var shell = require('gulp-shell');
 var rename = require('gulp-rename')
 
-dev_domain  = "127.0.0.1"
+dev_domains = ["127.0.0.1", "*.herokuapp.com"]
 dev_port = '8443'
 
 
@@ -43,8 +43,10 @@ gulp.task('chrome-manifest', function() {
   permissions = manifest.permissions || []
   content_scripts = manifest.content_scripts || []
 
-  permissions.push("https://" + dev_domain +":"+dev_port+"/")
-  content_scripts[1].matches.push("*://"+dev_domain+":*/")
+  dev_domains.forEach(function(dev_domain){
+    permissions.push("https://" + dev_domain +":"+dev_port+"/")
+    content_scripts[1].matches.push("*://"+dev_domain+":*/")
+  });
   
   gulp.src('./src/chrome/manifest.json')
     .pipe(jeditor({
@@ -64,7 +66,9 @@ gulp.task('firefox-package', function() {
   
   packagejson = require('./src/firefox/package.json')
   permissions = packagejson.permissions || {}
-  permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
+  dev_domains.forEach(function(dev_domain){
+    permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
+  });
 
   gulp.src('./src/firefox/package.json')
     .pipe(jeditor({
