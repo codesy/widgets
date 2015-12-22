@@ -1,3 +1,4 @@
+var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
@@ -38,10 +39,10 @@ gulp.task('load-static',function () {
 
 
 gulp.task('chrome-manifest', function() {
-  var manifest = require('./src/chrome/manifest.json')
-  var permissions = manifest.permissions.slice() || []
-  var content_scripts = manifest.content_scripts.slice() || []
-
+  var manifest = JSON.parse(fs.readFileSync('./src/chrome/manifest.json'));
+  var permissions = manifest.permissions || []
+  var content_scripts = manifest.content_scripts || []
+  
   permissions.push("https://" + dev_domain +":"+dev_port+"/")
   content_scripts[1].matches.push("*://"+dev_domain+":*/")
   
@@ -59,8 +60,7 @@ gulp.task('chrome-manifest', function() {
 });
 
 gulp.task('firefox-package', function() {
-  
-  packagejson = require('./src/firefox/package.json')
+  packagejson = JSON.parse(fs.readFileSync('./src/firefox/package.json'));
   permissions = packagejson.permissions.slice() || {}
   permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
 
