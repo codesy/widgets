@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
-var watch = require('gulp-watch')
 var sourcemaps = require('gulp-sourcemaps');
 var stripDebug = require('gulp-strip-debug');
 var merge = require('merge-stream');
@@ -13,18 +12,19 @@ var rename = require('gulp-rename')
 dev_domain  = "127.0.0.1"
 dev_port = '8443'
 
-
-compile_chrome = function (event) {
+compile_chrome = function () {
+  console.log("compile coffee")
   return gulp.src(['./src/chrome/*.coffee','./src/*.coffee'])
     .pipe(coffee({bare: true}).on('error', gutil.log))
 };
 
-gulp.task('chrome-coffee', function(event) {
-    compile_chrome().pipe(gulp.dest('./chrome/js'))
+gulp.task('chrome-coffee', function() {
+  console.log("chrome-coffee")
+  compile_chrome().pipe(gulp.dest('./chrome/js'))
 });
 
 
-gulp.task('firefox-coffee', function(event) {
+gulp.task('firefox-coffee', function() {
   return gulp.src(['./src/firefox/*.coffee','./src/*.coffee'])
     .pipe(coffee({bare: true}).on('error', gutil.log))
     .pipe(gulp.dest('./firefox/data/js'))
@@ -38,10 +38,9 @@ gulp.task('load-static',function () {
 
 
 gulp.task('chrome-manifest', function() {
-  
-  manifest = require('./src/chrome/manifest.json')
-  permissions = manifest.permissions || []
-  content_scripts = manifest.content_scripts || []
+  var manifest = require('./src/chrome/manifest.json')
+  var permissions = manifest.permissions.slice() || []
+  var content_scripts = manifest.content_scripts.slice() || []
 
   permissions.push("https://" + dev_domain +":"+dev_port+"/")
   content_scripts[1].matches.push("*://"+dev_domain+":*/")
@@ -57,13 +56,12 @@ gulp.task('chrome-manifest', function() {
       'content_scripts': content_scripts
     }))
     .pipe(gulp.dest("./chrome"));
-
 });
 
 gulp.task('firefox-package', function() {
   
   packagejson = require('./src/firefox/package.json')
-  permissions = packagejson.permissions || {}
+  permissions = packagejson.permissions.slice() || {}
   permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
 
   gulp.src('./src/firefox/package.json')
@@ -79,7 +77,8 @@ gulp.task('firefox-package', function() {
 
 
 gulp.task('dev-chrome',['load-static','chrome-manifest','chrome-coffee'],function () {
-    gulp.watch('./src/chrome/manifest.json',['chrome-manifest'])  
+    console.log("start watching")
+    gulp.watch('./src/chrome/manifest.json',['chrome-manifest'])
     gulp.watch(['./src/chrome/*.coffee','./src/*.coffee'],['chrome-coffee'])
 })
 
@@ -90,7 +89,6 @@ gulp.task('dev-firefox',['load-static','firefox-package','firefox-coffee'],funct
 })
 
 gulp.task('dev',['dev-chrome','dev-firefox'])
-
 
 // publish related tasks
 gulp.task('publish-chrome', function () {
