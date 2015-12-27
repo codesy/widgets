@@ -2,12 +2,15 @@ console.time 'codesy load'
 
 codesy =
   href : ""
-  div_name : "codesy_ext"
   auth :
     domain : ""
     token : ""
-  bid:{}
-  events:{}
+  bid : {}
+  events : {}
+  rx : /https:\/\/github.com\/.*\/issues\/[1-9]+/g
+  iframe :
+    attr:
+      id : "codesy_iframe"
 
 codesy.auth.set = (auth) ->
   console.log "codesy: new domain is " + auth.domain
@@ -17,24 +20,6 @@ codesy.auth.set = (auth) ->
   codesy.newpage()  
 
 chrome = chrome ? false
-
-codesy.events.submit = (e)->
-  e.preventDefault()
-  codesy.bid.submit $ @
-    .done (data) -> 
-        console.log 'codesy: bid update successful'
-        codesy.newpage()
-    .fail (err)->
-      console.log 'codesy: bid update failed' 
-      console.dir err
-      console.dir codesy  
-  false
-  
-# codesy.append = (html)->
-#     $new_bid = $('<iframe>').attr({'id':codesy.div_name,'src':html})
-#     $('body').append($new_bid)
-#     $('form',$new_bid).submit codesy.events.submit
-#     $new_bid
 
 if chrome 
   codesy.getAuth = () -> 
@@ -52,66 +37,25 @@ else # firefox
     codesy.$icon.attr('src',src)
 
   codesy.plain_append = codesy.append
-  
-  # codesy.append = (html) ->
-  #   $new_form = codesy.plain_append html
-  #   $('div',$new_form).css('z-index', 999)
-  #   codesy.$icon = $('img',$new_form)
-  #   r = /[^/\\]+(?:jpg|gif|png)/gi
-  #   file_name = codesy.$icon.attr('src').match(r)[0]
-  #   self.port.emit 'getLocal', file_name
-  #   $new_form
-          
+            
 class CodesyAjax
   constructor: ->
     @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
     @dataType ="html"
     @
   
-# codesy.bid.get = (ajax_params) ->
-#   ajax_options = new CodesyAjax
-#   ajax_options.data = ajax_params or {}
-#   ajax_options.type = "get"
-#   ajax_options.url = codesy.auth.domain +  '/bid/'
-#   $.ajax ajax_options
+codesy.bid.url = (issue_url) ->
+    codesy.auth.domain +  '/bid/?' + $.param({url:issue_url})
 
-codesy.bid.url = (ajax_params) ->
-    url = codesy.auth.domain +  '/bid/'
-    url + "?" + $.param(ajax_params)
-
-
-# codesy.bid.submit = ($form) ->
-#   $form = $form or []
-#   ajax_options = new CodesyAjax
-#   ajax_options.data = $form.serialize()
-#   ajax_options.type = $form.attr('method')
-#   ajax_options.url = $form.attr('action')
-#   $.ajax ajax_options
-
-codesy.isIssue = (href)->
-  console.log 'codesy isIssue : '+ href
-  rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/g
-  rx.test href
-    
 codesy.newpage = () ->
-  $("#"+codesy.div_name).remove()
-  if codesy.isIssue window.location.href
-    console.time "codesy: request form"
-    url = codesy.bid.url {url:window.location.href}
-    $new_bid = $('<iframe>').attr({'id':codesy.div_name,'src':url,width:"300px", height:"300px"})   
-    $('body').append($new_bid) 
-    
-    # codesy.bid.get {url:window.location.href}
-    #   .done (data) ->
-    #     console.timeEnd "codesy: request form"
-    #     codesy.append data
-    #   .fail (err) ->
-    #     console.timeEnd "codesy: request form"
-    #     if err.status is 401
-    #       codesy.append err.responseText
-    #     else
-    #       console.log err
-
+  $("#"+codesy.iframe.attr.id).remove()
+  if codesy.rx.test window.location.href
+    $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.auth.domain+'/static/css/codesy-iframe.css">')
+    codesy.iframe.attr.src = codesy.bid.url window.location.href
+    $('body').append $('<iframe>').attr(codesy.iframe.attr)
+    console.log("codesy: iFrame added")
+  else
+    console.log "codesy: not an issue"
 
 codesy.urlChange = () ->
   if codesy.href isnt window.location.href

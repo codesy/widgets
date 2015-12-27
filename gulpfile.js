@@ -61,7 +61,7 @@ gulp.task('chrome-manifest', function() {
 
 gulp.task('firefox-package', function() {
   packagejson = JSON.parse(fs.readFileSync('./src/firefox/package.json'));
-  permissions = packagejson.permissions.slice() || {}
+  permissions = packagejson.permissions || {}
   permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
 
   gulp.src('./src/firefox/package.json')

@@ -10,10 +10,16 @@
   },
   "permissions": [
     "https://api.codesy.io/",
+    "*://*.github.com/*",
     "storage",
     "tabs",
-    "webNavigation"
+    "webRequest",
+    "webRequestBlocking"
   ],
+  "background": {
+       "scripts": ["js/events.js"],
+       "persistent": true
+     },
   "web_accessible_resources": [
       "js/jquery-2.0.3.min.js",
       "js/jquery-2.0.3.min.map"
@@ -22,8 +28,7 @@
     { "matches" : ["*://*.github.com/*"],
       "js" : [
         "js/jquery-2.0.3.min.js",
-        "js/issue.js",
-        "js/events.js"
+        "js/issue.js"
       ],
       "all_frames" : true
     },
@@ -35,6 +40,5 @@
       ],
       "all_frames" : true
     }    
-  ]
+  ] 
 }
-
