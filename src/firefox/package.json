@@ -1,15 +1,22 @@
 {
-  "name": "codesy",
-  "title": "codesy.io",
-  "id": "codesy@codesy.io",
-  "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
-  "author": "Luke Crouch",
-  "license": "MPL 2.0",
-  "version": "0.0.9",
-  "main" : "./data/js/index.js",
-  "permissions": {
-    "cross-domain-content": [
-      "https://api.codesy.io/"
-    ]
-    }
+    "author": "Luke Crouch",
+    "background": {
+        "scripts": [
+            "./js/index.js"
+        ]
+    },
+    "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
+    "id": "codesy@codesy.io",
+    "license": "MPL 2.0",
+    "main": "./data/js/index.js",
+    "manifest_version": 2,
+    "name": "codesy",
+    "permissions": [
+        "*://*.github.com/*",
+        "https://api.codesy.io/",
+        "webRequest",
+        "webRequestBlocking"
+    ],
+    "title": "codesy.io",
+    "version": "0.0.9"
 }

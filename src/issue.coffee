@@ -1,4 +1,4 @@
-console.time 'codesy load'
+console.time 'codesy issue load'
 
 codesy =
   href : ""
@@ -33,11 +33,11 @@ else # firefox
   codesy.getAuth = () ->
     self.port.emit "getDomain"
 
-  self.port.on "replace",(src)->
-    codesy.$icon.attr('src',src)
+  # self.port.on "replace",(src)->
+  #   codesy.$icon.attr('src',src)
 
-  codesy.plain_append = codesy.append
-            
+  # codesy.plain_append = codesy.append
+              
 class CodesyAjax
   constructor: ->
     @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
@@ -53,9 +53,9 @@ codesy.newpage = () ->
     $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.auth.domain+'/static/css/codesy-iframe.css">')
     codesy.iframe.attr.src = codesy.bid.url window.location.href
     $('body').append $('<iframe>').attr(codesy.iframe.attr)
-    console.log("codesy: iFrame added")
+    console.log("codesy newpage: iFrame added")
   else
-    console.log "codesy: not an issue"
+    console.log "codesy newpage: not an issue"
 
 codesy.urlChange = () ->
   if codesy.href isnt window.location.href

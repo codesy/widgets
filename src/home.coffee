@@ -1,5 +1,5 @@
 console.log "codesy home page"
-
+console.time "codesy home"
 # replace the install instructions with a check mark
 if $(".installed").length > 0
    $(".install-step").hide()
@@ -24,6 +24,7 @@ if chrome
 
 else # firefox
   codesy.save = (domain)->
+    console.log "save domain: " + domain.domain
     self.port.emit "newDomain", domain
 
 
@@ -34,5 +35,4 @@ new_domain =
   'token': $token.val() or ""
 
 codesy.save(new_domain)
-
-console.log "codesy: home page script loaded"
+console.timeEnd  "codesy home"

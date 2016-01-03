@@ -14,10 +14,17 @@ dev_domain  = "127.0.0.1"
 dev_port = '8443'
 
 compile_chrome = function () {
-  console.log("compile coffee")
+  console.log("compile chrome coffee files")
   return gulp.src(['./src/chrome/*.coffee','./src/*.coffee'])
     .pipe(coffee({bare: true}).on('error', gutil.log))
 };
+
+compile_firefox = function () {
+  console.log("compile firefox coffee files")
+  return gulp.src(['./src/firefox/*.coffee','./src/*.coffee'])
+    .pipe(coffee({bare: true}).on('error', gutil.log))
+};
+
 
 gulp.task('chrome-coffee', function() {
   console.log("chrome-coffee")
@@ -60,9 +67,9 @@ gulp.task('chrome-manifest', function() {
 });
 
 gulp.task('firefox-package', function() {
-  packagejson = JSON.parse(fs.readFileSync('./src/firefox/package.json'));
-  permissions = packagejson.permissions || {}
-  permissions['cross-domain-content'].push("https://" + dev_domain +":"+dev_port+"/")
+  var manifest = JSON.parse(fs.readFileSync("./src/firefox/package.json"));
+  var permissions = manifest.permissions || {}
+  permissions.push("https://" + dev_domain +":"+dev_port+"/")
 
   gulp.src('./src/firefox/package.json')
     .pipe(jeditor({
@@ -89,6 +96,25 @@ gulp.task('dev-firefox',['load-static','firefox-package','firefox-coffee'],funct
 })
 
 gulp.task('dev',['dev-chrome','dev-firefox'])
+
+
+// create xpi for FF
+gulp.task('xpi', function () {
+  manifest = gulp.src('./src/firefox/manifest.json')
+  clean_js = compile_firefox()
+    .pipe(stripDebug())   
+    .pipe(rename(function (path) {
+      path.dirname += "/js";
+    }))
+  static_files = gulp.src(['static/js/*.js'], { base : "./static"})
+      
+  merge (manifest,clean_js,static_files)
+    .pipe(zip('codesy.zip'))
+    .pipe(gulp.dest('firefox'));
+  
+});
+
+
 
 // publish related tasks
 gulp.task('publish-chrome', function () {
