@@ -19,19 +19,20 @@ codesy.auth.set = (auth) ->
     codesy.auth.domain = auth.domain
   codesy.newpage()  
 
-chrome = chrome ? false
+onChrome = chrome.storage ? false
 
-if chrome 
+if onChrome
+  console.log "use chrome object" 
   codesy.getAuth = () -> 
     chrome.storage.local.get (data) ->
       codesy.auth.set data.domains[0]
     
 else # firefox
-  self.port.on "domain", (domain)->
-    codesy.auth.set domain
-    
+  # self.port.on "domain", (domain)->
+  #   codesy.auth.set domain
+  #
   codesy.getAuth = () ->
-    self.port.emit "getDomain"
+    chrome.runtime.sendMessage "getDomain"
 
   # self.port.on "replace",(src)->
   #   codesy.$icon.attr('src',src)
@@ -46,7 +47,7 @@ class CodesyAjax
   
 codesy.bid.url = (issue_url) ->
     codesy.auth.domain +  '/bid/?' + $.param({url:issue_url})
-
+    
 codesy.newpage = () ->
   $("#"+codesy.iframe.attr.id).remove()
   if codesy.rx.test window.location.href
