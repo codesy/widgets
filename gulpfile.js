@@ -9,6 +9,7 @@ var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var shell = require('gulp-shell');
 var rename = require('gulp-rename')
+var runSequence = require('run-sequence');
 
 dev_domain  = "127.0.0.1"
 dev_port = '8443'
@@ -28,15 +29,20 @@ gulp.task('chrome-coffee', function() {
 });
 
 
-gulp.task('firefox-coffee', function() {
-  combine_js("firefox").pipe(gulp.dest('./firefox/js'))
+gulp.task('firefox-coffee', function(cb) {
+  return combine_js("firefox").pipe(gulp.dest('./firefox/js'))
+
 });
 
-gulp.task('load-static',function () {
+gulp.task('chrome-static',function (cb) {
   static_files = static_stream()
   static_files.pipe(gulp.dest('chrome'))
-  static_files.pipe(gulp.dest('firefox'))  
 })
+
+gulp.task('firefox-static',function (cb) {
+  return gulp.src (['css/*','js/*.js','img/*.png'],{ base: "./static", cwd : "./static"}).pipe(gulp.dest('firefox')) 
+})
+
 
 
 gulp.task('chrome-manifest', function() {
@@ -63,41 +69,48 @@ gulp.task('chrome-manifest', function() {
 gulp.task('firefox-manifest', function() {
   var manifest = JSON.parse(fs.readFileSync("./src/firefox/manifest.json"));
   var permissions = manifest.permissions || {}
-  permissions.push("https://" + dev_domain +":"+dev_port+"/")
+  var content_scripts = manifest.content_scripts || []
 
-  gulp.src('./src/firefox/manifest.json')
+  permissions.push("https://" + dev_domain +":"+dev_port+"/*")
+  content_scripts[1].matches.push("https://"+dev_domain+"/")
+  
+  return gulp.src('./src/firefox/manifest.json')
     .pipe(jeditor({
-      'DEV_WARNING': 'THIS IS NOT the production package; use src/firefox/package.json for permanent changes'
+      'DEV_WARNING': 'THIS IS NOT the production package; use src/firefox/manifest.json for permanent changes'
     }))
     .pipe(jeditor({
       'permissions': permissions
     }))    
+    .pipe(jeditor({
+      'content_scripts': content_scripts
+    }))
     .pipe(gulp.dest("./firefox"));
-
 });
 
 
-gulp.task('dev-chrome',['load-static','chrome-manifest','chrome-coffee'],function () {
+gulp.task('dev-chrome',['chrome-static','chrome-manifest','chrome-coffee'],function () {
     console.log("start watching")
     gulp.watch('./src/chrome/manifest.json',['chrome-manifest'])
     gulp.watch(['./src/chrome/*.coffee','./src/*.coffee'],['chrome-coffee'])
 })
 
-gulp.task('dev-firefox',['load-static','firefox-manifest','firefox-coffee','dev-xpi'],function () {
-    gulp.watch('./src/firefox/manifest.json',['dev-xpi'])
-    gulp.watch(['./src/firefox/*.coffee','./src/*.coffee'],['dev-xpi'])  
-
+gulp.task('dev-firefox',['firefox-xpi'],function () {
+    gulp.watch('./src/firefox/manifest.json',['firefox-xpi'])
+    gulp.watch(['./src/firefox/*.coffee','./src/*.coffee'],['firefox-xpi'])  
 })
 
-gulp.task('dev-xpi',['load-static','firefox-manifest','firefox-coffee'],function () {
-  gulp.src("firefox/*")
+gulp.task('dev-xpi',function (cb) {
+  return gulp.src("firefox/**")
   .pipe(zip('codesy.xpi'))
   .pipe(gulp.dest('firefox'));
+  cb()
 })
 
+gulp.task('firefox-xpi',function (cb) {
+  runSequence('firefox-static','firefox-manifest','firefox-coffee',"dev-xpi",cb)
+})
 
 gulp.task('dev',['dev-chrome','dev-firefox'])
-
 
 // create xpi for FF
 gulp.task('publish-firefox', function () {
@@ -111,12 +124,9 @@ gulp.task('publish-firefox', function () {
   static_files = static_stream()
       
   merge (manifest,clean_js,static_files)
-    .pipe(zip('codesy.zip'))
-    .pipe(gulp.dest('firefox'));
-  
+    .pipe(zip('codesy.xpi'))
+    .pipe(gulp.dest('firefox')); 
 });
-
-
 
 // publish related tasks
 gulp.task('publish-chrome', function () {

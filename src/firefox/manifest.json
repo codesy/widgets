@@ -7,12 +7,14 @@
     "author": "Luke Crouch",
     "background": {
         "scripts": [
-            "js/background.js"
+            "js/csp.js",
+            "js/messages.js"
         ]
     },
     "content_scripts": [
         {
-            "all_frames": true,
+            "all_frames": false,
+            "run_at" : "document_end",
             "js": [
                 "js/jquery-2.0.3.min.js",
                 "js/issue.js"
@@ -22,14 +24,13 @@
             ]
         },
         {
-            "all_frames": true,
+            "all_frames": false,
             "js": [
                 "js/jquery-2.0.3.min.js",
                 "js/home.js"
             ],
             "matches": [              
-                "*://*.codesy.io/",
-                "*://127.0.0.1:8443/"
+                "*://*.codesy.io/"
             ]
         }
     ],
@@ -41,9 +42,10 @@
     "name": "codesy",
     "permissions": [
         "*://*.github.com/*",
-        "storage",
         "https://api.codesy.io/",
-        "*://127.0.0.1:8443/",
+        "notifications",
+        "storage",
+        "tabs",
         "webRequest",
         "webRequestBlocking"
     ],

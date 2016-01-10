@@ -5,34 +5,35 @@ if $(".installed").length > 0
    $(".install-step").hide()
    $(".installed").show()
 
-# codesy={}
-#
-# chrome = chrome.storage ? falsez
-#
-# if chrome
-#   codesy.find = (domains,domain) ->
-#     domains.map((item) -> item.domain).indexOf(domain)
-#
-#   codesy.save = (domain)->
-#     chrome.storage.local.get (data) ->
-#       console.log "codesy: local data"
-#       data.domains = data.domains or []
-#       idx = codesy.find(data.domains,domain.domain)
-#       data.domains.splice(idx, 1) if idx isnt -1
-#       data.domains.unshift(domain)
-#       chrome.storage.local.set(data);
-#
-# else # firefox
-#   codesy.save = (domain)->
-#     console.log "save domain: " + domain.domain
-#     self.port.emit "newDomain", domain
-#
-#
-# $token = $("#api_token_pass")
-#
-# new_domain =
-#   'domain': window.location.origin
-#   'token': $token.val() or ""
-#
-# codesy.save(new_domain)
-# console.timeEnd  "codesy home"
+codesy={}
+
+isChrome = chrome.storage ? false
+
+if isChrome
+  codesy.find = (domains,domain) ->
+    domains.map((item) -> item.domain).indexOf(domain)
+
+  codesy.save = (home)->
+    chrome.storage.local.get null,(data) ->
+      console.log "codesy: local data"
+      data.domains = data.domains or []
+      idx = codesy.find(data.domains,home.domain)
+      data.domains.splice(idx, 1) if idx isnt -1
+      data.domains.unshift(home)
+      chrome.storage.local.set(data);
+
+else # firefox
+  codesy.save = (home)->
+    console.log "save domain: " + home.domain
+    chrome.runtime.sendMessage home
+
+$token = $("#api_token_pass")
+
+codesy_home =
+  'task' : "setHome"
+  'domain': window.location.origin
+  'token': $token.val() or ""
+
+codesy.save(codesy_home)
+
+console.timeEnd  "codesy home"

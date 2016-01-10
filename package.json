@@ -1,40 +1,43 @@
 {
-    "license": "ISC", 
-    "name": "codesy-widgets",
-    "repository": {
-        "url": "https://github.com/codesy/widgets.git",
-        "type": "git"
-    }, 
-    "author": "John Dungan", 
-    "bugs": {
-        "url": "https://github.com/codesy/widgets/issues"
-    }, 
-    "version": "1.0.0",
-    "dependencies": {
-        "gulp": "^3.9.0", 
-        "gulp-coffee": "2.3.1",
-        "gulp-json-editor": "2.2.1",
-        "gulp-rename": "^1.2.0",
-        "gulp-shell" : "0.2.11",
-        "gulp-sourcemaps": "1.5.0",
-        "gulp-strip-debug": "1.0.2",
-        "gulp-util": "^3.0.1",
-        "gulp-zip": "2.0.3",
-        "jpm": "0.0.23",
-        "merge-stream": "0.1.7"
-    }, 
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    }, 
-    "keywords": [
-        "github", 
-        "codesy", 
-        "bid", 
-        "fix", 
-        "issues"
-    ], 
-    "main": "gulpfile.js", 
-    "homepage": "https://github.com/jdungan/chrome-extension", 
-    "id": "jid1-c7AoVz4RhpFuGA", 
-    "description": "View codesy bids while on github issue pages"
+  "license": "ISC",
+  "name": "codesy-widgets",
+  "repository": {
+    "url": "https://github.com/codesy/widgets.git",
+    "type": "git"
+  },
+  "author": "John Dungan",
+  "bugs": {
+    "url": "https://github.com/codesy/widgets/issues"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gulp-coffee": "2.3.1",
+    "gulp-json-editor": "2.2.1",
+    "gulp-rename": "^1.2.0",
+    "gulp-shell": "0.2.11",
+    "gulp-sourcemaps": "1.5.0",
+    "gulp-strip-debug": "1.0.2",
+    "gulp-util": "^3.0.1",
+    "gulp-zip": "2.0.3",
+    "jpm": "0.0.23",
+    "merge-stream": "0.1.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "github",
+    "codesy",
+    "bid",
+    "fix",
+    "issues"
+  ],
+  "main": "gulpfile.js",
+  "homepage": "https://github.com/jdungan/chrome-extension",
+  "id": "jid1-c7AoVz4RhpFuGA",
+  "description": "View codesy bids while on github issue pages",
+  "devDependencies": {
+    "run-sequence": "^1.1.5"
+  }
 }
