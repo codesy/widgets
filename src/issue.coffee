@@ -1,119 +1,69 @@
-console.time 'codesy load'
+console.time 'codesy issue load'
 
 codesy =
   href : ""
-  div_name : "codesy_ext"
-  auth :
-    domain : ""
-    token : ""
-  bid:{}
-  events:{}
+  home : {}
+  bid : {}
+  events : {}
+  rx : /https:\/\/github.com\/.*\/issues\/[1-9]+/g
+  iframe :
+    attr:
+      id : "codesy_iframe"
 
-codesy.auth.set = (auth) ->
-  console.log "codesy: new domain is " + auth.domain
-  if auth?
-    codesy.auth.token = auth.token
-    codesy.auth.domain = auth.domain
-  codesy.newpage()  
-
-chrome = chrome ? false
-
-codesy.events.submit = (e)->
-  e.preventDefault()
-  codesy.bid.submit $ @
-    .done (data) -> 
-        console.log 'codesy: bid update successful'
-        codesy.newpage()
-    .fail (err)->
-      console.log 'codesy: bid update failed' 
-      console.dir err
-      console.dir codesy  
-  false
-
-codesy.append = (html)->
-    $new_bid = $('<div>').attr('id',codesy.div_name).html(html)    
-    $('body').append($new_bid)        
-    $('form',$new_bid).submit codesy.events.submit
-    $new_bid
-
-if chrome 
-  codesy.getAuth = () -> 
-    chrome.storage.local.get (data)->
-      codesy.auth.set data.domains[0]
-    
-else # firefox
-  self.port.on "domain", (domain)->
-    codesy.auth.set domain
-    
-  codesy.getAuth = () ->
-    self.port.emit "getDomain"
-
-  self.port.on "replace",(src)->
-    codesy.$icon.attr('src',src)
-
-  codesy.plain_append = codesy.append
   
-  codesy.append = (html) ->
-    $new_form = codesy.plain_append html    
-    $('div',$new_form).css('z-index', 999)
-    codesy.$icon = $('img',$new_form)
-    r = /[^/\\]+(?:jpg|gif|png)/gi
-    file_name = codesy.$icon.attr('src').match(r)[0]
-    self.port.emit 'getLocal', file_name
-    $new_form
-          
 class CodesyAjax
   constructor: ->
     @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
     @dataType ="html"
     @
   
-codesy.bid.get = (ajax_params) ->
-  ajax_options = new CodesyAjax
-  ajax_options.data = ajax_params or {}
-  ajax_options.type = "get"
-  ajax_options.url = codesy.auth.domain +  '/bid/'
-  $.ajax ajax_options
+codesy.bid.url = (issue_url) ->
+    codesy.home.domain +  '/bid/?' + $.param({url:issue_url})
 
-codesy.bid.submit = ($form) ->
-  $form = $form or []
-  ajax_options = new CodesyAjax
-  ajax_options.data = $form.serialize()
-  ajax_options.type = $form.attr('method')
-  ajax_options.url = $form.attr('action')
-  $.ajax ajax_options
+onChrome = chrome.storage ? false
 
-codesy.isIssue = (href)->
-  console.log 'codesy isIssue : '+ href
-  rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/g
-  rx.test href
+if onChrome
+  console.log "use chrome object" 
+  codesy.getHome = () -> 
+    chrome.storage.local.get null,(data) ->
+      codesy.home = data.domains[0]
+      codesy.newpage()  
     
-codesy.newpage = ()->
-  $("#"+codesy.div_name).remove()
-  if codesy.isIssue window.location.href
-    console.time "codesy: request form"
-    codesy.bid.get {url:window.location.href}
-      .done (data) ->
-        console.timeEnd "codesy: request form"
-        codesy.append data
-      .fail (err) ->
-        console.timeEnd "codesy: request form"
-        if err.status is 401
-          codesy.append err.responseText
-        else
-          console.log err
+else # firefox
+  codesy.getHome = () ->
+    # codesy.home = {domain:"https://127.0.0.1:8443"}
+    if codesy.home.domain
+      codesy.newpage()  
+    else
+      chrome.runtime.sendMessage { task : "getHome"  }
+
+  chrome.runtime.onMessage.addListener (message) ->
+      switch message.task
+        when 'ackHome'
+          codesy.home = message
+          codesy.newpage()  
+
+codesy.newpage = () ->
+  $("#"+codesy.iframe.attr.id).remove()
+  if codesy.rx.test window.location.href
+    $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.home.domain+'/static/css/codesy-iframe.css">')
+    codesy.iframe.attr.src = codesy.bid.url window.location.href
+    $('body').append $('<iframe>').attr(codesy.iframe.attr)
+    console.log("codesy newpage: iFrame added")
+  else
+    console.log "codesy newpage: not an issue"
 
 codesy.urlChange = () ->
   if codesy.href isnt window.location.href
+    console.log "codesy: url changed"
     codesy.href = window.location.href
-    codesy.getAuth()
-  
+    codesy.getHome()
   window.setTimeout codesy.urlChange, 600
 
 codesy.urlChange()
 
 window.onpopstate = ->
   console.log "codesy: popstate"
-  codesy.getAuth()
+  codesy.getHome()
 
-console.timeEnd 'codesy load'
+console.timeEnd 'codesy issue load'

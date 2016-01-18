@@ -1,5 +1,5 @@
 console.log "codesy home page"
-
+console.time "codesy home"
 # replace the install instructions with a check mark
 if $(".installed").length > 0
    $(".install-step").hide()
@@ -7,32 +7,33 @@ if $(".installed").length > 0
 
 codesy={}
 
-chrome = chrome ? false
+isChrome = chrome.storage ? false
 
-if chrome 
+if isChrome
   codesy.find = (domains,domain) ->
     domains.map((item) -> item.domain).indexOf(domain)
 
-  codesy.save = (domain)->
-    chrome.storage.local.get (data) ->
+  codesy.save = (home)->
+    chrome.storage.local.get null,(data) ->
       console.log "codesy: local data"
       data.domains = data.domains or []
-      idx = codesy.find(data.domains,domain.domain)
+      idx = codesy.find(data.domains,home.domain)
       data.domains.splice(idx, 1) if idx isnt -1
-      data.domains.unshift(domain)
+      data.domains.unshift(home)
       chrome.storage.local.set(data);
 
 else # firefox
-  codesy.save = (domain)->
-    self.port.emit "newDomain", domain
-
+  codesy.save = (home)->
+    console.log "save domain: " + home.domain
+    chrome.runtime.sendMessage home
 
 $token = $("#api_token_pass")
-      
-new_domain = 
+
+codesy_home =
+  'task' : "setHome"
   'domain': window.location.origin
   'token': $token.val() or ""
 
-codesy.save(new_domain)
+codesy.save(codesy_home)
 
-console.log "codesy: home page script loaded"
+console.timeEnd  "codesy home"

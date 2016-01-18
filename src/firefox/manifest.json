@@ -1,13 +1,20 @@
 {
+    "applications": {
+        "gecko": {
+            "id": "codesy@codesy.io"
+        }
+    },
+    "author": "Luke Crouch",
     "background": {
-        "persistent": true,
         "scripts": [
-            "js/background-chrome.js"
+            "js/csp.js",
+            "js/messages.js"
         ]
     },
     "content_scripts": [
         {
             "all_frames": false,
+            "run_at" : "document_end",
             "js": [
                 "js/jquery-2.0.3.min.js",
                 "js/issue.js"
@@ -22,29 +29,26 @@
                 "js/jquery-2.0.3.min.js",
                 "js/home.js"
             ],
-            "matches": [
+            "matches": [              
                 "*://*.codesy.io/"
             ]
         }
     ],
     "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
-    "icons": {
-        "128": "img/icon128.png",
-        "16": "img/icon16.png",
-        "48": "img/icon48.png"
-    },
+    "id": "codesy@codesy.io",
+    "license": "MPL 2.0",
+    "main": "js/index.js",
     "manifest_version": 2,
-    "name": "codesy.io",
+    "name": "codesy",
     "permissions": [
-        "https://api.codesy.io/",
         "*://*.github.com/*",
+        "https://api.codesy.io/",
+        "notifications",
         "storage",
         "tabs",
         "webRequest",
         "webRequestBlocking"
     ],
-    "version": "2.0",
-    "web_accessible_resources": [
-        "js/jquery-2.0.3.min.js"
-    ]
+    "title": "codesy.io",
+    "version": "0.0.9"
 }
