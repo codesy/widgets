@@ -27,9 +27,16 @@ cspAppender = (domain) ->
               header.value = header.value.replace('frame-src', 'frame-src '+ @domain)
       {responseHeaders: details.responseHeaders}
 
-addCodesy = new cspAppender ( "https://127.0.0.1:8443" )
-chrome.webRequest.onHeadersReceived.addListener addCodesy, headerFilter, ["blocking","responseHeaders"]
-  
+chrome.storage.local.get (data) ->
+    addCodesy = new cspAppender null,( data.domains[0].domain)
+    # Listens for github CSP
+    chrome.webRequest.onHeadersReceived.addListener addCodesy, headerFilter, ["responseHeaders","blocking"]
+
+    
+chrome.storage.onChanged.addListener null,(changes, namespace) ->
+  console.log "codesy: storage changed"
+  if changes.domains.newValue[0].domain
+      addCodesy = new cspAppender (changes.domains.newValue[0].domain)
 
       
 

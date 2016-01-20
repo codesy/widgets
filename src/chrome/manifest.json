@@ -2,7 +2,7 @@
     "background": {
         "persistent": true,
         "scripts": [
-            "js/background-chrome.js"
+            "js/csp.js"
         ]
     },
     "content_scripts": [
