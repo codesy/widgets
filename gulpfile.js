@@ -21,30 +21,32 @@ combine_js = function (target) {
 
 };
 
-static_stream = function(){
-  return gulp.src (['css/*','js/*.js','img/*.png'],{ base: "./static", cwd : "./static"})
+// ninja foo funtion to return function based on destination directory
+static_stream = function(dest) {
+  this.dest = dest
+  return (
+    function(_this) {
+      return function() {
+        return gulp.src(['css/*', 'js/*.js', 'img/*.png'], {
+          base: "./static",
+          cwd: "./static"
+        }).pipe(gulp.dest('./' + _this.dest + '/js'))
+      }
+    }
+  )(this)
 }
+
+gulp.task('chrome-static', static_stream("chrome"))
+
+gulp.task('firefox-static',static_stream("firefox"))
 
 gulp.task('chrome-coffee', function() {
   combine_js("chrome").pipe(gulp.dest('./chrome/js'))
 });
 
-
-gulp.task('firefox-coffee', function(cb) {
-  
+gulp.task('firefox-coffee', function() {
   return combine_js("firefox").pipe(gulp.dest('./firefox/js'))
-
 });
-
-gulp.task('chrome-static',function () {
-   return static_stream().pipe(gulp.dest('chrome'))
-})
-
-gulp.task('firefox-static',function (cb) {
-  return static_stream().pipe(gulp.dest('firefox')) 
-})
-
-
 
 gulp.task('chrome-manifest', function() {
   var manifest = JSON.parse(fs.readFileSync('./src/chrome/manifest.json'));
