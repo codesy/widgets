@@ -30,15 +30,15 @@ static_stream = function(dest) {
         return gulp.src(['css/*', 'js/*.js', 'img/*.png'], {
           base: "./static",
           cwd: "./static"
-        }).pipe(gulp.dest('./' + _this.dest + '/js'))
+        }).pipe(gulp.dest('./' + _this.dest ))
       }
     }
   )(this)
 }
 
-gulp.task('chrome-static', static_stream("chrome"))
+gulp.task('chrome-static', new static_stream("chrome"))
 
-gulp.task('firefox-static',static_stream("firefox"))
+gulp.task('firefox-static',new static_stream("firefox"))
 
 gulp.task('chrome-coffee', function() {
   combine_js("chrome").pipe(gulp.dest('./chrome/js'))
