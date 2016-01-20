@@ -1,14 +1,4 @@
-notify = (msg) ->
-  chrome.notifications.create ({
-    title: "codesy"
-    message: msg
-    iconUrl: "img/icon128.png"
-  })
-
-isCSPHeader = (headerName) ->
-  (headerName is 'CONTENT-SECURITY-POLICY') or (headerName is 'X-WEBKIT-CSP')
- 
-headerFilter =     
+githubFilter =     
     {
       urls: ["https://github.com/*"]
       types: ["main_frame"]
@@ -16,28 +6,31 @@ headerFilter =
     
 cspAppender = (domain) ->
     @domain = domain
+    types = ['connect-src','frame-src','script-src','style-src']
+    @isCSP = (headerName) ->
+        (headerName is 'CONTENT-SECURITY-POLICY') or (headerName is 'X-WEBKIT-CSP')
     (details) => 
       for header in details.responseHeaders
-          if isCSPHeader header.name.toUpperCase()
-              console.log "codesy: appending CSP"
-              notify "appended CSP"
-              header.value = header.value.replace('connect-src', 'connect-src'+ @domain)
-              header.value = header.value.replace('script-src', 'script-src '+ @domain)
-              header.value = header.value.replace('style-src', 'style-src '+ @domain)
-              header.value = header.value.replace('frame-src', 'frame-src '+ @domain)
+          if @isCSP header.name.toUpperCase()
+              for type in types
+                header.value = header.value.replace(type, type + " " + @domain)
       {responseHeaders: details.responseHeaders}
 
-chrome.storage.local.get (data) ->
-    addCodesy = new cspAppender null,( data.domains[0].domain)
+addCodesy = new cspAppender ""
+
+chrome.storage.local.get null,(data) ->
+    addCodesy = new cspAppender ( data.domains[0].domain)
     # Listens for github CSP
-    chrome.webRequest.onHeadersReceived.addListener addCodesy, headerFilter, ["responseHeaders","blocking"]
+    chrome.webRequest.onHeadersReceived.addListener addCodesy, githubFilter, ["responseHeaders","blocking"]
 
     
-chrome.storage.onChanged.addListener null,(changes, namespace) ->
+chrome.storage.onChanged.addListener (changes, namespace) ->
   console.log "codesy: storage changed"
   if changes.domains.newValue[0].domain
-      addCodesy = new cspAppender (changes.domains.newValue[0].domain)
-
+    if chrome.webRequest.onHeadersReceived.hasListener addCodesy
+      chrome.webRequest.onHeadersReceived.removeListener addCodesy
+    addCodesy = new cspAppender (changes.domains.newValue[0].domain)
+    chrome.webRequest.onHeadersReceived.addListener addCodesy, githubFilter, ["responseHeaders","blocking"]
       
 
 
