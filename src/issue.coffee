@@ -9,6 +9,7 @@ codesy =
   iframe :
     attr:
       id : "codesy_iframe"
+      style: "visibility: collapse;"
 
   
 class CodesyAjax
@@ -46,9 +47,9 @@ else # firefox
 codesy.newpage = () ->
   $("#"+codesy.iframe.attr.id).remove()
   if codesy.rx.test window.location.href
-    $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.home.domain+'/static/css/codesy-iframe.css">')
     codesy.iframe.attr.src = codesy.bid.url window.location.href
     $('body').append $('<iframe>').attr(codesy.iframe.attr)
+    $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.home.domain+'/static/css/codesy-iframe.css">')
     console.log("codesy newpage: iFrame added")
   else
     console.log "codesy newpage: not an issue"
