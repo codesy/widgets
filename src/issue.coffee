@@ -18,7 +18,7 @@ class CodesyAjax
     @
   
 codesy.bid.url = (issue_url) ->
-    codesy.home.domain +  '/bid/?' + $.param({url:issue_url})
+    codesy.home.domain +  '/bid-for-url/?' + $.param({url:issue_url})
 
 onChrome = chrome.storage ? false
 
