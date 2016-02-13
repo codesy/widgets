@@ -21,8 +21,23 @@ combine_js = function (target) {
 
 };
 
-// ninja foo funtion to return function based on destination directory
-static_stream = function(dest) {
+compile_coffee= function(source,dest) {
+  this.source = source
+  this.dest = dest
+  return (
+    function(_this) {
+      return function() {
+
+        console.log("compile "+_this.source+" coffee files")
+        return gulp.src([_this.source + '/*.coffee','./src/*.coffee'])
+          .pipe(coffee({bare: true}).on('error', gutil.log))
+          .pipe(gulp.dest(_this.dest))
+      }
+    }
+  )(this)
+}
+
+copy_statics_to = function(dest) {
   this.dest = dest
   return (
     function(_this) {
@@ -30,23 +45,20 @@ static_stream = function(dest) {
         return gulp.src(['css/*', 'js/*.js', 'img/*.png'], {
           base: "./static",
           cwd: "./static"
-        }).pipe(gulp.dest('./' + _this.dest ))
+        }).pipe(gulp.dest( _this.dest ))
       }
     }
   )(this)
 }
 
-gulp.task('chrome-static', new static_stream("chrome"))
+gulp.task('chrome-static', new copy_statics_to("./chrome"))
+gulp.task('chrome-coffee', new compile_coffee('./src/chrome','./chrome/js'));
 
-gulp.task('firefox-static',new static_stream("firefox"))
 
-gulp.task('chrome-coffee', function() {
-  combine_js("chrome").pipe(gulp.dest('./chrome/js'))
-});
 
-gulp.task('firefox-coffee', function() {
-  return combine_js("firefox").pipe(gulp.dest('./firefox/js'))
-});
+gulp.task('firefox-static',new copy_statics_to("./firefox"))
+gulp.task('firefox-coffee', new compile_coffee('./src/firefox','./firefox/js'));
+
 
 gulp.task('chrome-manifest', function() {
   var manifest = JSON.parse(fs.readFileSync('./src/chrome/manifest.json'));
