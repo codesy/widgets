@@ -38,7 +38,7 @@
     "name": "codesy.io",
     "permissions": [
         "https://api.codesy.io/",
-        "*://codesy-stage.herokuapp.com/v",
+        "*://codesy-stage.herokuapp.com/",
         "*://*.github.com/*",
         "storage",
         "tabs",
