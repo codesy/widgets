@@ -10,6 +10,8 @@ codesy =
     attr:
       id : "codesy_iframe"
       style: "visibility: collapse;"
+      scrolling: "no" 
+      seamless: "seamless"
 
   
 class CodesyAjax
