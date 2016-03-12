@@ -12,7 +12,6 @@ codesy =
       style: "visibility: collapse;"
       scrolling: "no" 
       seamless: "seamless"
-
   
 class CodesyAjax
   constructor: ->

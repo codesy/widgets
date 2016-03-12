@@ -30,6 +30,3 @@ chrome.runtime.onMessage.addListener (message,sender) ->
         codesy.add message
       when "getHome"
         codesy.get sender
-
-
-
