@@ -11,6 +11,13 @@ var shell = require('gulp-shell');
 var rename = require('gulp-rename')
 var runSequence = require('run-sequence');
 
+
+// The following functions return a function to be used as a gulp task or to get
+// a stream of files.  They take an options object that contains:
+//    source: path of directory with files to work on
+//    destination: (optional) path where files will go.  If destination is not included,
+//                  the functions will return a stream of files.
+
 compile_coffee= function(options) {
   this.source = options.source
   this.destination = options.destination
@@ -49,6 +56,9 @@ static_files = function(options) {
     }
   )(this)
 }
+
+// this function needs to include dev server details in the options object:
+//    dev_server: object with domain and port
 
 var manifest = function (options){
   this.source = options.source
@@ -92,44 +102,71 @@ var manifest = function (options){
 }
 
 settings = {
-  static_files: {source:'./static'},
-  dev_server: {domain:'127.0.0.1',port:'8443'},
-  firefox: {source:'./src/firefox'},
-  chrome: {source:'./src/chrome',destination:'./chrome'}
+  static_files: {
+    source: './static'
+  },
+  dev_server: {
+    domain: '127.0.0.1',
+    port: '8443'
+  },
+  firefox: {
+    source: './src/firefox'
+  },
+  chrome: {
+    source: './src/chrome',
+    destination: './chrome'
+  }
 }
 
 options = {
-  firefox:{
-    manifest: {source:settings.firefox.source,dev_server:settings.dev_server},
-    prod:{source:settings.firefox.source}
+  firefox: {
+    manifest: {
+      source: settings.firefox.source,
+      dev_server: settings.dev_server
+    },
+    prod: {
+      source: settings.firefox.source
+    }
   },
   chrome: {
-    manifest: {source: settings.chrome.source,destination:settings.chrome.destination,dev_server:settings.dev_server},
-    static_files: {source:settings.static_files.source, destination: settings.chrome.destination},
-    coffee_files: {source: settings.chrome.source,destination:settings.chrome.destination + '/js'},
-    prod: {source: settings.chrome.source}
+    manifest: {
+      source: settings.chrome.source,
+      destination: settings.chrome.destination,
+      dev_server: settings.dev_server
+    },
+    static_files: {
+      source: settings.static_files.source,
+      destination: settings.chrome.destination
+    },
+    coffee_files: {
+      source: settings.chrome.source,
+      destination: settings.chrome.destination + '/js'
+    },
+    prod: {
+      source: settings.chrome.source
+    }
   }
 }
+
 
 gulp.task('chrome-static', new static_files(options.chrome.static_files));
 gulp.task('chrome-dev-manifest', new manifest(options.chrome.manifest));
 gulp.task('chrome-coffee', new compile_coffee(options.chrome.coffee_files));
 
-gulp.task('dev-chrome',['chrome-static','chrome-dev-manifest','chrome-coffee'],function () {
-    console.log("start watching src/chrome")
-    gulp.watch('./src/chrome/manifest.json',['chrome-dev-manifest'])
-    gulp.watch(['./src/chrome/*.coffee','./src/*.coffee'],['chrome-coffee'])
+gulp.task('dev-chrome', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'], function() {
+  console.log("start watching src/chrome")
+  gulp.watch(settings.chrome.source + '/manifest.json', ['chrome-dev-manifest'])
+  gulp.watch([settings.chrome.source + '/*.coffee', './src/*.coffee'], ['chrome-coffee'])
 })
 
-gulp.task('dev-firefox',['firefox-dev-xpi'],function () {
-    console.log("start watching src/firefox")
-    gulp.watch('./src/firefox/manifest.json',['firefox-dev-xpi'])
-    gulp.watch(['./src/firefox/*.coffee','./src/*.coffee'],['firefox-dev-xpi'])  
+gulp.task('dev-firefox', ['firefox-dev-xpi'], function() {
+  console.log("start watching " + settings.firefox.source)
+  gulp.watch(settings.firefox.source + '/manifest.json', ['firefox-dev-xpi'])
+  gulp.watch([settings.firefox.source '/*.coffee', './src/*.coffee'], ['firefox-dev-xpi'])
 })
+
 
 gulp.task('dev',['dev-chrome','dev-firefox'])
-
-
 
 // foo-splaining:  gulp task functions are wrapped in '(new task_name(options))()' to immediately
 // return result of function; usually this is the stream it creates
