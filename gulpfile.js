@@ -25,6 +25,8 @@ compile_coffee= function(options) {
     function(_this) {
       return function() {
         console.log("compile "+_this.source + "/*.coffee files")
+
+        // next line compile coffee files in source directory and ./src root
         var compiled_stream = gulp.src([_this.source + '/*.coffee','./src/*.coffee'])
                                         .pipe(coffee({bare: true}).on('error', gutil.log))
         if (_this.destination){
@@ -43,7 +45,7 @@ static_files = function(options) {
   return (
     function(_this) {
       return function() {
-        var static_stream = gulp.src(['css/*', 'js/*.js', 'img/*.png'], 
+        var static_stream = gulp.src(['css/*', 'js/*.js', 'img/*.png'],
                                       { base: _this.source,
                                         cwd: _this.source
                                       })
@@ -73,12 +75,12 @@ var manifest = function (options){
           manifest_file = JSON.parse(fs.readFileSync(_this.source + '/manifest.json')),
           permissions = manifest_file.permissions || [],
           content_scripts = manifest_file.content_scripts || [];
-      
+
           permissions.push("https://" + _this.dev_server.domain +":"+_this.dev_server.port+"/")
           content_scripts[1].matches.push("https://"+_this.dev_server.domain+"/")
-      
+
           var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes']
-      
+
           manifest_stream
             .pipe(jeditor({
               'DEV_WARNING': warning.join("")
@@ -88,8 +90,8 @@ var manifest = function (options){
             }))
             .pipe(jeditor({
               'content_scripts': content_scripts
-            }))     
-      
+            }))
+
           }
           if (_this.destination){
             return manifest_stream.pipe(gulp.dest(_this.destination));
@@ -143,7 +145,8 @@ options = {
       destination: settings.chrome.destination + '/js'
     },
     prod: {
-      source: settings.chrome.source
+      source: settings.chrome.source,
+      destination: "prod"
     }
   }
 }
@@ -162,7 +165,7 @@ gulp.task('dev-chrome', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'
 gulp.task('dev-firefox', ['firefox-dev-xpi'], function() {
   console.log("start watching " + settings.firefox.source)
   gulp.watch(settings.firefox.source + '/manifest.json', ['firefox-dev-xpi'])
-  gulp.watch([settings.firefox.source '/*.coffee', './src/*.coffee'], ['firefox-dev-xpi'])
+  gulp.watch([settings.firefox.source + '/*.coffee', './src/*.coffee'], ['firefox-dev-xpi'])
 })
 
 
@@ -182,7 +185,7 @@ gulp.task('firefox-dev-xpi', function () {
     }))
   merge (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
-    .pipe(gulp.dest('firefox')); 
+    .pipe(gulp.dest('firefox'));
 });
 
 
@@ -191,13 +194,13 @@ gulp.task('publish-firefox', function () {
   manifest_stream =  (new manifest(settings.firefox))()
   static_stream= (new static_files(settings.static_files))()
   js_stream = (new compile_coffee(settings.firefox))()
-    .pipe(stripDebug()) 
+    .pipe(stripDebug())
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
   merge (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
-    .pipe(gulp.dest('prod')); 
+    .pipe(gulp.dest('prod'));
 });
 
 // create zip for chrome
@@ -205,12 +208,11 @@ gulp.task('publish-chrome', function () {
   manifest = (new manifest(options.chrome.prod))()
   static_stream= (new static_files(settings.static_files))()
   js_stream = (new compile_coffee(options.chrome.prod))()
-    .pipe(stripDebug())   
+    .pipe(stripDebug())
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
   merge (manifest,js_stream,static_stream)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('prod'));
-  
 });
