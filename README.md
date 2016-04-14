@@ -11,7 +11,10 @@ The codesy.io widget is a Chrome Extension and Firefox Addon the adds codesy.io 
   * `cd widgets`
   * `npm install`
 3. Run gulp to watch changes to files and compile extensions
-  * `gulp dev`
+  * 'gulp dev-chrome' - creates addon directory and watches for changes
+  * 'gulp dev-firefox' - creates addon xpi file and watches for changes
+  * `gulp dev` - runs 'dev-chrome' and 'dev-firefox'
+  
 
 ## To use the Chrome Extension
 1. Follow the [Unpacked Chrome Extensions
@@ -19,17 +22,23 @@ The codesy.io widget is a Chrome Extension and Firefox Addon the adds codesy.io 
 
 ## To use the Firefox Add-on
 1. `cd firefox`
-2. Run Firefox via jpm:
-  * `../node_modules/.bin/jpm run`
+2. Run 'gulp firefox-dev-xpi' (or 'gulp dev-firefox' to watch changes)
+  * Goto the the //about:addons page
+  * Select 'Install Addon from File ...')
+  * Load the 'codesy.xpi' file from the firefox directory
 
-Note: You can [use `-p <PROFILE>` or `--profile
-<PROFILE>`](https://github.com/mozilla/jpm#usage)  to use your specific
-[Firefox
-profile](https://support.mozilla.org/en-US/kb/profiles-where-firefox-stores-user-data).
+## Publish
 
-## Publish (Chrome-only)
+### Chrome
 1. Run 'gulp publish-chrome'
   * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
 2. Upload the codesy.zip file to the chrome store
+
+### Firefox
+1. Run 'gulp publish-firefox'
+  * Runs gulp coffee to compile .js files
+  * Removes debug lines from .js files e.g. console.log
+  * Creates an xpi file for uploading to the moz store.  The file contains the manifest.json file.
+2. Upload the codesy.xpi file to the moz store

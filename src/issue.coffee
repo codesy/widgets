@@ -10,10 +10,9 @@ codesy =
     attr:
       id : "codesy_iframe"
       style: "visibility: collapse;"
-      scrolling: "no" 
+      scrolling: "no"
       seamless: "seamless"
 
-  
 class CodesyAjax
   constructor: ->
     @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
@@ -21,22 +20,22 @@ class CodesyAjax
     @
   
 codesy.bid.url = (issue_url) ->
-    codesy.home.domain +  '/bid-for-url/?' + $.param({url:issue_url})
+    codesy.home.domain +  '/bid-status/?' + $.param({url:issue_url})
 
 onChrome = chrome.storage ? false
 
 if onChrome
-  console.log "use chrome object" 
-  codesy.getHome = () -> 
+  console.log "use chrome object"
+  codesy.getHome = () ->
     chrome.storage.local.get null,(data) ->
       codesy.home = data.domains[0]
-      codesy.newpage()  
-    
+      codesy.newpage()
+
 else # firefox
   codesy.getHome = () ->
     # codesy.home = {domain:"https://127.0.0.1:8443"}
     if codesy.home.domain
-      codesy.newpage()  
+      codesy.newpage()
     else
       chrome.runtime.sendMessage { task : "getHome"  }
 
@@ -44,7 +43,7 @@ else # firefox
       switch message.task
         when 'ackHome'
           codesy.home = message
-          codesy.newpage()  
+          codesy.newpage()
 
 codesy.newpage = () ->
   $("#"+codesy.iframe.attr.id).remove()

@@ -21,18 +21,15 @@ if isChrome
       data.domains.splice(idx, 1) if idx isnt -1
       data.domains.unshift(home)
       chrome.storage.local.set(data);
-
+      
 else # firefox
   codesy.save = (home)->
     console.log "save domain: " + home.domain
     chrome.runtime.sendMessage home
 
-$token = $("#api_token_pass")
-
 codesy_home =
   'task' : "setHome"
   'domain': window.location.origin
-  'token': $token.val() or ""
 
 codesy.save(codesy_home)
 

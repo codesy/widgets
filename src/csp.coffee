@@ -22,8 +22,7 @@ chrome.storage.local.get null,(data) ->
     addCodesy = new cspAppender ( data.domains[0].domain)
     # Listens for github CSP
     chrome.webRequest.onHeadersReceived.addListener addCodesy, githubFilter, ["responseHeaders","blocking"]
-
-    
+   
 chrome.storage.onChanged.addListener (changes, namespace) ->
   console.log "codesy: storage changed"
   if changes.domains.newValue[0].domain
