@@ -200,7 +200,7 @@ gulp.task('publish-firefox', function () {
     }))
   merge (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
-    .pipe(gulp.dest('prod'));
+    .pipe(gulp.dest('build'));
 });
 
 // create zip for chrome
@@ -214,5 +214,5 @@ gulp.task('publish-chrome', function () {
     }))
   merge (manifest,js_stream,static_stream)
     .pipe(zip('codesy.zip'))
-    .pipe(gulp.dest('prod'));
+    .pipe(gulp.dest('build'));
 });
