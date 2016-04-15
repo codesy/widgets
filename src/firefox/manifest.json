@@ -30,7 +30,8 @@
                 "js/home.js"
             ],
             "matches": [              
-                "*://*.codesy.io/"
+                "*://*.codesy.io/",
+                "*://codesy-stage.herokuapp.com/"
             ]
         }
     ],
@@ -43,6 +44,7 @@
     "permissions": [
         "*://*.github.com/*",
         "https://api.codesy.io/",
+        "*://codesy-stage.herokuapp.com/",
         "notifications",
         "storage",
         "tabs",
