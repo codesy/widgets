@@ -37,7 +37,7 @@
     "manifest_version": 2,
     "name": "codesy.io",
     "permissions": [
-        "https://api.codesy.io/",
+        "https://*.codesy.io/",
         "*://codesy-stage.herokuapp.com/",
         "*://*.github.com/*",
         "storage",
@@ -45,7 +45,8 @@
         "webRequest",
         "webRequestBlocking"
     ],
-    "version": "2.0",
+    "version": "0.0.0.1",
+    "version_name": "invitation-only beta",
     "web_accessible_resources": [
         "js/jquery-2.0.3.min.js"
     ]
