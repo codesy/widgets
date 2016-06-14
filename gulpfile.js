@@ -6,7 +6,6 @@ var stripDebug = require('gulp-strip-debug');
 var merge = require('merge-stream');
 var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
-var shell = require('gulp-shell');
 var rename = require('gulp-rename')
 
 // The following functions return a function to be used as a gulp task or to get
