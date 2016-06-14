@@ -2,15 +2,12 @@ var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
-var sourcemaps = require('gulp-sourcemaps');
 var stripDebug = require('gulp-strip-debug');
 var merge = require('merge-stream');
 var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var shell = require('gulp-shell');
 var rename = require('gulp-rename')
-var runSequence = require('run-sequence');
-
 
 // The following functions return a function to be used as a gulp task or to get
 // a stream of files.  They take an options object that contains:
