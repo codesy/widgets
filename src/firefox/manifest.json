@@ -29,7 +29,7 @@
                 "js/jquery-2.0.3.min.js",
                 "js/home.js"
             ],
-            "matches": [              
+            "matches": [
                 "*://*.codesy.io/",
                 "*://codesy-stage.herokuapp.com/"
             ]
@@ -52,5 +52,5 @@
         "webRequestBlocking"
     ],
     "title": "codesy.io",
-    "version": "0.0.10"
+    "version": "0.0.0.1"
 }
