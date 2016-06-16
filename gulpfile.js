@@ -68,27 +68,18 @@ var manifest = function (options){
       return function() {
         manifest_stream = gulp.src(_this.source+'/manifest.json')
         if (_this.dev_server){
-          manifest_file = JSON.parse(fs.readFileSync(_this.source + '/manifest.json')),
-          permissions = manifest_file.permissions || [],
-          content_scripts = manifest_file.content_scripts || [];
+            var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes'],
+            dev_permission =["https://",_this.dev_server.domain,":",_this.dev_server.port,"/"],
+            dev_match =["https://",_this.dev_server.domain,"/"]
+            manifest_stream
+                .pipe(jeditor(function(json) {
+                    json.DEV_WARNING=warning.join("")
+                    json.permissions.push(dev_permission.join(""))
+                    json.content_scripts[1].matches.push(dev_match.join(""))
+                    return json
+                }))
 
-          permissions.push("https://" + _this.dev_server.domain +":"+_this.dev_server.port+"/")
-          content_scripts[1].matches.push("https://"+_this.dev_server.domain+"/")
-
-          var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes']
-
-          manifest_stream
-            .pipe(jeditor({
-              'DEV_WARNING': warning.join("")
-            }))
-            .pipe(jeditor({
-              'permissions': permissions
-            }))
-            .pipe(jeditor({
-              'content_scripts': content_scripts
-            }))
-
-          }
+        }
           if (_this.destination){
             return manifest_stream.pipe(gulp.dest(_this.destination));
           } else {
