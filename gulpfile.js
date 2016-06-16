@@ -3,7 +3,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
 var stripDebug = require('gulp-strip-debug');
-var merge = require('merge-stream');
+var mergeStream = require('merge-stream');
+var mergeJSON = require('gulp-merge-json');
 var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var rename = require('gulp-rename')
@@ -65,29 +66,32 @@ var manifest = function (options){
 
   return (
     function(_this) {
-      return function() {
-        manifest_stream = gulp.src(_this.source+'/manifest.json')
-        if (_this.dev_server){
-            var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes'],
-            dev_permission =["https://",_this.dev_server.domain,":",_this.dev_server.port,"/"],
-            dev_match =["https://",_this.dev_server.domain,"/"]
-            manifest_stream
-                .pipe(jeditor(function(json) {
-                    json.DEV_WARNING=warning.join("")
-                    json.permissions.push(dev_permission.join(""))
-                    json.content_scripts[1].matches.push(dev_match.join(""))
-                    return json
-                }))
+        return function() {
+            common = gulp.src('./src/manifest.json')
+            additions = gulp.src(_this.source+'/manifest_additions.json')
+            manifest_stream = mergeStream(common,additions)
+            .pipe(mergeJSON('manifest.json'))
 
+            if (_this.dev_server){
+                var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes'],
+                dev_permission =["https://",_this.dev_server.domain,":",_this.dev_server.port,"/"],
+                dev_match =["https://",_this.dev_server.domain,"/"]
+                manifest_stream
+                    .pipe(jeditor(function(json) {
+                        json.DEV_WARNING=warning.join("")
+                        json.permissions.push(dev_permission.join(""))
+                        json.content_scripts[1].matches.push(dev_match.join(""))
+                        return json
+                    }))
+
+            }
+            if (_this.destination){
+                return manifest_stream.pipe(gulp.dest(_this.destination));
+            } else {
+                return manifest_stream
+            }
         }
-          if (_this.destination){
-            return manifest_stream.pipe(gulp.dest(_this.destination));
-          } else {
-            return manifest_stream
-          }
-        }
-      }
-    )(this)
+    })(this)
 }
 
 settings = {
@@ -170,7 +174,7 @@ gulp.task('firefox-dev-xpi', function () {
   .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  merge (manifest_stream,js_stream,static_stream)
+  mergeStream (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
     .pipe(gulp.dest('firefox'));
 });
@@ -185,7 +189,7 @@ gulp.task('publish-firefox', function () {
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  merge (manifest_stream,js_stream,static_stream)
+  mergeStream (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
     .pipe(gulp.dest('build'));
 });
@@ -199,7 +203,7 @@ gulp.task('publish-chrome', function () {
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  merge (manifest,js_stream,static_stream)
+  mergeStream (manifest,js_stream,static_stream)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('build'));
 });
