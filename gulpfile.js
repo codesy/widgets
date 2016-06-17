@@ -16,24 +16,23 @@ var rename = require('gulp-rename')
 //                  the functions will return a stream of files.
 
 compile_coffee= function(options) {
-  this.source = options.source
-  this.destination = options.destination
-  return (
-    function(_this) {
-      return function() {
-        console.log("compile "+_this.source + "/*.coffee files")
-
-        // next line compile coffee files in source directory and ./src root
-        var compiled_stream = gulp.src([_this.source + '/*.coffee','./src/*.coffee'])
-                                        .pipe(coffee({bare: true}).on('error', gutil.log))
-        if (_this.destination){
-          return compiled_stream.pipe(gulp.dest(_this.destination))
-        } else {
-          return compiled_stream
+    this.source = options.source
+    this.destination = options.destination
+    return (
+        function(_this) {
+            return function() {
+                console.log("compile "+_this.source + "/*.coffee files")
+            // next line compile coffee files in source directory and ./src root
+                var compiled_stream = gulp.src([_this.source + '/*.coffee','./src/*.coffee'])
+                                            .pipe(coffee({bare: true}).on('error', gutil.log))
+                if (_this.destination){
+                    return compiled_stream.pipe(gulp.dest(_this.destination))
+                } else {
+                    return compiled_stream
+                }
+            }
         }
-      }
-    }
-  )(this)
+    )(this)
 }
 
 static_files = function(options) {
@@ -83,7 +82,6 @@ var manifest = function (options){
                         json.content_scripts[1].matches.push(dev_match.join(""))
                         return json
                     }))
-
             }
             if (_this.destination){
                 return manifest_stream.pipe(gulp.dest(_this.destination));
@@ -182,7 +180,7 @@ gulp.task('firefox-dev-xpi', function () {
 
 // create xpi for FF prod
 gulp.task('publish-firefox', function () {
-  manifest_stream =  (new manifest(settings.firefox))()
+  manifest_stream = (new manifest(settings.firefox))()
   static_stream= (new static_files(settings.static_files))()
   js_stream = (new compile_coffee(settings.firefox))()
     .pipe(stripDebug())
@@ -196,14 +194,16 @@ gulp.task('publish-firefox', function () {
 
 // create zip for chrome
 gulp.task('publish-chrome', function () {
-  manifest = (new manifest(options.chrome.prod))()
+  manifest_stream = (new manifest(options.chrome.prod))()
   static_stream= (new static_files(settings.static_files))()
   js_stream = (new compile_coffee(options.chrome.prod))()
     .pipe(stripDebug())
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  mergeStream (manifest,js_stream,static_stream)
+  mergeStream (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('build'));
 });
+
+gulp.task('publish-all',['publish-firefox','publish-chrome'])
