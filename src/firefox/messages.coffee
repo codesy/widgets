@@ -1,9 +1,3 @@
-notify = (msg) ->
-  chrome.notifications.create ({
-    title: "codesy"
-    message: msg
-  })
-
 codesy =
   find : (domains,domain) ->
     domains.map((item) -> item.domain).indexOf(domain)
@@ -22,8 +16,8 @@ codesy =
       message = domains[0]
       message.task = "ackHome"
       browser.tabs.sendMessage sender.tab.id, message
-    
-chrome.runtime.onMessage.addListener (message,sender) -> 
+
+chrome.runtime.onMessage.addListener (message,sender) ->
     console.log message
     switch message.task
       when "setHome"
