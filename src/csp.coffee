@@ -23,9 +23,9 @@ addCodesy = (new_domain)->
     chrome.webRequest.onHeadersReceived.addListener codesyAppender, githubFilter, ["responseHeaders","blocking"]
 
 chrome.storage.local.get null,(data) ->
-    addCodesy data.domains[0].domain
+    addCodesy data.domain
 
 chrome.storage.onChanged.addListener (changes, namespace) ->
-    new_domain = changes.domains.newValue[0].domain
+    new_domain = changes.domain.newValue
     if new_domain
         addCodesy new_domain
