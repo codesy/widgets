@@ -1,64 +1,54 @@
 console.time 'codesy issue load'
 
 codesy =
-  href : ""
-  home : {}
-  bid : {}
-  events : {}
-  rx : /https:\/\/github.com\/.*\/issues\/[1-9]+/g
-  iframe :
-    attr:
-      id : "codesy_iframe"
-      style: "visibility: collapse;"
-      scrolling: "no"
-      seamless: "seamless"
-
-codesy.bid.url = (issue_url) ->
-    codesy.home.domain +  '/bid-status/?' + $.param({url:issue_url})
+    href : ""
+    rx : /https:\/\/github.com\/.*\/issues\/[1-9]+/g
+    iframe :
+        attr:
+            id : "codesy_iframe"
+            style: "visibility: collapse;"
+            scrolling: "no"
+            seamless: "seamless"
+    bid_url : (issue_url) ->
+            codesy.domain +  '/bid-status/?' + $.param({url:issue_url})
 
 onChrome = chrome.storage ? false
 
 if onChrome
-  console.log "use chrome object"
-  codesy.getHome = () ->
-    chrome.storage.local.get null,(data) ->
-      codesy.home = data.domains[0]
-      codesy.newpage()
-
+    codesy.getHome = () ->
+        chrome.storage.local.get null,(data) ->
+            codesy.domain = data.domain
+            codesy.newpage()
 else # firefox
-  codesy.getHome = () ->
-    if codesy.home.domain
-      codesy.newpage()
-    else
-      chrome.runtime.sendMessage { task : "getHome"  }
-
-  chrome.runtime.onMessage.addListener (message) ->
-      switch message.task
-        when 'ackHome'
-          codesy.home = message
-          codesy.newpage()
+    codesy.getHome = () ->
+        chrome.runtime.sendMessage { task : "getHome"  }
+    chrome.runtime.onMessage.addListener (message) ->
+        switch message.task
+            when 'ackHome'
+                codesy.domain = message.domain
+                codesy.newpage()
 
 codesy.newpage = () ->
-  $("#"+codesy.iframe.attr.id).remove()
-  if codesy.rx.test window.location.href
-    codesy.iframe.attr.src = codesy.bid.url window.location.href
-    $('body').append $('<iframe>').attr(codesy.iframe.attr)
-    $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.home.domain+'/static/css/codesy-iframe.css">')
-    console.log("codesy newpage: iFrame added")
-  else
-    console.log "codesy newpage: not an issue"
+    $("#"+codesy.iframe.attr.id).remove()
+    if codesy.rx.test window.location.href
+        codesy.iframe.attr.src = codesy.bid_url window.location.href
+        $('body').append $('<iframe>').attr(codesy.iframe.attr)
+        $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.domain+'/static/css/codesy-iframe.css">')
+        console.log("codesy newpage: iFrame added")
+    else
+        console.log "codesy newpage: not an issue"
 
 codesy.urlChange = () ->
-  if codesy.href isnt window.location.href
-    console.log "codesy: url changed"
-    codesy.href = window.location.href
-    codesy.getHome()
-  window.setTimeout codesy.urlChange, 600
+    if codesy.href isnt window.location.href
+        console.log "codesy: url changed"
+        codesy.href = window.location.href
+        codesy.getHome()
+    window.setTimeout codesy.urlChange, 600
 
 codesy.urlChange()
 
 window.onpopstate = ->
-  console.log "codesy: popstate"
-  codesy.getHome()
+    console.log "codesy: popstate"
+    codesy.getHome()
 
 console.timeEnd 'codesy issue load'

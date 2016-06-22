@@ -1,6 +1,6 @@
 # The codesy.io widget
 
-The codesy.io widget is a Chrome Extension and Firefox Addon the adds codesy.io interface to open-source bugs you visit.
+The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codesy.io interface to open-source bugs you visit.
 
 
 ## To work locally
@@ -14,7 +14,7 @@ The codesy.io widget is a Chrome Extension and Firefox Addon the adds codesy.io 
   * 'gulp dev-chrome' - creates addon directory and watches for changes
   * 'gulp dev-firefox' - creates addon xpi file and watches for changes
   * `gulp dev` - runs 'dev-chrome' and 'dev-firefox'
-  
+
 
 ## To use the Chrome Extension
 1. Follow the [Unpacked Chrome Extensions
@@ -29,12 +29,12 @@ The codesy.io widget is a Chrome Extension and Firefox Addon the adds codesy.io 
 
 ## Publish
 
-### Chrome
+### Chrome and Opera
 1. Run 'gulp publish-chrome'
   * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
-2. Upload the codesy.zip file to the chrome store
+2. Upload the codesy.zip file to the chrome or opera store
 
 ### Firefox
 1. Run 'gulp publish-firefox'
