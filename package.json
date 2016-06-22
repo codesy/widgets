@@ -15,12 +15,9 @@
     "gulp-coffee": "2.3.1",
     "gulp-json-editor": "2.2.1",
     "gulp-rename": "^1.2.0",
-    "gulp-shell": "0.2.11",
-    "gulp-sourcemaps": "1.5.0",
     "gulp-strip-debug": "1.0.2",
     "gulp-util": "^3.0.1",
     "gulp-zip": "2.0.3",
-    "jpm": "0.0.23",
     "merge-stream": "0.1.7"
   },
   "scripts": {
@@ -34,7 +31,7 @@
     "issues"
   ],
   "main": "gulpfile.js",
-  "homepage": "https://github.com/jdungan/chrome-extension",
+  "homepage": "https://github.com/codesy/widgets",
   "id": "jid1-c7AoVz4RhpFuGA",
   "description": "View codesy bids while on github issue pages",
   "devDependencies": {
