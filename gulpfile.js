@@ -3,7 +3,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
 var stripDebug = require('gulp-strip-debug');
-var merge = require('merge-stream');
+var mergeStream = require('merge-stream');
+var mergeJSON = require('gulp-merge-json');
 var zip = require('gulp-zip');
 var jeditor = require("gulp-json-editor");
 var rename = require('gulp-rename')
@@ -15,24 +16,23 @@ var rename = require('gulp-rename')
 //                  the functions will return a stream of files.
 
 compile_coffee= function(options) {
-  this.source = options.source
-  this.destination = options.destination
-  return (
-    function(_this) {
-      return function() {
-        console.log("compile "+_this.source + "/*.coffee files")
-
-        // next line compile coffee files in source directory and ./src root
-        var compiled_stream = gulp.src([_this.source + '/*.coffee','./src/*.coffee'])
-                                        .pipe(coffee({bare: true}).on('error', gutil.log))
-        if (_this.destination){
-          return compiled_stream.pipe(gulp.dest(_this.destination))
-        } else {
-          return compiled_stream
+    this.source = options.source
+    this.destination = options.destination
+    return (
+        function(_this) {
+            return function() {
+                console.log("compile "+_this.source + "/*.coffee files")
+            // next line compile coffee files in source directory and ./src root
+                var compiled_stream = gulp.src([_this.source + '/*.coffee','./src/*.coffee'])
+                                            .pipe(coffee({bare: true}).on('error', gutil.log))
+                if (_this.destination){
+                    return compiled_stream.pipe(gulp.dest(_this.destination))
+                } else {
+                    return compiled_stream
+                }
+            }
         }
-      }
-    }
-  )(this)
+    )(this)
 }
 
 static_files = function(options) {
@@ -65,38 +65,31 @@ var manifest = function (options){
 
   return (
     function(_this) {
-      return function() {
-        manifest_stream = gulp.src(_this.source+'/manifest.json')
-        if (_this.dev_server){
-          manifest_file = JSON.parse(fs.readFileSync(_this.source + '/manifest.json')),
-          permissions = manifest_file.permissions || [],
-          content_scripts = manifest_file.content_scripts || [];
+        return function() {
+            common = gulp.src('./src/manifest.json')
+            additions = gulp.src(_this.source+'/manifest_additions.json')
+            manifest_stream = mergeStream(common,additions)
+            .pipe(mergeJSON('manifest.json'))
 
-          permissions.push("https://" + _this.dev_server.domain +":"+_this.dev_server.port+"/")
-          content_scripts[1].matches.push("https://"+_this.dev_server.domain+"/")
-
-          var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes']
-
-          manifest_stream
-            .pipe(jeditor({
-              'DEV_WARNING': warning.join("")
-            }))
-            .pipe(jeditor({
-              'permissions': permissions
-            }))
-            .pipe(jeditor({
-              'content_scripts': content_scripts
-            }))
-
-          }
-          if (_this.destination){
-            return manifest_stream.pipe(gulp.dest(_this.destination));
-          } else {
-            return manifest_stream
-          }
+            if (_this.dev_server){
+                var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes'],
+                dev_permission =["https://",_this.dev_server.domain,":",_this.dev_server.port,"/"],
+                dev_match =["https://",_this.dev_server.domain,"/"]
+                manifest_stream
+                    .pipe(jeditor(function(json) {
+                        json.DEV_WARNING=warning.join("")
+                        json.permissions.push(dev_permission.join(""))
+                        json.content_scripts[1].matches.push(dev_match.join(""))
+                        return json
+                    }))
+            }
+            if (_this.destination){
+                return manifest_stream.pipe(gulp.dest(_this.destination));
+            } else {
+                return manifest_stream
+            }
         }
-      }
-    )(this)
+    })(this)
 }
 
 settings = {
@@ -179,7 +172,7 @@ gulp.task('firefox-dev-xpi', function () {
   .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  merge (manifest_stream,js_stream,static_stream)
+  mergeStream (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
     .pipe(gulp.dest('firefox'));
 });
@@ -187,28 +180,30 @@ gulp.task('firefox-dev-xpi', function () {
 
 // create xpi for FF prod
 gulp.task('publish-firefox', function () {
-  manifest_stream =  (new manifest(settings.firefox))()
+  manifest_stream = (new manifest(settings.firefox))()
   static_stream= (new static_files(settings.static_files))()
   js_stream = (new compile_coffee(settings.firefox))()
     .pipe(stripDebug())
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  merge (manifest_stream,js_stream,static_stream)
+  mergeStream (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.xpi'))
     .pipe(gulp.dest('build'));
 });
 
 // create zip for chrome
 gulp.task('publish-chrome', function () {
-  manifest = (new manifest(options.chrome.prod))()
+  manifest_stream = (new manifest(options.chrome.prod))()
   static_stream= (new static_files(settings.static_files))()
   js_stream = (new compile_coffee(options.chrome.prod))()
     .pipe(stripDebug())
     .pipe(rename(function (path) {
       path.dirname += "/js";
     }))
-  merge (manifest,js_stream,static_stream)
+  mergeStream (manifest_stream,js_stream,static_stream)
     .pipe(zip('codesy.zip'))
     .pipe(gulp.dest('build'));
 });
+
+gulp.task('publish-all',['publish-firefox','publish-chrome'])

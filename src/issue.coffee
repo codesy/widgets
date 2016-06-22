@@ -13,12 +13,6 @@ codesy =
       scrolling: "no"
       seamless: "seamless"
 
-class CodesyAjax
-  constructor: ->
-    @beforeSend=( ->(xhr,settings) -> xhr.setRequestHeader("Authorization","Token " + codesy.auth.token))()
-    @dataType ="html"
-    @
-  
 codesy.bid.url = (issue_url) ->
     codesy.home.domain +  '/bid-status/?' + $.param({url:issue_url})
 
@@ -33,7 +27,6 @@ if onChrome
 
 else # firefox
   codesy.getHome = () ->
-    # codesy.home = {domain:"https://127.0.0.1:8443"}
     if codesy.home.domain
       codesy.newpage()
     else
