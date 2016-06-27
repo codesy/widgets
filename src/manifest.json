@@ -39,7 +39,8 @@
     "icons": {
         "128": "img/icon128.png",
         "16": "img/icon16.png",
-        "48": "img/icon48.png"
+        "48": "img/icon48.png",
+        "64": "img/icon64.png"
     },
     "web_accessible_resources": [
         "css/iframe.css"
