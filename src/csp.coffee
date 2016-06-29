@@ -11,7 +11,7 @@ cspAppender = (domain) ->
       for header in details.responseHeaders
           if @isCSP header.name.toUpperCase()
               for type in types
-                header.value = header.value.replace(type, type + " " + @domain)
+                header.value = header.value.replace(type, type + " 'self' " + @domain)
       {responseHeaders: details.responseHeaders}
 
 codesyAppender = new cspAppender ""

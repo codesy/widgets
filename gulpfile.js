@@ -93,20 +93,21 @@ var manifest = function (options){
 }
 
 settings = {
-  static_files: {
-    source: './static'
-  },
-  dev_server: {
-    domain: '127.0.0.1',
-    port: '8443'
-  },
-  firefox: {
-    source: './src/firefox'
-  },
-  chrome: {
-    source: './src/chrome',
-    destination: './chrome'
-  }
+    source: './src',
+    static_files: {
+        source: './static'
+    },
+    dev_server: {
+        domain: '127.0.0.1',
+        port: '8443'
+    },
+    firefox: {
+        source: './src/firefox'
+    },
+    chrome: {
+        source: './src/chrome',
+        destination: './chrome'
+    }
 }
 
 options = {
@@ -146,15 +147,17 @@ gulp.task('chrome-dev-manifest', new manifest(options.chrome.manifest));
 gulp.task('chrome-coffee', new compile_coffee(options.chrome.coffee_files));
 
 gulp.task('dev-chrome', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'], function() {
-  console.log("start watching src/chrome")
-  gulp.watch(settings.chrome.source + '/manifest.json', ['chrome-dev-manifest'])
-  gulp.watch([settings.chrome.source + '/*.coffee', './src/*.coffee'], ['chrome-coffee'])
+    console.log("start watching src/chrome")
+    gulp.watch(settings.source + '/manifest.json', ['chrome-dev-manifest'])
+    gulp.watch(settings.chrome.source + '/manifest_additions.json', ['chrome-dev-manifest'])
+    gulp.watch([settings.chrome.source + '/*.coffee', './src/*.coffee'], ['chrome-coffee'])
 })
 
 gulp.task('dev-firefox', ['firefox-dev-xpi'], function() {
-  console.log("start watching " + settings.firefox.source)
-  gulp.watch(settings.firefox.source + '/manifest.json', ['firefox-dev-xpi'])
-  gulp.watch([settings.firefox.source + '/*.coffee', './src/*.coffee'], ['firefox-dev-xpi'])
+    console.log("start watching " + settings.firefox.source)
+    gulp.watch(settings.source + '/manifest.json', ['firefox-dev-xpi'])
+    gulp.watch(settings.firefox.source + '/manifest_additions.json', ['firefox-dev-xpi'])
+    gulp.watch([settings.firefox.source + '/*.coffee', './src/*.coffee'], ['firefox-dev-xpi'])
 })
 
 

@@ -1,7 +1,9 @@
 {
+    "name": "codesy.io",
+    "version": "0.0.0.3",
+    "author": "founders@codesy.io",
     "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
     "manifest_version": 2,
-    "name": "codesy.io",
     "permissions": [
         "https://*.codesy.io/",
         "*://codesy-stage.herokuapp.com/",
@@ -34,5 +36,13 @@
             ]
         }
     ],
-    "version": "0.0.0.2"
+    "icons": {
+        "128": "img/icon128.png",
+        "16": "img/icon16.png",
+        "48": "img/icon48.png",
+        "64": "img/icon64.png"
+    },
+    "web_accessible_resources": [
+        "css/iframe.css"
+    ]
 }

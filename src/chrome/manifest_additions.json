@@ -5,13 +5,5 @@
             "js/csp.js"
         ]
     },
-    "icons": {
-        "128": "img/icon128.png",
-        "16": "img/icon16.png",
-        "48": "img/icon48.png"
-    },
-    "version_name": "invitation-only beta",
-    "web_accessible_resources": [
-        "js/jquery-2.0.3.min.js"
-    ]
+    "version_name": "invitation-only beta"
 }

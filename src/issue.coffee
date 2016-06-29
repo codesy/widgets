@@ -3,6 +3,11 @@ console.time 'codesy issue load'
 codesy =
     href : ""
     rx : /https:\/\/github.com\/.*\/issues\/[1-9]+/g
+    css:
+        attr:
+            rel:"stylesheet"
+            type:"text/css"
+            href:""
     iframe :
         attr:
             id : "codesy_iframe"
@@ -28,13 +33,17 @@ else # firefox
                 codesy.domain = message.domain
                 codesy.newpage()
 
+codesy.loadcss = () ->
+    console.log("codesy newpage: iFrame loaded")
+    codesy.css.attr.href = chrome.extension.getURL "css/iframe.css"
+    $("head").append $('<link>').attr(codesy.css.attr)
+
 codesy.newpage = () ->
     $("#"+codesy.iframe.attr.id).remove()
     if codesy.rx.test window.location.href
         codesy.iframe.attr.src = codesy.bid_url window.location.href
-        $('body').append $('<iframe>').attr(codesy.iframe.attr)
-        $("head").append('<link rel="stylesheet" type="text/css" href="'+codesy.domain+'/static/css/codesy-iframe.css">')
-        console.log("codesy newpage: iFrame added")
+        new_iframe = $('body').append $('<iframe>').attr(codesy.iframe.attr)
+        new_iframe.ready(codesy.loadcss)
     else
         console.log "codesy newpage: not an issue"
 
