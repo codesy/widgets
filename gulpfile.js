@@ -12,6 +12,7 @@ var rename = require('gulp-rename')
 // Settings for building packages
 settings = {
     name: 'codesy',
+    version: '0.0.0.5',
     source: './src',
     destination: './build',
     static_files: {
@@ -81,6 +82,9 @@ static_files = function(options) {
   )(this)
 }
 
+file_name = function (ext){
+    return settings.name+'-'+settings.version+ext
+}
 // this function needs to include dev server details in the options object:
 //    dev_server: object with domain and port
 
@@ -96,9 +100,13 @@ var manifest = function (options){
             additions = gulp.src(_this.source+'/manifest_additions.json')
             manifest_stream = mergeStream(common,additions)
             .pipe(mergeJSON('manifest.json'))
+            .pipe(jeditor(function(json) {
+                json.version=settings.version
+                return json
+            }))
 
             if (_this.dev_server){
-                var warning = ['THIS IS NOT the production manifest; use ',_this.source,'/manifest.json for permanent changes'],
+                var warning = ['THIS IS NOT the production manifest.'],
                 dev_permission =["https://",_this.dev_server.domain,":",_this.dev_server.port,"/"],
                 dev_match =["https://",_this.dev_server.domain,"/"]
                 manifest_stream
@@ -119,12 +127,16 @@ var manifest = function (options){
 }
 
 
-var chrome_options = settings.static_files
-chrome_options.destination = settings.chrome.destination
+var chrome_options = settings.chrome
+chrome_options.static_files = settings.static_files
 chrome_options.dev_server = settings.dev_server
+
 gulp.task('chrome-static', new static_files(chrome_options));
-gulp.task('chrome-dev-manifest', new manifest(settings.chrome));
-gulp.task('chrome-coffee', new compile_coffee(settings.chrome));
+gulp.task('chrome-dev-manifest', new manifest(chrome_options));
+gulp.task('chrome-coffee', new compile_coffee(chrome_options));
+
+// NOTE: static files are not watched because they are ... static.
+//  Restart dev tasks if static files change
 
 gulp.task('dev-chrome', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'], function() {
     console.log("start watching " + settings.chrome.source)
@@ -144,6 +156,7 @@ gulp.task('dev-firefox', ['firefox-dev-xpi'], function() {
 })
 
 gulp.task('dev',['dev-chrome','dev-firefox'])
+
 
 // foo-splaining:  gulp task functions are wrapped in '(new task_name(options))()' to immediately
 // return result of function; usually this is the stream it creates
@@ -177,7 +190,7 @@ gulp.task('publish-firefox', function () {
             path.dirname += "/js";
         }))
     mergeStream (manifest_stream,js_stream,static_stream)
-        .pipe(zip(settings.name+settings.firefox.extension))
+        .pipe(zip(file_name(settings.firefox.extension)))
         .pipe(gulp.dest(settings.destination));
 });
 
@@ -191,7 +204,7 @@ gulp.task('publish-chrome', function () {
             path.dirname += "/js";
         }))
     mergeStream (manifest_stream,js_stream,static_stream)
-        .pipe(zip(settings.name+settings.chrome.extension))
+        .pipe(zip(file_name(settings.chrome.extension)))
         .pipe(gulp.dest(settings.destination));
 });
 
