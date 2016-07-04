@@ -15,10 +15,7 @@ settings = {
     version: '0.0.0.5',
     source: './src',
     destination: './build',
-    static_files: {
-        source: './static',
-        destination: ''
-    },
+    static_files: './static',
     dev_server: {
         domain: '127.0.0.1',
         port: '8443'
@@ -53,7 +50,7 @@ compile_coffee= function(options) {
                 var compiled_stream = gulp.src([_this.source + '/*.coffee', settings.source +'/*.coffee'])
                                             .pipe(coffee({bare: true}).on('error', gutil.log))
                 if (_this.destination){
-                    return compiled_stream.pipe(gulp.dest(_this.destination))
+                    return compiled_stream.pipe(gulp.dest(_this.destination + '/js'))
                 } else {
                     return compiled_stream
                 }
@@ -62,9 +59,9 @@ compile_coffee= function(options) {
     )(this)
 }
 
-static_files = function(options) {
-  this.source = options.source
-  this.destination = options.destination
+static_files = function(destination) {
+  this.source = settings.static_files
+  this.destination = destination
   return (
     function(_this) {
       return function() {
@@ -104,7 +101,6 @@ var manifest = function (options){
                 json.version=settings.version
                 return json
             }))
-
             if (_this.dev_server){
                 var warning = ['THIS IS NOT the production manifest.'],
                 dev_permission =["https://",_this.dev_server.domain,":",_this.dev_server.port,"/"],
@@ -126,19 +122,17 @@ var manifest = function (options){
     })(this)
 }
 
-
-var chrome_options = settings.chrome
-chrome_options.static_files = settings.static_files
-chrome_options.dev_server = settings.dev_server
-
-gulp.task('chrome-static', new static_files(chrome_options));
-gulp.task('chrome-dev-manifest', new manifest(chrome_options));
-gulp.task('chrome-coffee', new compile_coffee(chrome_options));
-
+// DEV TASKS
 // NOTE: static files are not watched because they are ... static.
 //  Restart dev tasks if static files change
 
-gulp.task('dev-chrome', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'], function() {
+var chrome_options = settings.chrome
+chrome_options.dev_server = settings.dev_server
+gulp.task('chrome-static', new static_files(settings.chrome.destination));
+gulp.task('chrome-dev-manifest', new manifest(chrome_options));
+gulp.task('chrome-coffee', new compile_coffee(chrome_options));
+
+gulp.task('dev-chrome-unpacked', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'], function() {
     console.log("start watching " + settings.chrome.source)
     var manifest_files = [settings.source + '/manifest.json',settings.chrome.source + '/manifest_additions.json']
     var coffee_files = [settings.chrome.source + '/*.coffee', settings.source + '/*.coffee']
@@ -146,8 +140,29 @@ gulp.task('dev-chrome', ['chrome-static', 'chrome-dev-manifest', 'chrome-coffee'
     gulp.watch(coffee_files, ['chrome-coffee'])
 })
 
+gulp.task('dev-chrome-packed', ['chrome-dev-zip'], function() {
+    console.log("start watching " + settings.chrome.source)
+    var manifest_files = [settings.source + '/manifest.json',settings.chrome.source + '/manifest_additions.json']
+    var coffee_files = [settings.source + '/*.coffee', settings.chrome.source + '/*.coffee']
+    gulp.watch(manifest_files, ['chrome-dev-manifest'])
+    gulp.watch(coffee_files, ['chrome-coffee'])
+})
 
-gulp.task('dev-firefox', ['firefox-dev-xpi'], function() {
+var firefox_options = settings.firefox
+firefox_options.dev_server = settings.dev_server
+gulp.task('firefox-static', new static_files(settings.firefox.destination));
+gulp.task('firefox-dev-manifest', new manifest(firefox_options));
+gulp.task('firefox-coffee', new compile_coffee(firefox_options));
+
+gulp.task('dev-firefox-unpacked', ['firefox-static', 'firefox-dev-manifest', 'firefox-coffee'], function() {
+    console.log("start watching " + settings.firefox.source)
+    var manifest_files = [settings.source + '/manifest.json',settings.firefox.source + '/manifest_additions.json']
+    var coffee_files = [settings.firefox.source + '/*.coffee', settings.source + '/*.coffee']
+    gulp.watch(manifest_files, ['firefox-dev-manifest'])
+    gulp.watch(coffee_files, ['firefox-coffee'])
+})
+
+gulp.task('dev-firefox-packed', ['firefox-dev-xpi'], function() {
     console.log("start watching " + settings.firefox.source)
     var manifest_files = [settings.source + '/manifest.json',settings.firefox.source + '/manifest_additions.json']
     var coffee_files = [settings.source + '/*.coffee', settings.firefox.source + '/*.coffee']
@@ -155,9 +170,12 @@ gulp.task('dev-firefox', ['firefox-dev-xpi'], function() {
     gulp.watch(coffee_files, ['chrome-coffee'])
 })
 
-gulp.task('dev',['dev-chrome','dev-firefox'])
+gulp.task('dev-unpacked',['dev-chrome-unpacked','dev-firefox-unpacked'])
+gulp.task('dev-packed',['dev-chrome-packed','dev-firefox-packed'])
 
 
+
+// FILE BUILDING TASKS
 // foo-splaining:  gulp task functions are wrapped in '(new task_name(options))()' to immediately
 // return result of function; usually this is the stream it creates
 
@@ -169,21 +187,37 @@ gulp.task('firefox-dev-xpi', function () {
         dev_server: settings.dev_server
     }
     manifest_stream = (new manifest(firefox_options))()
-    static_stream= (new static_files({source: settings.static_files.source}))()
+    static_stream= (new static_files())()
     js_stream = (new compile_coffee(firefox_options))()
         .pipe(rename(function (path) {
             path.dirname += "/js";
         }))
     mergeStream (manifest_stream,js_stream,static_stream)
-        .pipe(zip(settings.name+settings.firefox.extension))
+        .pipe(zip(settings.name+'.dev'+settings.firefox.extension))
         .pipe(gulp.dest(settings.firefox.destination));
 });
 
+// create zip for chrome dev
+gulp.task('chrome-dev-zip', function () {
+    var chrome_options = {
+        source: settings.chrome.source,
+        dev_server: settings.dev_server
+    }
+    manifest_stream = (new manifest(chrome_options))()
+    static_stream= (new static_files())()
+    js_stream = (new compile_coffee(chrome_options))()
+        .pipe(rename(function (path) {
+            path.dirname += "/js";
+        }))
+    mergeStream (manifest_stream,js_stream,static_stream)
+        .pipe(zip(settings.name+'.dev'+settings.chrome.extension))
+        .pipe(gulp.dest(settings.chrome.destination));
+});
 
 // create xpi for FF prod
 gulp.task('publish-firefox', function () {
     manifest_stream = (new manifest({source: settings.firefox.source}))()
-    static_stream= (new static_files({source: settings.static_files.source}))()
+    static_stream= (new static_files())()
     js_stream = (new compile_coffee({source: settings.firefox.source}))()
         .pipe(stripDebug())
         .pipe(rename(function (path) {
@@ -197,7 +231,7 @@ gulp.task('publish-firefox', function () {
 // create zip for chrome
 gulp.task('publish-chrome', function () {
     manifest_stream = (new manifest({source: settings.chrome.source}))()
-    static_stream= (new static_files({source: settings.static_files.source}))()
+    static_stream= (new static_files())()
     js_stream = (new compile_coffee({source: settings.chrome.source}))()
         .pipe(stripDebug())
         .pipe(rename(function (path) {
