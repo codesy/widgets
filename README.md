@@ -10,22 +10,27 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
 2. Install requirements:
   * `cd widgets`
   * `npm install`
-3. Run gulp to watch changes to files and compile extensions
-  * 'gulp dev-chrome' - creates addon directory and watches for changes
-  * 'gulp dev-firefox' - creates addon xpi file and watches for changes
-  * `gulp dev` - runs 'dev-chrome' and 'dev-firefox'
+3. Run these gulp tasks to watch changes to files and compile extensions.
+  * gulp dev-chrome-unpacked - creates addon directory and watches for changes
+  * gulp dev-chrome-packed - creates addon zip file and watches for changes
+  * gulp dev-firefox-unpacked - creates addon directory and watches for changes
+  * gulp dev-firefox-packed - creates addon xpi file and watches for changes
+
+combined tasks:
+  * gulp dev-packed - creates addon packages and watches for changes
+  * gulp dev-unpacked - creates directories with addon files and watches all for changes
 
 
-## To use the Chrome Extension
-1. Follow the [Unpacked Chrome Extensions
+### To use the Chrome Extension
+1. Run one of the dev-chrome tasks above
+2. Follow the [Unpacked Chrome Extensions
    docs](http://developer.chrome.com/extensions/getstarted.html#unpacked) and load the `chrome` directory
 
-## To use the Firefox Add-on
-1. `cd firefox`
-2. Run 'gulp firefox-dev-xpi' (or 'gulp dev-firefox' to watch changes)
-  * Goto the the //about:addons page
-  * Select 'Install Addon from File ...')
-  * Load the 'codesy.xpi' file from the firefox directory
+### To use the Firefox Add-on
+1. Run one of the dev-firefox tasks above
+2. Goto the the //about:addons page
+3. Select 'Install Addon from File ...')
+4. Load the xpi file from the firefox directory
 
 ## Publish
 
@@ -41,4 +46,4 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
   * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates an xpi file for uploading to the moz store.  The file contains the manifest.json file.
-2. Upload the codesy.xpi file to the moz store
+2. Upload the xpi file to the moz store

@@ -3,7 +3,8 @@ githubFilter =
     types: ["main_frame"]
 
 cspAppender = (domain) ->
-    @domain = domain
+    domains = [" 'self'", domain]
+    @domain =  domains.join(' ')
     types = ['connect-src','frame-src','script-src','style-src']
     @isCSP = (headerName) ->
         (headerName is 'CONTENT-SECURITY-POLICY') or (headerName is 'X-WEBKIT-CSP')
@@ -11,7 +12,7 @@ cspAppender = (domain) ->
       for header in details.responseHeaders
           if @isCSP header.name.toUpperCase()
               for type in types
-                header.value = header.value.replace(type, type + " 'self' " + @domain)
+                header.value = header.value.replace(type, type + @domain)
       {responseHeaders: details.responseHeaders}
 
 codesyAppender = new cspAppender ""
