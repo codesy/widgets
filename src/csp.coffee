@@ -5,7 +5,7 @@ githubFilter =
 cspAppender = (domain) ->
     domains = [" 'self'", domain]
     @domain =  domains.join(' ')
-    types = ['connect-src','frame-src','script-src','style-src']
+    types = ['connect-src','child-src','script-src','style-src']
     @isCSP = (headerName) ->
         (headerName is 'CONTENT-SECURITY-POLICY') or (headerName is 'X-WEBKIT-CSP')
     (details) =>
