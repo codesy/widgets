@@ -9,7 +9,7 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
   * `git clone https://github.com/codesy/widgets.git`
 2. Install requirements:
   * `cd widgets`
-  * `npm install`
+  * `npm install` (You can install globally with `npm install -g`)
 3. Run these gulp tasks to watch changes to files and compile extensions.
   * gulp dev-chrome-unpacked - creates addon directory and watches for changes
   * gulp dev-chrome-packed - creates addon zip file and watches for changes

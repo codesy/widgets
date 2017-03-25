@@ -1,7 +1,6 @@
 var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var coffee = require('gulp-coffee');
 var stripDebug = require('gulp-strip-debug');
 var mergeStream = require('merge-stream');
 var mergeJSON = require('gulp-merge-json');
@@ -42,25 +41,26 @@ var settings = {
 //    destination: (optional) path where files will go.  If destination is not included,
 //                  the functions will return a stream of files.
 
-compile_coffee = function(options) {
+javascript_src = function(options) {
     this.source = options.source
     this.destination = options.destination
     return (
         function(_this) {
             return function() {
-                console.log("compile "+_this.source + "/*.coffee files")
-            // next line compile coffee files in source directory and ./src root
-                var compiled_stream = gulp.src([_this.source + '/*.coffee', settings.source +'/*.coffee'])
-                                            .pipe(coffee({bare: true}).on('error', gutil.log))
+                console.log("gather src "+_this.source + "/*.js files")
+
+                var js_files = gulp.src([_this.source + '/*.js', settings.source +'/*.js'])
+
                 if (_this.destination){
-                    return compiled_stream.pipe(gulp.dest(_this.destination + '/js'))
+                    return js_files.pipe(gulp.dest(_this.destination + '/js'))
                 } else {
-                    return compiled_stream
+                    return js_files
                 }
             }
         }
     )(this)
 }
+
 
 static_files = function(destination) {
   this.destination = destination
@@ -129,7 +129,7 @@ var package = function (options, zipped, for_dev){
                 var package_name, destination, package_stream
                 var static_stream = (new static_files())()
                 var manifest_stream = (new manifest({source:_this.options.source}))()
-                var js_stream = (new compile_coffee({source:_this.options.source}))()
+                var js_stream = (new javascript_src({source:_this.options.source}))()
                     .pipe(rename(function (path) {
                         path.dirname += "/js";
                     }))
@@ -163,12 +163,12 @@ var package = function (options, zipped, for_dev){
 var watch_dev = function (options, task) {
     console.log("start watching");
     var manifest_files = [settings.source + '/manifest.json',options.source + '/manifest_additions.json']
-    var coffee_files = [options.source + '/*.coffee', settings.source + '/*.coffee']
+    var js_files = [options.source + '/*.js', settings.source + '/*.js']
     // watch static files
     gulp.watch(settings.static_files.source + '/**', task)
     // watch manifest files
     gulp.watch(manifest_files, task)
-    gulp.watch(coffee_files, task)
+    gulp.watch(js_files, task)
 }
 
 // DEV TASKS
@@ -212,7 +212,7 @@ gulp.task('chrome-unpacked', (new package(settings.chrome, false, true)))
 // create xpi for FF prod
 gulp.task('publish-firefox', (new package(settings.firefox, true, false)))
 
-// create zip for chrome
+    // create zip for chrome and opera
 gulp.task('publish-chrome', (new package(settings.chrome, true, false)))
 
 gulp.task('publish-all',['publish-firefox','publish-chrome'])
