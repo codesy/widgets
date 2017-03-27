@@ -1,88 +1,79 @@
-var codesy, onChrome, ref;
 
 console.time('codesy issue load');
 
-codesy = {
-  href: "",
-  rx: /https:\/\/github.com\/.*\/issues\/[1-9]+/g,
-  css: {
-    attr: {
-      rel: "stylesheet",
-      type: "text/css",
-      href: ""
+const codesy = {
+    domain: "https://codesy.io",
+    href: "",
+    rx: /https:\/\/github.com\/.*\/issues\/[1-9]+/g,
+    css: {
+        attr: {
+            rel: "stylesheet",
+            type: "text/css",
+            href: ""
+        }
+    },
+    iframe: {
+        attr: {
+            id: "codesy_iframe",
+            style: "visibility: collapse;",
+            scrolling: "no",
+            seamless: "seamless"
+        }
     }
-  },
-  iframe: {
-    attr: {
-      id: "codesy_iframe",
-      style: "visibility: collapse;",
-      scrolling: "no",
-      seamless: "seamless"
-    }
-  },
-  bid_url: function(issue_url) {
-    return codesy.domain + '/bid-status/?' + $.param({
-      url: issue_url
-    });
-  }
 };
 
-onChrome = (ref = chrome.storage) != null ? ref : false;
-
-if (onChrome) {
-  codesy.getHome = function() {
-    return chrome.storage.local.get(null, function(data) {
-      codesy.domain = data.domain;
-      return codesy.newpage();
-    });
-  };
-} else {
-  codesy.getHome = function() {
-    return chrome.runtime.sendMessage({
-      task: "getHome"
-    });
-  };
-  chrome.runtime.onMessage.addListener(function(message) {
-    switch (message.task) {
-      case 'ackHome':
-        codesy.domain = message.domain;
-        return codesy.newpage();
+codesy.iframeElementMaker = function(url=[codesy.domain]) {
+    return function (){
+        codesy.iframe.attr.src = `${url}/bid-status/?${$.param({url})}`
+        return $('<iframe>').attr(codesy.iframe.attr)
     }
-  });
+}
+
+// set default iframe
+codesy.$iframe = codesy.iframeElementMaker()
+
+codesy.setIframe = ({domain})=>{
+    codesy.$iframe = codesy.iframeElementMaker(domain)
 }
 
 codesy.loadcss = function() {
-  console.log("codesy newpage: iFrame loaded");
-  codesy.css.attr.href = chrome.extension.getURL("css/iframe.css");
-  return $("head").append($('<link>').attr(codesy.css.attr));
+    console.log("codesy newpage: iFrame loaded");
+    codesy.css.attr.href = chrome.extension.getURL("css/iframe.css");
+    $("head").append($('<link>').attr(codesy.css.attr));
 };
 
-codesy.newpage = function() {
-  var new_iframe;
-  $("#" + codesy.iframe.attr.id).remove();
-  if (codesy.rx.test(window.location.href)) {
-    codesy.iframe.attr.src = codesy.bid_url(window.location.href);
-    new_iframe = $('body').append($('<iframe>').attr(codesy.iframe.attr));
-    return new_iframe.ready(codesy.loadcss);
-  } else {
-    return console.log("codesy newpage: not an issue");
-  }
+codesy.newpage = function(new_url) {
+    ({ rx, iframe: {attr}} = codesy)
+    $(`#${attr.id}`).remove();
+    if (rx.test(new_url)) {
+        $('body').append(codesy.$iframe()).ready(codesy.loadcss)
+    } else {
+        return console.log("codesy newpage: not an issue");
+    }
 };
 
-codesy.urlChange = function() {
-  if (codesy.href !== window.location.href) {
-    console.log("codesy: url changed");
-    codesy.href = window.location.href;
-    codesy.getHome();
-  }
-  return window.setTimeout(codesy.urlChange, 600);
+codesy.watchURL = function() {
+    if (codesy.href !== window.location.href) {
+        console.log("codesy: url changed");
+        codesy.href = window.location.href;
+        codesy.newpage(window.location.href);
+    }
+    return window.setTimeout(codesy.watchURL, 600);
 };
 
-codesy.urlChange();
+//start watching
+
+// get the current codesy domain and start listening for changes
+chrome.storage.local.get(null, codesy.setIframe)
+chrome.storage.onChanged.addListener(codesy.setIframe)
+
+
+codesy.watchURL();
+
 
 window.onpopstate = function() {
-  console.log("codesy: popstate");
-  return codesy.getHome();
+    console.log("codesy: popstate");
+    codesy.newpage(window.location.href)
 };
 
 console.timeEnd('codesy issue load');

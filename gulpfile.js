@@ -182,11 +182,11 @@ gulp.task('dev-chrome-packed', ['chrome-dev-zip'], function() {
 })
 
 gulp.task('dev-firefox-unpacked', ['firefox-unpacked'], function() {
-    watch_dev(settings.chrome,['firefox-unpacked'])
+    watch_dev(settings.firefox,['firefox-unpacked'])
 })
 
 gulp.task('dev-firefox-packed', ['firefox-dev-xpi'], function() {
-    watch_dev(settings.chrome,['firefox-dev-xpi'])
+    watch_dev(settings.firefox,['firefox-dev-xpi'])
 })
 
 gulp.task('dev-unpacked',['dev-chrome-unpacked','dev-firefox-unpacked'])

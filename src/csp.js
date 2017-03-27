@@ -1,56 +1,52 @@
-var addCodesy, codesyAppender, cspAppender, githubFilter;
 
 githubFilter = {
-  urls: ["https://github.com/*"],
-  types: ["main_frame"]
+    urls: ["https://github.com/*"],
+    types: ["main_frame"]
 };
 
-cspAppender = function(domain) {
-  var domains, types;
-  domains = [" 'self'", domain];
-  this.domain = domains.join(' ');
-  types = ['connect-src', 'child-src', 'script-src', 'style-src'];
-  this.isCSP = function(headerName) {
-    return (headerName === 'CONTENT-SECURITY-POLICY') || (headerName === 'X-WEBKIT-CSP');
-  };
-  return (function(_this) {
-    return function(details) {
-      var header, i, j, len, len1, ref, type;
-      ref = details.responseHeaders;
-      for (i = 0, len = ref.length; i < len; i++) {
-        header = ref[i];
-        if (_this.isCSP(header.name.toUpperCase())) {
-          for (j = 0, len1 = types.length; j < len1; j++) {
-            type = types[j];
-            header.value = header.value.replace(type, type + _this.domain);
-          }
-        }
-      }
-      return {
-        responseHeaders: details.responseHeaders
-      };
+const makeCspAppender = function(domain) {
+    const new_domain = ` 'self' ${domain}`
+    const types = ['connect-src', 'child-src', 'script-src', 'style-src'];
+    const isCSP = function ({ name: maybe_lower }) {
+        const name = maybe_lower.toUpperCase()
+        return (name === 'CONTENT-SECURITY-POLICY') || (name === 'X-WEBKIT-CSP');
     };
-  })(this);
+    return function({details:{responseHeaders: headers}}) {
+        for (header of headers) {
+            if ( isCSP(header) ) {
+                for (type of types) {
+                    header.value = header.value.replace(type, `${type}${new_domain}`);
+                }
+            }
+        }
+        return {
+            responseHeaders: headers
+        };
+    }
 };
 
-codesyAppender = new cspAppender("");
+let codesyAppender;
 
-addCodesy = function(new_domain) {
-  if (chrome.webRequest.onHeadersReceived.hasListener(codesyAppender)) {
-    chrome.webRequest.onHeadersReceived.removeListener(codesyAppender);
-  }
-  codesyAppender = new cspAppender(new_domain);
-  return chrome.webRequest.onHeadersReceived.addListener(codesyAppender, githubFilter, ["responseHeaders", "blocking"]);
+({hasListener, removeListener, addListener} = chrome.webRequest.onHeadersReceived)
+
+const addCodesy = function(new_domain) {
+    // if (hasListener(codesyAppender)) {
+    //     removeListener(codesyAppender);
+    // }
+    codesyAppender = new makeCspAppender(new_domain);
+    return addListener(codesyAppender, githubFilter, ["responseHeaders", "blocking"]);
 };
 
-chrome.storage.local.get(null, function(data) {
-  return addCodesy(data.domain);
-});
+({local: {get: getStorage},onChanged:{addListener: addStorageListener}} = chrome.storage)
 
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  var new_domain;
-  new_domain = changes.domain.newValue;
-  if (new_domain) {
-    return addCodesy(new_domain);
-  }
-});
+getStorage(null,
+    function ({domain}) {
+        return addCodesy(domain)
+    }
+);
+
+// addStorageListener(
+//     function({domain:{newValue}}, namespace) {
+//         if (newValue) { return addCodesy(newValue); }
+//     }
+// );
