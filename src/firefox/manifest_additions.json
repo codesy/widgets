@@ -6,8 +6,7 @@
     },
     "background": {
         "scripts": [
-            "js/csp.js",
-            "js/messages.js"
+            "js/csp.js"
         ]
     },
     "id": "codesy@codesy.io",

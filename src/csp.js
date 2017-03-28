@@ -4,42 +4,52 @@ githubFilter = {
     types: ["main_frame"]
 };
 
+headerOptions = ["responseHeaders", "blocking"]
+
 const makeCspAppender = function(domain='') {
     const types = ['connect-src', 'child-src', 'script-src', 'style-src'];
+    const inserts = types.map(function(name){
+        return {name, value: `${name} 'self' ${domain} `}
+    })
     const isCSP = function ({ name: maybe_lower }) {
         const name = maybe_lower.toUpperCase()
         return (name === 'CONTENT-SECURITY-POLICY') || (name === 'X-WEBKIT-CSP');
     };
     return function({responseHeaders: headers}) {
-        for (header of headers) {
+        console.time('codesy map headers');
+        const responseHeaders = headers.map(function(header){
             if ( isCSP(header) ) {
-                for (type of types) {
-                    header.value = header.value.replace(type, `${type} 'self' ${domain} `);
+                for (type of inserts) {
+                    header.value = header.value.replace(type.name, type.value);
                 }
             }
-        }
-        return {responseHeaders: headers};
+            return header
+        })
+        console.timeEnd('codesy map headers');
+        return {responseHeaders};
     }
 };
 
-let codesyAppender;
+let codesyAppender = new makeCspAppender()
 
-const addCodesy = function(domain) {
+const setCodesyAppender = function(domain) {
     if (chrome.webRequest.onHeadersReceived.hasListener(codesyAppender)) {
         chrome.webRequest.onHeadersReceived.removeListener(codesyAppender);
     }
     codesyAppender = new makeCspAppender(domain);
-    return chrome.webRequest.onHeadersReceived.addListener(codesyAppender, githubFilter, ["responseHeaders", "blocking"]);
+    chrome.webRequest.onHeadersReceived.addListener(
+        codesyAppender, githubFilter, headerOptions
+    );
 };
 
-chrome.storage.local.get(null, function({domain}) {
-    return addCodesy(domain);
-});
+chrome.storage.local.get(null,
+    ({domain})=>{
+        if (domain) setCodesyAppender(domain);
+    }
+);
 
 chrome.storage.onChanged.addListener(
-    function({domain: {newValue:domain} }, namespace) {
-        if (domain) {
-            return addCodesy(domain);
-        }
+    ({domain: {newValue: domain} }, namespace)=>{
+        if (domain) setCodesyAppender(domain);
     }
 );

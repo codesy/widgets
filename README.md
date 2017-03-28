@@ -36,14 +36,12 @@ combined tasks:
 
 ### Chrome and Opera
 1. Run 'gulp publish-chrome'
-  * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
 2. Upload the codesy.zip file to the chrome or opera store
 
 ### Firefox
 1. Run 'gulp publish-firefox'
-  * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates an xpi file for uploading to the moz store.  The file contains the manifest.json file.
 2. Upload the xpi file to the moz store
