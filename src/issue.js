@@ -22,7 +22,17 @@ const codesy = {
     }
 };
 
+codesy.watchURL = function() {
+    if (codesy.href !== window.location.href) {
+        console.log("codesy: url changed");
+        codesy.href = window.location.href;
+        codesy.newpage(window.location.href);
+    }
+    codesy.timerID = window.setTimeout(codesy.watchURL, 600);
+};
+
 codesy.iframeElementMaker = function(url=[codesy.domain]) {
+
     return function (){
         codesy.iframe.attr.src = `${url}/bid-status/?${$.param({url})}`
         return $('<iframe>').attr(codesy.iframe.attr)
@@ -33,7 +43,10 @@ codesy.iframeElementMaker = function(url=[codesy.domain]) {
 codesy.$iframe = codesy.iframeElementMaker()
 
 codesy.setIframe = ({domain})=>{
+    if (codesy.timerID){ window.clearTimeout(codesy.timerID) }
     codesy.$iframe = codesy.iframeElementMaker(domain)
+    codesy.href = ''
+    codesy.watchURL()
 }
 
 codesy.loadcss = function() {
@@ -52,23 +65,13 @@ codesy.newpage = function(new_url) {
     }
 };
 
-codesy.watchURL = function() {
-    if (codesy.href !== window.location.href) {
-        console.log("codesy: url changed");
-        codesy.href = window.location.href;
-        codesy.newpage(window.location.href);
-    }
-    return window.setTimeout(codesy.watchURL, 600);
-};
-
-//start watching
 
 // get the current codesy domain and start listening for changes
 chrome.storage.local.get(null, codesy.setIframe)
+
 chrome.storage.onChanged.addListener(codesy.setIframe)
 
 
-codesy.watchURL();
 
 
 window.onpopstate = function() {
