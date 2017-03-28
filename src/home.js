@@ -1,6 +1,4 @@
-console.log("codesy home page");
-
-console.time("codesy home");
+console.time("load codesy home");
 
 if ($(".installed").length > 0) {
     $(".install-step").hide();
@@ -9,7 +7,6 @@ if ($(".installed").length > 0) {
 
 codesy = {};
 
-// if (isChrome) {
 codesy.storeDomain = function(domain) {
     return chrome.storage.local.get(null,
         function(data) {
@@ -19,18 +16,6 @@ codesy.storeDomain = function(domain) {
     );
 };
 
-
-// } else {
-//   codesy.storeDomain = function(domain) {
-//     var message;
-//     message = {
-//       task: "setHome",
-//       domain: domain
-//     };
-//     return chrome.runtime.sendMessage(message);
-//   };
-// }
-
 codesy.storeDomain(window.location.origin);
 
-console.timeEnd("codesy home");
+console.timeEnd("load codesy home");
