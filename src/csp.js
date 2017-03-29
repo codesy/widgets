@@ -7,23 +7,22 @@ githubFilter = {
 headerOptions = ["responseHeaders", "blocking"]
 
 const makeCspAppender = function(domain='') {
-    const types = ['connect-src', 'child-src', 'script-src', 'style-src'];
-    const inserts = types.map(function(name){
-        return {name, value: `${name} 'self' ${domain} `}
-    })
-    const isCSP = function ({ name: maybe_lower }) {
-        const name = maybe_lower.toUpperCase()
+    const types = 'connect-src child-src script-src style-src';
+    const isType = (word) => types.indexOf(word) !== -1;
+    const isCSP = function (name) {
+        name = name.toUpperCase()
         return (name === 'CONTENT-SECURITY-POLICY') || (name === 'X-WEBKIT-CSP');
     };
     return function({responseHeaders: headers}) {
         console.time('codesy map headers');
-        const responseHeaders = headers.map(function(header){
-            if ( isCSP(header) ) {
-                for (type of inserts) {
-                    header.value = header.value.replace(type.name, type.value);
-                }
+        const responseHeaders = headers.map(function({name, value}){
+            if ( isCSP(name) ) {
+                value = value.split(' ').reduce(
+                    (accum, word)=>{
+                        return `${accum} ${word} ${isType(word) ? domain : '' }`
+                    },'')
             }
-            return header
+            return {name,value}
         })
         console.timeEnd('codesy map headers');
         return {responseHeaders};
