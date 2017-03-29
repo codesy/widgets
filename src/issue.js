@@ -1,8 +1,6 @@
 console.time('codesy issue load');
-console.time('codesy issue to iframe');
 
 const codesy = {
-    href: "",
     rx: /https:\/\/github.com\/.*\/issues\/[1-9]+/g,
     css: {
         attr: {
@@ -45,7 +43,6 @@ codesy.rx_test = codesy.make_rx_test(codesy)
 function watch_href (href='', waitime=400) {
     if (watch_href.href !== href) {
         watch_href.href = href;
-        console.log("codesy: url changed");
         $(`#${codesy.iframe.attr.id}`).remove();
         if (codesy.rx_test(href)) codesy.addWidget(href);
     }
