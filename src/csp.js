@@ -9,19 +9,15 @@ headerOptions = ["responseHeaders", "blocking"]
 const makeCspAppender = function(domain='') {
     const types = 'connect-src child-src script-src style-src';
     const isType = (word) => types.indexOf(word) !== -1;
+    const addDomain = (accum, word)=>`${accum} ${word} ${isType(word) ? domain : '' }`
     const isCSP = function (name) {
         name = name.toUpperCase()
         return (name === 'CONTENT-SECURITY-POLICY') || (name === 'X-WEBKIT-CSP');
     };
     return function({responseHeaders: headers}) {
         console.time('codesy map headers');
-        const responseHeaders = headers.map(function({name, value}){
-            if ( isCSP(name) ) {
-                value = value.split(' ').reduce(
-                    (accum, word)=>{
-                        return `${accum} ${word} ${isType(word) ? domain : '' }`
-                    },'')
-            }
+        const responseHeaders = headers.map(function({name, value: v}){
+            value = isCSP(name) ? v.split(' ').reduce(addDomain,'') : v
             return {name,value}
         })
         console.timeEnd('codesy map headers');
