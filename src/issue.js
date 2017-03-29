@@ -1,4 +1,5 @@
 console.time('codesy issue load');
+console.time('codesy issue to iframe');
 
 const codesy = {
     href: "",
@@ -7,7 +8,7 @@ const codesy = {
         attr: {
             rel: "stylesheet",
             type: "text/css",
-            href: ""
+            href: chrome.extension.getURL("css/iframe.css")
         }
     },
     iframe: {
@@ -20,41 +21,41 @@ const codesy = {
     }
 };
 
-codesy.watchURL = function() {
-    if (codesy.href !== window.location.href) {
+codesy.make_iframe_attr = ({attr})=>{
+    return (url)=>{
+        attr.src =`${codesy.domain}/bid-status/?${$.param({url})}`
+        return attr
+    }
+}
+codesy.iframe_attr = codesy.make_iframe_attr(codesy.iframe)
+codesy.$iframe = (url)=>$('<iframe>').attr(codesy.iframe_attr(url))
+codesy.$link = ()=> $("head").append($('<link>').attr(codesy.css.attr));
+codesy.endtimer = ()=> console.timeEnd('codesy append iframe');
+
+codesy.addWidget = function(url) {
+    console.time('codesy append iframe');
+    $('body').append(codesy.$iframe(url)).ready(codesy.$link).ready(codesy.endtimer)
+    return 400
+};
+
+codesy.make_rx_test = ({rx})=> (url) => rx.test(url)
+
+codesy.rx_test = codesy.make_rx_test(codesy)
+
+function watch_href (href='', waitime=400) {
+    if (watch_href.href !== href) {
+        watch_href.href = href;
         console.log("codesy: url changed");
-        codesy.href = window.location.href;
-        codesy.newpage();
+        $(`#${codesy.iframe.attr.id}`).remove();
+        if (codesy.rx_test(href)) codesy.addWidget(href);
     }
-    codesy.timerID = window.setTimeout(codesy.watchURL, 600);
-};
-
-codesy.$iframe = ()=>$('<iframe>').attr(codesy.iframe.attr)
-
-codesy.loadcss = function() {
-    console.log("codesy newpage: iFrame loaded");
-    codesy.css.attr.href = chrome.extension.getURL("css/iframe.css");
-    $("head").append($('<link>').attr(codesy.css.attr));
-    console.timeEnd('codesy insert iframe');
-};
-
-codesy.newpage = function() {
-    ({ href: url, domain, rx, iframe: {attr}} = codesy)
-    $(`#${attr.id}`).remove();
-    if (rx.test(url)) {
-        console.time('codesy insert iframe');
-        codesy.iframe.attr.src = `${domain}/bid-status/?${$.param({url})}`;
-        $('body').append(codesy.$iframe()).ready(codesy.loadcss)
-    } else {
-        return console.log("codesy newpage: not an issue");
-    }
+    codesy.timerID = window.setTimeout(watch_href, waitime, window.location.href);
 };
 
 codesy.setDomain = ({domain})=>{
-    if (codesy.timerID){ window.clearTimeout(codesy.timerID) }
+    if (codesy.timerID) window.clearTimeout(codesy.timerID);
     codesy.domain = domain
-    codesy.href = ''
-    codesy.watchURL()
+    watch_href()
 }
 
 // get the current codesy domain and start listening for changes
