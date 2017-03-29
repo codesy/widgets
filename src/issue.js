@@ -1,7 +1,5 @@
 console.time('codesy issue load');
-
 const codesy = {
-    rx: /https:\/\/github.com\/.*\/issues\/[1-9]+/g,
     css: {
         attr: {
             rel: "stylesheet",
@@ -19,44 +17,41 @@ const codesy = {
     }
 };
 
-codesy.make_iframe_attr = ({attr})=>{
-    return (url)=>{
-        attr.src =`${codesy.domain}/bid-status/?${$.param({url})}`
-        return attr
-    }
-}
-codesy.iframe_attr = codesy.make_iframe_attr(codesy.iframe)
-codesy.$iframe = (url)=>$('<iframe>').attr(codesy.iframe_attr(url))
-codesy.$link = ()=> $("head").append($('<link>').attr(codesy.css.attr));
-codesy.endtimer = ()=> console.timeEnd('codesy append iframe');
-
-codesy.addWidget = function(url) {
+$iframe  = (url)=>$('<iframe>').attr(set_bid_url(url))
+$link    = ()=> $("head").append($('<link>').attr(codesy.css.attr));
+endtimer = ()=> console.timeEnd('codesy append iframe');
+add_widget = function(url) {
     console.time('codesy append iframe');
-    $('body').append(codesy.$iframe(url)).ready(codesy.$link).ready(codesy.endtimer)
+    $('body').append($iframe(url)).ready($link).ready(endtimer)
     return 400
 };
 
-codesy.make_rx_test = ({rx})=> (url) => rx.test(url)
+github_test = (url)=>/https:\/\/github.com\/.*\/issues\/[1-9]+/g.test(url)
 
-codesy.rx_test = codesy.make_rx_test(codesy)
-
-function watch_href (href='', waitime=400) {
+function watch_href (href='', wait=400) {
+    if (watch_href.timerID) window.clearTimeout(watch_href.timerID);
     if (watch_href.href !== href) {
         watch_href.href = href;
         $(`#${codesy.iframe.attr.id}`).remove();
-        if (codesy.rx_test(href)) codesy.addWidget(href);
+        if (github_test(href)) add_widget(href);
     }
-    codesy.timerID = window.setTimeout(watch_href, waitime, window.location.href);
+    watch_href.timerID = window.setTimeout(watch_href, wait, window.location.href);
 };
 
-codesy.setDomain = ({domain})=>{
-    if (codesy.timerID) window.clearTimeout(codesy.timerID);
-    codesy.domain = domain
-    watch_href()
+const set_iframe_domain = (domain, attr)=>{
+    return (url)=>{
+        attr.src =`${domain}/bid-status/?${$.param({url})}`
+        return attr
+    }
 }
 
+let set_bid_url;
+setDomain = ({domain})=>{
+    set_bid_url = set_iframe_domain(domain, codesy.iframe.attr)
+    watch_href()
+}
 // get the current codesy domain and start listening for changes
-chrome.storage.local.get(null, codesy.setDomain)
-chrome.storage.onChanged.addListener(codesy.setDomain)
+chrome.storage.local.get(null, setDomain)
+chrome.storage.onChanged.addListener(setDomain)
 
 console.timeEnd('codesy issue load');
