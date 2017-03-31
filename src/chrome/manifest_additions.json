@@ -1,9 +1,3 @@
 {
-    "background": {
-        "persistent": true,
-        "scripts": [
-            "js/csp.js"
-        ]
-    },
     "version_name": "invitation-only beta"
 }

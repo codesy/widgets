@@ -50,12 +50,10 @@ set_domain = ({domain})=>{
     set_bid_url = set_iframe_domain(domain, codesy.iframe.attr)
     watch_href()
 }
-set_domain_reload = ({domain})=>{
-    window.location.reload(true);
-    set_domain({doman})
-}
+reload_page = () => window.location.reload(true);
+
 // get the current codesy domain and start listening for changes
 chrome.storage.local.get(null, set_domain)
-chrome.storage.onChanged.addListener(set_domain_reload)
+chrome.storage.onChanged.addListener(reload_page)
 
 console.timeEnd('codesy issue load');

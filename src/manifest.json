@@ -35,6 +35,13 @@
             ]
         }
     ],
+    "background": {
+        "persistent": true,
+        "scripts": [
+            "js/csp.js",
+            "js/on_install.js"
+        ]
+    },
     "icons": {
         "16": "img/icon16.png",
         "48": "img/icon48.png",

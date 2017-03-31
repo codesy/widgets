@@ -11,7 +11,7 @@ var rename = require('gulp-rename')
 // Settings for building packages
 var settings = {
     name: 'codesy',
-    version: '0.0.0.5',
+    version: '0.0.0.6',
     source: './src',
     destination: './build',
     static_files: {
