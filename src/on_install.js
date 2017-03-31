@@ -25,15 +25,29 @@ const reload_them = (tabs)=> {
     return Promise.all(reloads)
 }
 
+const  selected = (id)=>{
+    return new Promise((resolve)=>{
+        chrome.tabs.update(id, {selected:true}, resolve)
+    });
+}
+
+const select_them = (tabs)=> {
+    const reloads = tabs.map(({id})=> selected(id))
+    return Promise.all(reloads)
+    return tabs
+}
+
 when_installed = ({reason})=> {
     find_these({ title: "*codesy.io*" })
-        .then(reload_them)
-            .then(()=>{
-                if (reason === 'install'){
-                    find_these({ url: "*://*.github.com/*" })
-                        .then(reload_them)
-                }
-            })
+            .then(select_them)
+                .then(reload_them)
+                    .then(()=>{
+                        find_these({ title: "*codesy.io*" })
+                        if (reason === 'install'){
+                            find_these({ url: "*://*.github.com/*" })
+                                .then(reload_them)
+                        }
+                })
 }
 
 chrome.runtime.onInstalled.addListener(when_installed);
