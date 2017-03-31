@@ -25,7 +25,7 @@ const reload_them = (tabs)=> {
     return Promise.all(reloads)
 }
 
-on_installation = ({reason})=> {
+when_installed = ({reason})=> {
     find_these({ title: "*codesy.io*" })
         .then(reload_them)
             .then(()=>{
@@ -36,4 +36,4 @@ on_installation = ({reason})=> {
             })
 }
 
-chrome.runtime.onInstalled.addListener(on_installation);
+chrome.runtime.onInstalled.addListener(when_installed);
