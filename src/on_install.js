@@ -35,11 +35,9 @@ when_installed = ({reason})=> {
             .then(select_them)
                 .then(reload_them)
                     .then(()=>{
-                        if (reason === 'install'){
-                            find_these({ url: "*://*.github.com/*" })
-                                .then(reload_them)
-                        }
-                })
+                        find_these({ url: "*://*.github.com/*" })
+                            .then(reload_them)
+                    })
 }
 
 chrome.runtime.onInstalled.addListener(when_installed);
