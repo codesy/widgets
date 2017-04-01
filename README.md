@@ -11,10 +11,10 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
   * `cd widgets`
   * `npm install` (You can install globally with `npm install -g`)
 3. Run these gulp tasks to watch changes to files and compile extensions.
-  * gulp dev-chrome-unpacked - creates addon directory and watches for changes
-  * gulp dev-chrome-packed - creates addon zip file and watches for changes
-  * gulp dev-firefox-unpacked - creates addon directory and watches for changes
-  * gulp dev-firefox-packed - creates addon xpi file and watches for changes
+  * gulp dev-chrome-unpacked - creates chrome/ directory and watches for changes
+  * gulp dev-chrome-packed - creates a zip file in /chrome and watches for changes
+  * gulp dev-firefox-unpacked - creates firefox/ directory and watches for changes
+  * gulp dev-firefox-packed - creates an xpi in firefox/ file and watches for changes
 
 combined tasks:
   * gulp dev-packed - creates addon packages and watches for changes
