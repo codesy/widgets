@@ -1,15 +1,15 @@
-var fs = require('fs');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var stripDebug = require('gulp-strip-debug');
-var mergeStream = require('merge-stream');
-var mergeJSON = require('gulp-merge-json');
-var zip = require('gulp-zip');
-var jeditor = require("gulp-json-editor");
-var rename = require('gulp-rename')
+const fs = require('fs');
+const gulp = require('gulp');
+const stripDebug = require('gulp-strip-debug');
+const mergeStream = require('merge-stream');
+const mergeJSON = require('gulp-merge-json');
+const zip = require('gulp-zip');
+const jeditor = require("gulp-json-editor");
+const rename = require('gulp-rename')
+const headerComment = require('gulp-header-comment');
 
 // Settings for building packages
-var settings = {
+const settings = {
     name: 'codesy',
     version: '0.0.0.6',
     source: './src',
@@ -49,8 +49,8 @@ javascript_src = function(options) {
             return function() {
                 console.log("gather src "+_this.source + "/*.js files")
 
-                var js_files = gulp.src([_this.source + '/*.js', settings.source +'/*.js'])
-
+                const js_files = gulp.src([_this.source + '/*.js', settings.source +'/*.js'])
+                    .pipe(headerComment(`codesy widget version ${settings.version}`))
                 if (_this.destination){
                     return js_files.pipe(gulp.dest(_this.destination + '/js'))
                 } else {
@@ -67,7 +67,7 @@ static_files = function(destination) {
   return (
     function(_this) {
       return function() {
-        var static_stream = gulp.src(settings.static_files.glob,
+        const static_stream = gulp.src(settings.static_files.glob,
                                       { base: settings.static_files.source,
                                         cwd: settings.static_files.source
                                       })
@@ -84,13 +84,13 @@ static_files = function(destination) {
 // this function needs to include dev server details in the options object:
 //    dev_server: object with domain and port
 
-var manifest = function (options){
+const manifest = function (options){
   this.options = options
   return (
     function(_this) {
         return function() {
-            var common = gulp.src(settings.source + '/manifest.json')
-            var additions = gulp.src(_this.options.source+'/manifest_additions.json')
+            const common = gulp.src(settings.source + '/manifest.json')
+            const additions = gulp.src(_this.options.source+'/manifest_additions.json')
             manifest_stream = mergeStream(additions, common)
             .pipe(mergeJSON('manifest.json'))
             .pipe(jeditor(function(json) {
@@ -106,8 +106,8 @@ var manifest = function (options){
     })(this)
 }
 
-var add_dev_server = function (manifest_stream) {
-    var warning = ['THIS IS NOT the production manifest.'],
+const add_dev_server = function (manifest_stream) {
+    const warning = ['THIS IS NOT the production manifest.'],
     dev_permission =["https://",settings.dev_server.domain,":",settings.dev_server.port,"/"],
     dev_match =["https://",settings.dev_server.domain,"/"]
     return manifest_stream
@@ -119,17 +119,17 @@ var add_dev_server = function (manifest_stream) {
         }))
 }
 
-var package = function (options, zipped, for_dev){
+const package = function (options, zipped, for_dev){
     this.options = options
     this.zipped = zipped
     this.for_dev = for_dev
     return (
-        function(_this) {
+            function(_this) {
             return function() {
-                var package_name, destination, package_stream
-                var static_stream = (new static_files())()
-                var manifest_stream = (new manifest({source:_this.options.source}))()
-                var js_stream = (new javascript_src({source:_this.options.source}))()
+                let package_name, destination, package_stream;
+                let static_stream = (new static_files())()
+                let manifest_stream = (new manifest({source:_this.options.source}))()
+                const js_stream = (new javascript_src({source:_this.options.source}))()
                     .pipe(rename(function (path) {
                         path.dirname += "/js";
                     }))
@@ -160,10 +160,10 @@ var package = function (options, zipped, for_dev){
     )(this)
 }
 
-var watch_dev = function (options, task) {
+const watch_dev = function (options, task) {
     console.log("start watching");
-    var manifest_files = [settings.source + '/manifest.json',options.source + '/manifest_additions.json']
-    var js_files = [options.source + '/*.js', settings.source + '/*.js']
+    const manifest_files = [settings.source + '/manifest.json',options.source + '/manifest_additions.json']
+    const js_files = [options.source + '/*.js', settings.source + '/*.js']
     // watch static files
     gulp.watch(settings.static_files.source + '/**', task)
     // watch manifest files
