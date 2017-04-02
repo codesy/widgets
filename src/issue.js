@@ -6,8 +6,7 @@ const make_widget = ({domain}) => {
             css:
                 {attr: {
                     rel: "stylesheet",
-                    type: "text/css",
-                    href: chrome.extension.getURL("css/iframe.css")
+                    type: "text/css"
                 }
             },
             iframe:
@@ -20,7 +19,11 @@ const make_widget = ({domain}) => {
             }
         };
 
-        const add_link = ()=> $("head").append($('<link>').attr(codesy.css.attr));
+        const add_link = (attr) => {
+            attr.href = chrome.extension.getURL("css/iframe.css")
+            return attr
+        }
+        $("head").append($('<link>').attr(add_link(codesy.css.attr)));
         const endtimer = ()=> console.timeEnd('codesy append iframe');
         const add_src = (url, attr)=> {
             attr.src = `${domain}/bid-status/?${$.param({url})}`
@@ -62,5 +65,5 @@ const get_codesy_domain = () => {
 get_codesy_domain()
     .then(make_widget)
         .then(watch_the_href)
-        
+
 console.timeEnd('codesy issue load');

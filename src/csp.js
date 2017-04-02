@@ -7,7 +7,7 @@ githubFilter = {
 headerOptions = ["responseHeaders", "blocking"]
 
 const makeCspAppender = function(domain='') {
-    const types = 'connect-src child-src script-src style-src';
+    const types = 'connect-src child-src script-src style-src font-src';
     const isType = (word) => types.indexOf(word) !== -1;
     const addDomain = (accum, word)=>`${accum} ${word} ${isType(word) ? domain : '' }`
     const isCSP = function (name) {
