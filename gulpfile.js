@@ -13,7 +13,7 @@ const settings = {
     name: 'codesy',
     version: '0.0.0.6',
     source: './src',
-    destination: './build',
+    destination: './dist',
     static_files: {
         source: './static',
         glob: ['css/*', 'js/*.js', 'img/*.png']
@@ -42,112 +42,100 @@ const settings = {
 //                  the functions will return a stream of files.
 
 javascript_src = function(options) {
-    this.source = options.source
-    this.destination = options.destination
     return (
-        function(_this) {
+        function({source, destination}) {
             return function() {
-                console.log("gather src "+_this.source + "/*.js files")
-
-                const js_files = gulp.src([_this.source + '/*.js', settings.source +'/*.js'])
+                console.log(`gather src ${source} /*.js files`)
+                const js_files = gulp.src([`${source}/*.js`, `${source}/*.js`])
                     .pipe(headerComment(`codesy widget version ${settings.version}`))
-                if (_this.destination){
-                    return js_files.pipe(gulp.dest(_this.destination + '/js'))
+                if (destination){
+                    return js_files.pipe(gulp.dest(`${destination}/js`))
                 } else {
                     return js_files
                 }
             }
         }
-    )(this)
+    )(options)
 }
 
 
 static_files = function(destination) {
-  this.destination = destination
-  return (
-    function(_this) {
-      return function() {
-        const static_stream = gulp.src(settings.static_files.glob,
-                                      { base: settings.static_files.source,
-                                        cwd: settings.static_files.source
-                                      })
-        if (_this.destination){
-          return static_stream.pipe(gulp.dest( _this.destination ))
-        } else {
-          return static_stream
+    return (
+        function(destination,{glob, source}) {
+            return function() {
+                const static_stream = gulp.src(glob, { base: source, cwd: source })
+                if (destination){
+                    return static_stream.pipe(gulp.dest( destination ))
+                } else {
+                    return static_stream
+                }
+            }
         }
-      }
-    }
-  )(this)
+    )(destination,settings.static_files)
 }
 
 // this function needs to include dev server details in the options object:
 //    dev_server: object with domain and port
 
 const manifest = function (options){
-  this.options = options
   return (
-    function(_this) {
+    function({source, destination}) {
         return function() {
-            const common = gulp.src(settings.source + '/manifest.json')
-            const additions = gulp.src(_this.options.source+'/manifest_additions.json')
+            const common = gulp.src(`${settings.source}/manifest.json`)
+            const additions = gulp.src(`${source}/manifest_additions.json`)
             manifest_stream = mergeStream(additions, common)
             .pipe(mergeJSON('manifest.json'))
             .pipe(jeditor(function(json) {
                 json.version=settings.version
                 return json
             }))
-            if (_this.destination){
-                return manifest_stream.pipe(gulp.dest(_this.destination));
+            if (destination){
+                return manifest_stream.pipe(gulp.dest(destination));
             } else {
                 return manifest_stream
             }
         }
-    })(this)
+    })(options)
 }
 
 const add_dev_server = function (manifest_stream) {
-    const warning = ['THIS IS NOT the production manifest.'],
-    dev_permission =["https://",settings.dev_server.domain,":",settings.dev_server.port,"/"],
-    dev_match =["https://",settings.dev_server.domain,"/"]
+    ({domain, port} = settings.dev_server)
+    const warning = 'THIS IS NOT the production manifest.',
+    dev_permission =`https://${domain}:${port}/`,
+    dev_match =`https://${domain}/`
     return manifest_stream
         .pipe(jeditor(function(json) {
-            json.DEV_WARNING=warning.join("")
-            json.permissions.push(dev_permission.join(""))
-            json.content_scripts[1].matches.push(dev_match.join(""))
+            json.DEV_WARNING=warning
+            json.permissions.push(dev_permission)
+            json.content_scripts[1].matches.push(dev_match)
             return json
         }))
 }
 
 const package = function (options, zipped, for_dev){
-    this.options = options
-    this.zipped = zipped
-    this.for_dev = for_dev
     return (
-            function(_this) {
+            function({source, destination: dest, extension}, zipped, for_dev) {
             return function() {
                 let package_name, destination, package_stream;
                 let static_stream = (new static_files())()
-                let manifest_stream = (new manifest({source:_this.options.source}))()
-                const js_stream = (new javascript_src({source:_this.options.source}))()
+                let manifest_stream = (new manifest({source}))()
+                const js_stream = (new javascript_src({source}))()
                     .pipe(rename(function (path) {
                         path.dirname += "/js";
                     }))
 
-                if (_this.for_dev){
+                if (for_dev){
                     manifest_stream = add_dev_server (manifest_stream)
-                    package_name = settings.name + '-dev' + _this.options.extension
-                    destination = _this.options.destination
-
+                    package_name = `${settings.name}-dev${extension}`
                 } else {
                     js_stream.pipe(stripDebug())
-                    package_name = settings.name + '-' + settings.version + _this.options.extension
-                    destination = settings.destination
+                    package_name = `${settings.name}-${settings.version}${extension}`
                 }
 
+                destination = for_dev ? dest : settings.destination
                 package_stream = mergeStream (manifest_stream,js_stream,static_stream)
 
-                if (_this.zipped) {
+                if (zipped) {
                     package_stream
                         .pipe(zip(package_name))
                         .pipe(gulp.dest(destination))
@@ -157,22 +145,19 @@ const package = function (options, zipped, for_dev){
                 }
             }
         }
-    )(this)
+    )(options, zipped, for_dev)
 }
 
-const watch_dev = function (options, task) {
+const watch_dev = function ({source}, task) {
     console.log("start watching");
-    const manifest_files = [settings.source + '/manifest.json',options.source + '/manifest_additions.json']
-    const js_files = [options.source + '/*.js', settings.source + '/*.js']
-    // watch static files
-    gulp.watch(settings.static_files.source + '/**', task)
-    // watch manifest files
+    const manifest_files = [`${settings.source}/manifest.json`,`${source}/manifest_additions.json`]
+    const js_files = [`${source}/*.js`, `${settings.source}/*.js`]
+    gulp.watch(`${settings.static_files.source}/**`, task)
     gulp.watch(manifest_files, task)
     gulp.watch(js_files, task)
 }
 
 // DEV TASKS
-
 gulp.task('dev-chrome-unpacked', ['chrome-unpacked'], function() {
     watch_dev(settings.chrome,['chrome-unpacked'])
 })
@@ -192,6 +177,8 @@ gulp.task('dev-firefox-packed', ['firefox-dev-xpi'], function() {
 gulp.task('dev-unpacked',['dev-chrome-unpacked','dev-firefox-unpacked'])
 gulp.task('dev-packed',['dev-chrome-packed','dev-firefox-packed'])
 
+// FF dev must use file
+gulp.task('dev-mixed',['dev-chrome-unpacked','dev-firefox-packed'])
 
 
 // FILE BUILDING TASKS
@@ -208,11 +195,10 @@ gulp.task('chrome-dev-zip', (new package(settings.chrome, true, true)))
 // create chrome dev directroy in the chrome.source directory with dev settings
 gulp.task('chrome-unpacked', (new package(settings.chrome, false, true)))
 
-
 // create xpi for FF prod
 gulp.task('publish-firefox', (new package(settings.firefox, true, false)))
 
-    // create zip for chrome and opera
+// create zip for chrome and opera
 gulp.task('publish-chrome', (new package(settings.chrome, true, false)))
 
 gulp.task('publish-all',['publish-firefox','publish-chrome'])
