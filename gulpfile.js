@@ -45,10 +45,14 @@ javascript_src = function(options) {
     return (
         function({source, destination}) {
             return function() {
-                console.log(`gather src ${source} /*.js files`)
-                const js_files = gulp.src([`${source}/*.js`, `${source}/*.js`])
+                console.log(`gather src ${source}/*.js files`)
+                console.log(`gather src ${settings.source}/*.js files`)
+
+                const js_files = gulp.src([`${source}/*.js`, `${settings.source}/*.js`])
                     .pipe(headerComment(`codesy widget version ${settings.version}`))
+
                 if (destination){
+                    console.log(` destination ${destination}/js`);
                     return js_files.pipe(gulp.dest(`${destination}/js`))
                 } else {
                     return js_files
@@ -57,7 +61,6 @@ javascript_src = function(options) {
         }
     )(options)
 }
-
 
 static_files = function(destination) {
     return (
@@ -116,13 +119,12 @@ const package = function (options, zipped, for_dev){
     return (
             function({source, destination: dest, extension}, zipped, for_dev) {
             return function() {
+                console.log(`package source: ${source}`);
                 let package_name, destination, package_stream;
                 let static_stream = (new static_files())()
                 let manifest_stream = (new manifest({source}))()
-                const js_stream = (new javascript_src({source}))()
-                    .pipe(rename(function (path) {
-                        path.dirname += "/js";
-                    }))
+                const js_stream = (new javascript_src( {source} ))()
+                    .pipe(rename( (path)=>path.dirname += "/js" ))
 
                 if (for_dev){
                     manifest_stream = add_dev_server (manifest_stream)
@@ -131,8 +133,9 @@ const package = function (options, zipped, for_dev){
                     js_stream.pipe(stripDebug())
                     package_name = `${settings.name}-${settings.version}${extension}`
                 }
-
                 destination = for_dev ? dest : settings.destination
+                console.log(`package dest: ${destination}`);
+
                 package_stream = mergeStream (manifest_stream,js_stream,static_stream)
 
                 if (zipped) {
