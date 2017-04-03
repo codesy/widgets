@@ -23,19 +23,19 @@ const make_widget = ({domain}) => {
             attr.href = chrome.extension.getURL("css/iframe.css")
             return attr
         }
-        $("head").append($('<link>').attr(add_link(codesy.css.attr)));
-        const endtimer = ()=> console.timeEnd('codesy append iframe');
         const add_src = (url, attr)=> {
             attr.src = `${domain}/bid-status/?${$.param({url})}`
             return attr
         }
+        const endtimer = ()=> console.timeEnd('codesy append iframe');
+        $link = () => $("head").append($('<link>').attr(add_link(codesy.css.attr)));
         $iframe  = (new_url) => $('<iframe>').attr(add_src(new_url, codesy.iframe.attr))
         const add = (new_url) => {
             console.time('codesy append iframe');
-            $('body').append($iframe(new_url)).ready(add_link).ready(endtimer)
+            $('body').append($iframe(new_url)).ready($link).ready(endtimer)
         }
         const remove = ()=> $(`#${codesy.iframe.attr.id}`).remove();
-        resolve( { url:'', add, remove })
+        resolve( { url: '', add, remove })
     })
 }
 
@@ -55,10 +55,12 @@ const watch_the_href = (widget) => {
     });
 };
 
+page_reload = ()=> window.location.reload(true);
+
 const get_codesy_domain = () => {
     return new Promise((resolve)=>{
         chrome.storage.local.get(null, resolve)
-        chrome.storage.onChanged.addListener(window.location.reload)
+        chrome.storage.onChanged.addListener(page_reload)
     });
 }
 

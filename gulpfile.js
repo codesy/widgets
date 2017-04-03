@@ -25,12 +25,12 @@ const settings = {
     firefox: {
         source: './src/firefox',
         destination: 'firefox',
-        extension: '.xpi'
+        extension: 'xpi'
     },
     chrome: {
         source: './src/chrome',
         destination: 'chrome',
-        extension: '.zip'
+        extension: 'zip'
 
     }
 }
@@ -117,7 +117,7 @@ const add_dev_server = function (manifest_stream) {
 
 const package = function (options, zipped, for_dev){
     return (
-            function({source, destination: dest, extension}, zipped, for_dev) {
+            function({source, destination: dest, extension: ext}, zipped, for_dev) {
             return function() {
                 console.log(`package source: ${source}`);
                 let package_name, destination, package_stream;
@@ -128,10 +128,10 @@ const package = function (options, zipped, for_dev){
 
                 if (for_dev){
                     manifest_stream = add_dev_server (manifest_stream)
-                    package_name = `${settings.name}-dev${extension}`
+                    package_name = `${settings.name}-${settings.version}.dev.${ext}`
                 } else {
                     js_stream.pipe(stripDebug())
-                    package_name = `${settings.name}-${settings.version}${extension}`
+                    package_name = `${settings.name}-${settings.version}.${ext}`
                 }
                 destination = for_dev ? dest : settings.destination
                 console.log(`package dest: ${destination}`);
