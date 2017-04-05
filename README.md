@@ -9,12 +9,12 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
   * `git clone https://github.com/codesy/widgets.git`
 2. Install requirements:
   * `cd widgets`
-  * `npm install`
+  * `npm install` (You can install globally with `npm install -g`)
 3. Run these gulp tasks to watch changes to files and compile extensions.
-  * gulp dev-chrome-unpacked - creates addon directory and watches for changes
-  * gulp dev-chrome-packed - creates addon zip file and watches for changes
-  * gulp dev-firefox-unpacked - creates addon directory and watches for changes
-  * gulp dev-firefox-packed - creates addon xpi file and watches for changes
+  * gulp dev-chrome-unpacked - creates chrome/ directory and watches for changes
+  * gulp dev-chrome-packed - creates a zip file in /chrome and watches for changes
+  * gulp dev-firefox-unpacked - creates firefox/ directory and watches for changes
+  * gulp dev-firefox-packed - creates an xpi in firefox/ file and watches for changes
 
 combined tasks:
   * gulp dev-packed - creates addon packages and watches for changes
@@ -36,14 +36,12 @@ combined tasks:
 
 ### Chrome and Opera
 1. Run 'gulp publish-chrome'
-  * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates a zip file for uploading to the chrome store.  The zip file contains the manifest.json file.
 2. Upload the codesy.zip file to the chrome or opera store
 
 ### Firefox
 1. Run 'gulp publish-firefox'
-  * Runs gulp coffee to compile .js files
   * Removes debug lines from .js files e.g. console.log
   * Creates an xpi file for uploading to the moz store.  The file contains the manifest.json file.
 2. Upload the xpi file to the moz store

@@ -4,12 +4,6 @@
             "id": "codesy@codesy.io"
         }
     },
-    "background": {
-        "scripts": [
-            "js/csp.js",
-            "js/messages.js"
-        ]
-    },
     "id": "codesy@codesy.io",
     "license": "MPL 2.0",
     "main": "js/index.js",
