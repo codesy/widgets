@@ -1,73 +1,70 @@
 console.time('codesy issue load');
 
-const make_widget = ( {domain} ) => {
-    const codesy = {
-        css:
-            {attr: {
-                rel: "stylesheet",
-                type: "text/css"
-            }
-        },
-        iframe:
-            { attr:{
+const make_widget_appender = (domain) => {
+    const iframe_attr = {
                 id: "codesy_iframe",
                 style: "visibility: collapse;",
                 scrolling: "no",
-                seamless: "seamless"
+                seamless: "seamless",
             }
-        }
-    };
-    const $iframe = () => $('<iframe>').attr(codesy.iframe.attr)
-    codesy.css.attr.href = chrome.extension.getURL("css/iframe.css");
-    const $link = $('<link>').attr(codesy.css.attr);
-    const add_link = () => $("head").append($link)
+    const $iframe = (url) => {
+        iframe_attr.src = `${domain}/bid-status/?${$.param({url})}`
+        return $('<iframe>').attr(iframe_attr)
+    }
+    const css_attr = {
+                rel: "stylesheet",
+                type: "text/css",
+                href: chrome.extension.getURL("css/iframe.css")
+            }
+    const $link = $('<link>').attr(css_attr);
+    const append_link = () => $("head").append($link);
     const endtimer = () => console.timeEnd('codesy append iframe');
 
     return (url) => {
-        codesy.iframe.attr.src = `${domain}/bid-status/?${$.param({url})}`
         console.time('codesy append iframe');
-        $('body').append($iframe).ready(add_link).ready(endtimer)
-        return ( { url, id: codesy.iframe.attr.id } )
+        $('body').append($iframe(url)).ready(append_link).ready(endtimer)
+        return ( { url, id: iframe_attr.id } )
     }
 }
 
-const wait_for_issue = () => {
-    const is_issue = (url)=>/https:\/\/github.com\/.*\/issues\/[1-9]+/g.test(url)
-    function watch_for(resolve) {
+const wait_for_issue_page = () => {
+    const issue_rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/
+    function watch_for_issue(resolve) {
         let url = window.location.href;
-        if ( is_issue(url) ) return resolve(url)
-        window.setTimeout(watch_for, 600, resolve);
+        if ( issue_rx.test(url) ) return resolve(url)
+        window.setTimeout(watch_for_issue, 400, resolve);
     }
     return new Promise( (resolve) => {
-        watch_for(resolve);
+        watch_for_issue(resolve);
     })
 };
 
-const wait_for_change = ( {url, id} ) => {
+const wait_for_page_change = ( {url, id} ) => {
+    function watch_href(resolve) {
+        if (window.location.href != url) {
+             $(`#${id}`).remove();
+            return resolve();
+        };
+        window.setTimeout(watch_href, 400, resolve);
+    }
     return new Promise( (resolve) => {
-        function wait() {
-            if (window.location.href != url) {
-                 $(`#${id}`).remove();
-                return resolve();
-            };
-            window.setTimeout(wait, 600);
-        }
-        wait();
+        watch_href(resolve);
     })
 };
 
 const get_codesy_domain = () => {
-    return new Promise((resolve)=>{
-        chrome.storage.local.get(null, resolve)
+    return new Promise((resolve) => {
+        const resolve_domain = ({domain}) => resolve(domain)
+        chrome.storage.local.get(null, resolve_domain)
     });
 }
-const prepare_widget = get_codesy_domain().then((domain)=>make_widget(domain))
-const add_widget = ( [maker, url] ) => maker(url);
+const prepare_widget = get_codesy_domain().then(make_widget_appender)
+const append_widget = ( [appender, url] ) => appender(url);
 
 function on_github_pages(){
-    Promise.all([prepare_widget, wait_for_issue()])
-        .then(add_widget)
-            .then(wait_for_change)
+    Promise.all( [prepare_widget, wait_for_issue_page()] )
+        .then(append_widget)
+            .then(wait_for_page_change)
                 .then(on_github_pages)
 }
 on_github_pages()
