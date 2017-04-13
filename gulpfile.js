@@ -58,17 +58,7 @@ javascript_src = function({source, destination}) {
     }
 }
 
-static_files = function(destination) {
-    ({glob, source} = settings.static_files)
-    return function() {
-        const static_stream = gulp.src(glob, { base: source, cwd: source })
-        if (destination){
-            return static_stream.pipe(gulp.dest( destination ))
-        } else {
-            return static_stream
-        }
-    }
-}
+static_files = ({glob, source}) => gulp.src(glob, { base: source, cwd: source });
 
 // this function needs to include dev server details in the options object:
 //    dev_server: object with domain and port
@@ -108,23 +98,22 @@ const add_dev_server = function (manifest_stream) {
 const package = function ({source, destination: dest, extension: ext}, zipped, for_dev){
     return function() {
         console.log(`package source: ${source}`);
-        let package_name, destination, package_stream;
-        let static_stream = (new static_files())()
+        const package_name = `${settings.name}-${settings.version}${for_dev?'.dev':''}.${ext}`
+        const destination = for_dev ? dest : settings.destination
+        console.log(`package dest: ${destination}`);
+
+        let static_stream = static_files(settings.static_files)
         let manifest_stream = (new manifest({source}))()
         const js_stream = (new javascript_src( {source} ))()
             .pipe(rename( (path)=>path.dirname += "/js" ))
 
         if (for_dev){
             manifest_stream = add_dev_server (manifest_stream)
-            package_name = `${settings.name}-${settings.version}.dev.${ext}`
         } else {
             js_stream.pipe(stripDebug())
-            package_name = `${settings.name}-${settings.version}.${ext}`
         }
-        destination = for_dev ? dest : settings.destination
-        console.log(`package dest: ${destination}`);
 
-        package_stream = mergeStream (manifest_stream,js_stream,static_stream)
+        const package_stream = mergeStream (manifest_stream,js_stream,static_stream)
 
         if (zipped) {
             package_stream
