@@ -41,64 +41,54 @@ const settings = {
 //    destination: (optional) path where files will go.  If destination is not included,
 //                  the functions will return a stream of files.
 
-javascript_src = function(options) {
-    return (
-        function({source, destination}) {
-            return function() {
-                console.log(`gather src ${source}/*.js files`)
-                console.log(`gather src ${settings.source}/*.js files`)
+javascript_src = function({source, destination}) {
+    return function() {
+        console.log(`gather src ${source}/*.js files`)
+        console.log(`gather src ${settings.source}/*.js files`)
 
-                const js_files = gulp.src([`${source}/*.js`, `${settings.source}/*.js`])
-                    .pipe(headerComment(`codesy widget version ${settings.version}`))
+        const js_files = gulp.src([`${source}/*.js`, `${settings.source}/*.js`])
+            .pipe(headerComment(`codesy widget version ${settings.version}`))
 
-                if (destination){
-                    console.log(` destination ${destination}/js`);
-                    return js_files.pipe(gulp.dest(`${destination}/js`))
-                } else {
-                    return js_files
-                }
-            }
+        if (destination){
+            console.log(` destination ${destination}/js`);
+            return js_files.pipe(gulp.dest(`${destination}/js`))
+        } else {
+            return js_files
         }
-    )(options)
+    }
 }
 
 static_files = function(destination) {
-    return (
-        function(destination,{glob, source}) {
-            return function() {
-                const static_stream = gulp.src(glob, { base: source, cwd: source })
-                if (destination){
-                    return static_stream.pipe(gulp.dest( destination ))
-                } else {
-                    return static_stream
-                }
-            }
+    ({glob, source} = settings.static_files)
+    return function() {
+        const static_stream = gulp.src(glob, { base: source, cwd: source })
+        if (destination){
+            return static_stream.pipe(gulp.dest( destination ))
+        } else {
+            return static_stream
         }
-    )(destination,settings.static_files)
+    }
 }
 
 // this function needs to include dev server details in the options object:
 //    dev_server: object with domain and port
 
-const manifest = function (options){
-  return (
-    function({source, destination}) {
-        return function() {
-            const common = gulp.src(`${settings.source}/manifest.json`)
-            const additions = gulp.src(`${source}/manifest_additions.json`)
-            manifest_stream = mergeStream(additions, common)
+const manifest = function ({source, destination}){
+    return function() {
+        const common = gulp.src(`${settings.source}/manifest.json`)
+        const additions = gulp.src(`${source}/manifest_additions.json`)
+        manifest_stream = mergeStream(additions, common)
             .pipe(mergeJSON('manifest.json'))
             .pipe(jeditor(function(json) {
                 json.version=settings.version
                 return json
             }))
-            if (destination){
-                return manifest_stream.pipe(gulp.dest(destination));
-            } else {
-                return manifest_stream
-            }
+        if (destination){
+            return manifest_stream.pipe(gulp.dest(destination));
+        } else {
+            return manifest_stream
         }
-    })(options)
+    }
 }
 
 const add_dev_server = function (manifest_stream) {
@@ -115,40 +105,36 @@ const add_dev_server = function (manifest_stream) {
         }))
 }
 
-const package = function (options, zipped, for_dev){
-    return (
-            function({source, destination: dest, extension: ext}, zipped, for_dev) {
-            return function() {
-                console.log(`package source: ${source}`);
-                let package_name, destination, package_stream;
-                let static_stream = (new static_files())()
-                let manifest_stream = (new manifest({source}))()
-                const js_stream = (new javascript_src( {source} ))()
-                    .pipe(rename( (path)=>path.dirname += "/js" ))
+const package = function ({source, destination: dest, extension: ext}, zipped, for_dev){
+    return function() {
+        console.log(`package source: ${source}`);
+        let package_name, destination, package_stream;
+        let static_stream = (new static_files())()
+        let manifest_stream = (new manifest({source}))()
+        const js_stream = (new javascript_src( {source} ))()
+            .pipe(rename( (path)=>path.dirname += "/js" ))
 
-                if (for_dev){
-                    manifest_stream = add_dev_server (manifest_stream)
-                    package_name = `${settings.name}-${settings.version}.dev.${ext}`
-                } else {
-                    js_stream.pipe(stripDebug())
-                    package_name = `${settings.name}-${settings.version}.${ext}`
-                }
-                destination = for_dev ? dest : settings.destination
-                console.log(`package dest: ${destination}`);
-
-                package_stream = mergeStream (manifest_stream,js_stream,static_stream)
-
-                if (zipped) {
-                    package_stream
-                        .pipe(zip(package_name))
-                        .pipe(gulp.dest(destination))
-                } else {
-                    package_stream
-                        .pipe(gulp.dest(destination));
-                }
-            }
+        if (for_dev){
+            manifest_stream = add_dev_server (manifest_stream)
+            package_name = `${settings.name}-${settings.version}.dev.${ext}`
+        } else {
+            js_stream.pipe(stripDebug())
+            package_name = `${settings.name}-${settings.version}.${ext}`
         }
-    )(options, zipped, for_dev)
+        destination = for_dev ? dest : settings.destination
+        console.log(`package dest: ${destination}`);
+
+        package_stream = mergeStream (manifest_stream,js_stream,static_stream)
+
+        if (zipped) {
+            package_stream
+                .pipe(zip(package_name))
+                .pipe(gulp.dest(destination))
+        } else {
+            package_stream
+                .pipe(gulp.dest(destination));
+        }
+    }
 }
 
 const watch_dev = function ({source}, task) {
@@ -161,6 +147,7 @@ const watch_dev = function ({source}, task) {
 }
 
 // DEV TASKS
+
 gulp.task('dev-chrome-unpacked', ['chrome-unpacked'], function() {
     watch_dev(settings.chrome,['chrome-unpacked'])
 })
