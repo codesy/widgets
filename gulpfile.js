@@ -135,49 +135,29 @@ const watch_dev = function ({source}, task) {
     gulp.watch(js_files, task)
 }
 
-// DEV TASKS
+const browsers = ['firefox', 'chrome']
 
-gulp.task('dev-chrome-unpacked', ['chrome-unpacked'], function() {
-    watch_dev(settings.chrome,['chrome-unpacked'])
-})
+for (browser of browsers){
+    const workon_directory = [`build-${browser}-directory`]
+    const workon_file = [`build-${browser}-file`]
+    const options = settings[browser]
 
-gulp.task('dev-chrome-packed', ['chrome-dev-zip'], function() {
-    watch_dev(settings.chrome,['chrome-dev-zip'])
-})
+    // FILE BUILDING TASKS
+    gulp.task(`build-${browser}-file`, (new package(options, true, true)))
+    gulp.task(`build-${browser}-directory`, (new package(options, false, true)))
+    gulp.task(`publish-${browser}-file`, (new package(options, true, false)))
+    // DEV TASKS
+    const directory_task = `workon-${browser}-directory`
+    gulp.task(`workon-${browser}-directory`, workon_directory,
+        () => watch_dev(options, workon_directory)
+    );
+    gulp.task(`workon-${browser}-file`, workon_file,
+        () => watch_dev(options, workon_file)
+    );
+}
 
-gulp.task('dev-firefox-unpacked', ['firefox-unpacked'], function() {
-    watch_dev(settings.firefox,['firefox-unpacked'])
-})
-
-gulp.task('dev-firefox-packed', ['firefox-dev-xpi'], function() {
-    watch_dev(settings.firefox,['firefox-dev-xpi'])
-})
-
-gulp.task('dev-unpacked',['dev-chrome-unpacked','dev-firefox-unpacked'])
-gulp.task('dev-packed',['dev-chrome-packed','dev-firefox-packed'])
+const publish_tasks = browsers.map((b)=>`publish-${b}-file`)
+gulp.task('publish-all',publish_tasks)
 
 // FF dev must use file
-gulp.task('dev-mixed',['dev-chrome-unpacked','dev-firefox-packed'])
-
-
-// FILE BUILDING TASKS
-
-// create xpi for FF dev in the firefox.source directory with dev settings
-gulp.task('firefox-dev-xpi', (new package(settings.firefox, true, true)))
-
-// create firefox dev directroy in the firefox.source directory with dev settings
-gulp.task('firefox-unpacked', (new package(settings.firefox, false, true)))
-
-// create zip for chrome dev in the chrome.source directory with dev settings
-gulp.task('chrome-dev-zip', (new package(settings.chrome, true, true)))
-
-// create chrome dev directroy in the chrome.source directory with dev settings
-gulp.task('chrome-unpacked', (new package(settings.chrome, false, true)))
-
-// create xpi for FF prod
-gulp.task('publish-firefox', (new package(settings.firefox, true, false)))
-
-// create zip for chrome and opera
-gulp.task('publish-chrome', (new package(settings.chrome, true, false)))
-
-gulp.task('publish-all',['publish-firefox','publish-chrome'])
+gulp.task('workon-mixed',['workon-chrome-directory','workon-firefox-file'])
