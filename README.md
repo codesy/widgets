@@ -14,12 +14,12 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
 
 
 ### To use the Chrome Extension
-1. Run one of the dev-chrome tasks above
+1. Run `workon-chrome-directory`
 2. Follow the [Unpacked Chrome Extensions
    docs](http://developer.chrome.com/extensions/getstarted.html#unpacked) and load the `chrome` directory
 
 ### To use the Firefox Add-on
-1. Run one of the dev-firefox tasks above
+1. Run `gulp workon-firefox-file`
 2. Goto the the //about:addons page
 3. Select 'Install Addon from File ...')
 4. Load the xpi file from the firefox directory
@@ -51,7 +51,10 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
 
 #### workon-{browser}-directory or workon-{browser}-directory:
 watches extension files and rebuilds
-
+* **workon-firefox-file**
+* **workon-firefox-directory**
+* **workon-chrome-file**
+* **workon-chrome-directory**
 
 #### publish-{browser}-file
 * **publish-firefox-file**: create xpi for FF prod
