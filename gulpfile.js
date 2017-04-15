@@ -138,8 +138,8 @@ const watch_src = function ({source}, task) {
 const browsers = ['firefox', 'chrome']
 
 for (browser of browsers){
-    const build_file_task = [`build-${browser}-file`]
-    const build_directory_task = [`build-${browser}-directory`]
+    const build_file_task = `build-${browser}-file`
+    const build_directory_task = `build-${browser}-directory`
     const options = settings[browser]
 
     // ADDON BUILDING TASKS
@@ -148,11 +148,11 @@ for (browser of browsers){
     gulp.task(`publish-${browser}-file`, (new package(options, true, false)))
 
     // WATCH TASKS
-    gulp.task(`workon-${browser}-directory`, build_directory_task,
-        () => watch_src(options, build_directory_task)
+    gulp.task(`workon-${browser}-directory`, [build_directory_task],
+        () => watch_src(options, [build_directory_task])
     );
-    gulp.task(`workon-${browser}-file`, build_file_task,
-        () => watch_src(options, build_file_task)
+    gulp.task(`workon-${browser}-file`, [build_file_task],
+        () => watch_src(options, [build_file_task])
     );
 }
 
