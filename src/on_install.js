@@ -36,7 +36,7 @@ function select_them (tabs) {
     return tabs
 }
 
-when_installed ({reason}) => {
+function when_installed ({reason}) {
     find_these({ title: "*codesy.io*" })
             .then(select_them)
                 .then(reload_them)
