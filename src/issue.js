@@ -1,6 +1,6 @@
 console.time('codesy issue load');
 
-const make_widget_appender = (domain) => {
+function make_widget_appender (domain) {
     const iframe_attr = {
                 id: "codesy_iframe",
                 style: "visibility: collapse;",
@@ -27,7 +27,7 @@ const make_widget_appender = (domain) => {
     }
 }
 
-const wait_for_issue_page = () => {
+function wait_for_issue_page () {
     const issue_rx = /https:\/\/github.com\/.*\/issues\/[1-9]+/
     function watch_for_issue(resolve) {
         let url = window.location.href;
@@ -39,7 +39,7 @@ const wait_for_issue_page = () => {
     })
 };
 
-const wait_for_page_change = ( {url, id} ) => {
+function wait_for_page_change  ( {url, id} ) {
     function watch_href(resolve) {
         if (window.location.href != url) {
              $(`#${id}`).remove();
@@ -52,7 +52,7 @@ const wait_for_page_change = ( {url, id} ) => {
     })
 };
 
-const get_codesy_domain = () => {
+function get_codesy_domain () {
     return new Promise((resolve) => {
         const resolve_domain = ({domain}) => resolve(domain)
         chrome.storage.local.get(null, resolve_domain)

@@ -1,4 +1,4 @@
-const makeCspAppender = function(domain='') {
+function makeCspAppender (domain='') {
     const csp_names = ['CONTENT-SECURITY-POLICY','X-WEBKIT-CSP']
     const name_finder = (name) => (csp_name) => csp_name === name.toUpperCase()
     const if_csp = (name) => csp_names.find(name_finder(name)) ? true : false
@@ -28,7 +28,7 @@ const githubFilter = {
 
 const headerOptions = ["responseHeaders", "blocking"]
 
-const setCodesyAppender = function(domain) {
+function setCodesyAppender (domain) {
     if (chrome.webRequest.onHeadersReceived.hasListener(codesyAppender)) {
         chrome.webRequest.onHeadersReceived.removeListener(codesyAppender);
     }

@@ -41,7 +41,7 @@ const settings = {
 //    destination: (optional) path where files will go.  If destination is not included,
 //                  the functions will return a stream of files.
 
-javascript_src = function({source, destination}) {
+function javascript_src ({source, destination}) {
     return function() {
         console.log(`gather src ${source}/*.js files`)
         console.log(`gather src ${settings.source}/*.js files`)
@@ -63,7 +63,7 @@ static_files = ({glob, source}) => gulp.src(glob, { base: source, cwd: source })
 // this function needs to include dev server details in the options object:
 //    dev_server: object with domain and port
 
-const manifest = function ({source, destination}){
+function manifest({source, destination}){
     return function() {
         const common = gulp.src(`${settings.source}/manifest.json`)
         const additions = gulp.src(`${source}/manifest_additions.json`)
@@ -81,7 +81,7 @@ const manifest = function ({source, destination}){
     }
 }
 
-const add_dev_server = function (manifest_stream) {
+function add_dev_server (manifest_stream) {
     ({domain, port} = settings.dev_server)
     const warning = 'THIS IS NOT the production manifest.',
     dev_permission =`https://${domain}:${port}/`,
@@ -95,7 +95,7 @@ const add_dev_server = function (manifest_stream) {
         }))
 }
 
-const package = function ({source, destination: dest, extension: ext}, zipped, for_dev){
+function package ({source, destination: dest, extension: ext}, zipped, for_dev){
     return function() {
         console.log(`package source: ${source}`);
         const package_name = `${settings.name}-${settings.version}${for_dev?'.dev':''}.${ext}`
@@ -126,7 +126,7 @@ const package = function ({source, destination: dest, extension: ext}, zipped, f
     }
 }
 
-const watch_src = function ({source}, task) {
+function watch_src ({source}, task) {
     console.log("start watching");
     const manifest_files = [`${settings.source}/manifest.json`,`${source}/manifest_additions.json`]
     const js_files = [`${source}/*.js`, `${settings.source}/*.js`]
