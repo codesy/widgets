@@ -1,11 +1,3 @@
-
-githubFilter = {
-    urls: ["https://github.com/*"],
-    types: ["main_frame"]
-};
-
-headerOptions = ["responseHeaders", "blocking"]
-
 const makeCspAppender = function(domain='') {
     const types = 'connect-src child-src script-src style-src font-src';
     const isType = (word) => types.indexOf(word) !== -1;
@@ -26,6 +18,13 @@ const makeCspAppender = function(domain='') {
 };
 
 let codesyAppender = new makeCspAppender()
+
+const githubFilter = {
+    urls: ["https://github.com/*"],
+    types: ["main_frame"]
+};
+
+const headerOptions = ["responseHeaders", "blocking"]
 
 const setCodesyAppender = function(domain) {
     if (chrome.webRequest.onHeadersReceived.hasListener(codesyAppender)) {
