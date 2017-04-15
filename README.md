@@ -10,24 +10,16 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
 2. Install requirements:
   * `cd widgets`
   * `npm install` (You can install globally with `npm install -g`)
-3. Run these gulp tasks to watch changes to files and compile extensions.
-  * gulp dev-chrome-unpacked - creates chrome/ directory and watches for changes
-  * gulp dev-chrome-packed - creates a zip file in /chrome and watches for changes
-  * gulp dev-firefox-unpacked - creates firefox/ directory and watches for changes
-  * gulp dev-firefox-packed - creates an xpi in firefox/ file and watches for changes
-
-combined tasks:
-  * gulp dev-packed - creates addon packages and watches for changes
-  * gulp dev-unpacked - creates directories with addon files and watches all for changes
+3. See the list of gulp tasks build or watch changes to files and compile extensions:
 
 
 ### To use the Chrome Extension
-1. Run one of the dev-chrome tasks above
+1. Run `workon-chrome-directory`
 2. Follow the [Unpacked Chrome Extensions
    docs](http://developer.chrome.com/extensions/getstarted.html#unpacked) and load the `chrome` directory
 
 ### To use the Firefox Add-on
-1. Run one of the dev-firefox tasks above
+1. Run `gulp workon-firefox-file`
 2. Goto the the //about:addons page
 3. Select 'Install Addon from File ...')
 4. Load the xpi file from the firefox directory
@@ -45,3 +37,26 @@ combined tasks:
   * Removes debug lines from .js files e.g. console.log
   * Creates an xpi file for uploading to the moz store.  The file contains the manifest.json file.
 2. Upload the xpi file to the moz store
+
+
+## Gulp Tasks
+
+#### build-{browser}-file:
+* **build-firefox-file**: create xpi for FF dev in the firefox.source directory with dev settings
+* **build-chrome-file**: create zip for chrome dev in the chrome.source directory with dev settings
+
+#### build-{browser}-directory:
+* **build-firefox-directory**: create firefox dev directroy in the firefox.source directory with dev settings
+* **build-chrome-directory**: create chrome dev directroy in the chrome.source directory with dev settings
+
+#### workon-{browser}-directory or workon-{browser}-directory:
+watches extension files and rebuilds
+* **workon-firefox-file**
+* **workon-firefox-directory**
+* **workon-chrome-file**
+* **workon-chrome-directory**
+
+#### publish-{browser}-file
+* **publish-firefox-file**: create xpi for FF prod
+* **publish-chrome-file**: create zip for chrome and opera
+* **publish-all**: creates all browser extension files

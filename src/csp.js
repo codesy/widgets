@@ -1,23 +1,17 @@
+function makeCspAppender (domain='') {
+    const csp_names = ['CONTENT-SECURITY-POLICY','X-WEBKIT-CSP']
+    const name_finder = (name) => (csp_name) => csp_name === name.toUpperCase()
+    const if_csp = (name) => csp_names.find(name_finder(name)) ? true : false
 
-githubFilter = {
-    urls: ["https://github.com/*"],
-    types: ["main_frame"]
-};
+    const codesy_types = 'connect-src child-src script-src style-src';
+    const is_codesy = (type) => codesy_types.indexOf(type) !== -1;
+    const add_codesy = (accum, word) =>`${accum} ${word} ${is_codesy(word) ? domain : '' }`;
+    const insert_domain = (csp) => csp.split(' ').reduce(add_codesy,'');
 
-headerOptions = ["responseHeaders", "blocking"]
-
-const makeCspAppender = function(domain='') {
-    const types = 'connect-src child-src script-src style-src font-src';
-    const isType = (word) => types.indexOf(word) !== -1;
-    const addDomain = (accum, word)=>`${accum} ${word} ${isType(word) ? domain : '' }`
-    const isCSP = function (name) {
-        name = name.toUpperCase()
-        return (name === 'CONTENT-SECURITY-POLICY') || (name === 'X-WEBKIT-CSP');
-    };
     return function({responseHeaders: headers}) {
         console.time('codesy map headers');
-        const responseHeaders = headers.map(function({name, value: v}){
-            value = isCSP(name) ? v.split(' ').reduce(addDomain,'') : v
+        const responseHeaders = headers.map(function({name, value: original}){
+            const value = if_csp(name) ? insert_domain(original) : original
             return {name,value}
         })
         console.timeEnd('codesy map headers');
@@ -27,7 +21,14 @@ const makeCspAppender = function(domain='') {
 
 let codesyAppender = new makeCspAppender()
 
-const setCodesyAppender = function(domain) {
+const githubFilter = {
+    urls: ["https://github.com/*"],
+    types: ["main_frame"]
+};
+
+const headerOptions = ["responseHeaders", "blocking"]
+
+function setCodesyAppender (domain) {
     if (chrome.webRequest.onHeadersReceived.hasListener(codesyAppender)) {
         chrome.webRequest.onHeadersReceived.removeListener(codesyAppender);
     }
