@@ -126,7 +126,7 @@ const package = function ({source, destination: dest, extension: ext}, zipped, f
     }
 }
 
-const watch_dev = function ({source}, task) {
+const watch_src = function ({source}, task) {
     console.log("start watching");
     const manifest_files = [`${settings.source}/manifest.json`,`${source}/manifest_additions.json`]
     const js_files = [`${source}/*.js`, `${settings.source}/*.js`]
@@ -138,21 +138,21 @@ const watch_dev = function ({source}, task) {
 const browsers = ['firefox', 'chrome']
 
 for (browser of browsers){
-    const workon_directory = [`build-${browser}-directory`]
-    const workon_file = [`build-${browser}-file`]
+    const build_file_task = [`build-${browser}-file`]
+    const build_directory_task = [`build-${browser}-directory`]
     const options = settings[browser]
 
-    // FILE BUILDING TASKS
-    gulp.task(`build-${browser}-file`, (new package(options, true, true)))
-    gulp.task(`build-${browser}-directory`, (new package(options, false, true)))
+    // ADDON BUILDING TASKS
+    gulp.task(build_file_task, (new package(options, true, true)))
+    gulp.task(build_directory_task, (new package(options, false, true)))
     gulp.task(`publish-${browser}-file`, (new package(options, true, false)))
-    // DEV TASKS
-    const directory_task = `workon-${browser}-directory`
-    gulp.task(`workon-${browser}-directory`, workon_directory,
-        () => watch_dev(options, workon_directory)
+
+    // WATCH TASKS
+    gulp.task(`workon-${browser}-directory`, build_directory_task,
+        () => watch_src(options, build_directory_task)
     );
-    gulp.task(`workon-${browser}-file`, workon_file,
-        () => watch_dev(options, workon_file)
+    gulp.task(`workon-${browser}-file`, build_file_task,
+        () => watch_src(options, build_file_task)
     );
 }
 
