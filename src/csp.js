@@ -22,7 +22,7 @@ function makeCspAppender (domain='') {
 let codesyAppender = new makeCspAppender()
 
 const githubFilter = {
-    urls: ["https://github.com/*"],
+    urls: ["*://*.github.com/*"],
     types: ["main_frame"]
 };
 
