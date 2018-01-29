@@ -3,7 +3,7 @@ function makeCspAppender (domain='') {
     const name_finder = (name) => (csp_name) => csp_name === name.toUpperCase()
     const if_csp = (name) => csp_names.find(name_finder(name)) ? true : false
 
-    const codesy_types = 'connect-src child-src script-src style-src';
+    const codesy_types = 'connect-src frame-src child-src script-src style-src';
     const is_codesy = (type) => codesy_types.indexOf(type) !== -1;
     const add_codesy = (accum, word) =>`${accum} ${word} ${is_codesy(word) ? domain : '' }`;
     const insert_domain = (csp) => csp.split(' ').reduce(add_codesy,'');
