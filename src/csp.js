@@ -39,7 +39,7 @@ function setCodesyAppender (domain) {
 };
 
 chrome.storage.local.get(null,
-    ({domain})=>{
+    ({domain = "https://codesy.io" })=>{
         if (domain) setCodesyAppender(domain);
     }
 );
