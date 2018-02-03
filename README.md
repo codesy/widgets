@@ -46,8 +46,8 @@ The codesy.io widget is an add-on for Firefox, Chrome, and Opera that adds codes
 * **build-chrome-file**: create zip for chrome dev in the chrome.source directory with dev settings
 
 #### build-{browser}-directory:
-* **build-firefox-directory**: create firefox dev directroy in the firefox.source directory with dev settings
-* **build-chrome-directory**: create chrome dev directroy in the chrome.source directory with dev settings
+* **build-firefox-directory**: create firefox dev directory in the firefox.source directory with dev settings
+* **build-chrome-directory**: create chrome dev directory in the chrome.source directory with dev settings
 
 #### workon-{browser}-directory or workon-{browser}-directory:
 watches extension files and rebuilds

@@ -1,7 +1,7 @@
 {
     "name": "codesy.io",
     "author": "founders@codesy.io",
-    "description": "codesy is a pay-what-you-want market for the open source community to encourage coders to fix important bugs.",
+    "description": "Codesy is a platform for fixing and funding open source software.",
     "manifest_version": 2,
     "permissions": [
         "https://*.codesy.io/",
