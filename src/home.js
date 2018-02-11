@@ -10,8 +10,10 @@ codesy = {};
 codesy.storeDomain = function(domain) {
     return chrome.storage.local.get(null,
         function(data) {
-            data.domain = domain || "";
-            return chrome.storage.local.set(data);
+            if (data.domain != domain ){
+                data.domain = domain || "";
+                return chrome.storage.local.set(data);
+            }
         }
     );
 };

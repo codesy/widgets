@@ -54,7 +54,7 @@ function wait_for_page_change  ( {url, id} ) {
 
 function get_codesy_domain () {
     return new Promise((resolve) => {
-        const resolve_domain = ({domain = "https://codesy.io"}) => resolve(domain)
+        const resolve_domain = ({domain = "https://www.codesy.io"}) => resolve(domain)
         chrome.storage.local.get(null, resolve_domain)
     });
 }
