@@ -1,5 +1,4 @@
 function makeCspAppender (domain='') {
-    domain = `${domain} https://github.com`
     const csp_names = ['CONTENT-SECURITY-POLICY','X-WEBKIT-CSP']
     const name_finder = (name) => (csp_name) => csp_name === name.toUpperCase()
     const if_csp = (name) => csp_names.find(name_finder(name)) ? true : false
