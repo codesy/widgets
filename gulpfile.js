@@ -11,7 +11,7 @@ const headerComment = require('gulp-header-comment');
 // Settings for building packages
 const settings = {
     name: 'codesy',
-    version: '0.0.0.9',
+    version: '0.0.1.0',
     source: './src',
     destination: './dist',
     static_files: {
