@@ -1,3 +1,7 @@
+
+// TODO: consolated csp.js and on_install.js into single background.js file
+
+// functions for refreshing tabs after an extension install:
 function find_these (query) {
     return new Promise((resolve)=>{
         if (Object.keys(query).includes('title')) {
@@ -55,3 +59,39 @@ function when_installed ({reason}) {
 }
 
 chrome.runtime.onInstalled.addListener(when_installed);
+
+// functions for handling auth changes:
+
+const auth_header ='x-codesy-auth-changed'
+const has_auth_header = ({name})=>{ return name.startsWith(auth_header) }
+
+function check_codesy_auth ({responseHeaders}) {
+    auth_headers = responseHeaders.filter(has_auth_header)
+    if ( auth_headers.length > 0 ) {
+        find_these( {url: "*://*.github.com/*"} )
+            .then(reload_them)
+    }
+}
+
+function listen_for_auth (domain) {
+    const filter = {urls:[`${domain}/*`], types:["main_frame"]};
+    const options = ["responseHeaders"]
+    if (chrome.webRequest.onHeadersReceived.hasListener(check_codesy_auth)) {
+        chrome.webRequest.onHeadersReceived.removeListener(check_codesy_auth);
+    }
+    chrome.webRequest.onHeadersReceived.addListener(
+        check_codesy_auth, filter, options
+    );
+};
+
+chrome.storage.local.get(null,
+    ({domain = "https://www.codesy.io" })=>{
+        if (domain) listen_for_auth(domain);
+    }
+);
+
+chrome.storage.onChanged.addListener(
+    ({domain: {newValue: domain} }, namespace)=>{
+        if (domain) listen_for_auth(domain);
+    }
+);
