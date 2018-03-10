@@ -63,7 +63,7 @@ chrome.runtime.onInstalled.addListener(when_installed);
 // functions for handling auth changes:
 
 const auth_header ='x-codesy-auth-changed'
-const has_auth_header = ({name})=>{ return name.startsWith(auth_header) }
+const has_auth_header = ({name})=>{ return name.toLowerCase().startsWith(auth_header) }
 
 function check_codesy_auth ({responseHeaders}) {
     auth_headers = responseHeaders.filter(has_auth_header)
